@@ -3,5 +3,15 @@
     "date": "—",
     "categories": [],
     "players": 0
+  },
+  "rapport_07052026.html": {
+    "date": "07/05/2026",
+    "categories": [
+      "FFF",
+      "N3",
+      "U17",
+      "U19"
+    ],
+    "players": 7
   }
 }
