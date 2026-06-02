@@ -440,10 +440,10 @@ function closeConfirm(){
 }
 async function confirmDelete(){
   if(!deleteTarget) return;
+  const target = {name: deleteTarget.name, sha: deleteTarget.sha};
   closeConfirm();
-  // Tenter la suppression du fichier — si fichier inexistant, on nettoie quand même le manifest
-  await ghDelete(`rapports/${deleteTarget.name}`, deleteTarget.sha);
-  delete manifest[deleteTarget.name];
+  await ghDelete(`rapports/${target.name}`, target.sha);
+  delete manifest[target.name];
   await saveManifest();
   await loadManifest();
 }
