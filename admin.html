@@ -441,14 +441,11 @@ function closeConfirm(){
 async function confirmDelete(){
   if(!deleteTarget) return;
   closeConfirm();
-  const ok = await ghDelete(`rapports/${deleteTarget.name}`, deleteTarget.sha);
-  if(ok){
-    delete manifest[deleteTarget.name];
-    await saveManifest();
-    await loadManifest();
-  } else {
-    alert('Erreur lors de la suppression.');
-  }
+  // Tenter la suppression du fichier — si fichier inexistant, on nettoie quand même le manifest
+  await ghDelete(`rapports/${deleteTarget.name}`, deleteTarget.sha);
+  delete manifest[deleteTarget.name];
+  await saveManifest();
+  await loadManifest();
 }
 </script>
 </body>
