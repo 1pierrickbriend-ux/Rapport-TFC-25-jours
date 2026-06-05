@@ -220,5 +220,15 @@
     "date": "05/06/2026",
     "fichier": "Bilan_Naziahry_Siaka.html",
     "type": "bilan"
+  },
+  "rapport_12052026.html": {
+    "date": "12/05/2026",
+    "categories": [
+      "FFF",
+      "N3",
+      "U17",
+      "U19"
+    ],
+    "players": 7
   }
 }
