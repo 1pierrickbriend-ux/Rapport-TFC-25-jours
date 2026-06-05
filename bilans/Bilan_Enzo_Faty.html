@@ -317,7 +317,7 @@ tr:nth-child(even) td{background:rgba(255,255,255,0.03)}
 <circle cx="270" cy="232" r="5" fill="#EF4444"/>
 <text x="279" y="236" font-size="9" fill="#EF4444" font-family="system-ui">Alerte</text>
 </svg>
-    <div id="frise-popup" style="display:none;position:absolute;background:#2D2660;color:white;padding:8px 14px;border-radius:8px;font-size:.8rem;font-weight:600;border:1.5px solid #C9A84C;z-index:10;pointer-events:none;max-width:260px;line-height:1.4;box-shadow:0 4px 16px rgba(0,0,0,.4)"></div>
+
   </div>
 
   <!-- ROW 5 : TEMPS DE JEU -->
@@ -398,16 +398,17 @@ function showPopup(e, msg){
   if(!pop) return;
   pop.textContent = msg;
   pop.style.display = 'block';
-  var card = pop.parentElement;
-  var rect = card.getBoundingClientRect();
-  var x = e.clientX - rect.left + 10;
-  var y = e.clientY - rect.top - 40;
-  if(x + 270 > card.offsetWidth) x = e.clientX - rect.left - 270;
-  pop.style.left = Math.max(0,x) + 'px';
-  pop.style.top  = Math.max(0,y) + 'px';
-  setTimeout(function(){ document.addEventListener('click', hidePopup, {once:true}); }, 10);
+  var px = (e.pageX || e.clientX); var py = (e.pageY || e.clientY);
+  var x = px + 12; var y = py - 42;
+  if(x + 290 > window.innerWidth) x = px - 295;
+  if(y < 8) y = py + 18;
+  pop.style.left = Math.max(8,x) + 'px';
+  pop.style.top  = Math.max(8,y) + 'px';
+  setTimeout(function(){ document.addEventListener('click', hidePopup, {once:true}); }, 50);
 }
 function hidePopup(){ var pop=document.getElementById('frise-popup'); if(pop) pop.style.display='none'; }
 </script>
+<div id="frise-popup" style="display:none;position:fixed;background:#2D2660;color:white;padding:9px 16px;border-radius:10px;font-size:.82rem;font-weight:600;border:2px solid #C9A84C;z-index:9999;pointer-events:none;max-width:300px;line-height:1.5;box-shadow:0 6px 24px rgba(0,0,0,.5)"></div>
+
 </body>
 </html>
