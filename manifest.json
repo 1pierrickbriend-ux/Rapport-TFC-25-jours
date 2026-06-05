@@ -68,5 +68,14 @@
     "date": "",
     "fichier": "Bilan_Enzo_Faty.html",
     "type": "bilan"
+  },
+  "bilan_Bilan_Sacha_Vivent.html": {
+    "joueur": "Sacha Vivent",
+    "cat": "",
+    "statut": "",
+    "rri": "",
+    "date": "",
+    "fichier": "Bilan_Sacha_Vivent.html",
+    "type": "bilan"
   }
 }
