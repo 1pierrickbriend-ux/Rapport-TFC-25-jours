@@ -89,6 +89,10 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);min-height
   <span class="header-badge">🔧 Admin</span>
 </div>
 
+<div style="background:white;border-bottom:2px solid #E5E3F5;padding:0 28px;display:flex;gap:0">
+  <button onclick="showTab('rapports')" id="tab-rapports" style="padding:12px 24px;border:none;background:none;cursor:pointer;font-weight:700;font-size:.85rem;color:#2D2660;border-bottom:3px solid #2D2660">📋 Rapports collectifs</button>
+  <button onclick="showTab('bilans')" id="tab-bilans" style="padding:12px 24px;border:none;background:none;cursor:pointer;font-weight:600;font-size:.85rem;color:#888;border-bottom:3px solid transparent">👤 Bilans individuels</button>
+</div>
 <div class="main">
 
   <!-- CONFIG TOKEN -->
@@ -108,6 +112,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);min-height
     <div class="token-status" id="token-status"></div>
   </div>
 
+  <div id="section-rapports">
   <!-- UPLOAD NOUVEAU RAPPORT -->
   <div class="card">
     <div class="card-title">📤 Publier un nouveau rapport</div>
@@ -139,6 +144,38 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);min-height
     <div class="card-title">📁 Rapports en ligne</div>
     <div id="reports-list"><div class="empty-list">Chargement...</div></div>
   </div>
+  </div><!-- fin section-rapports -->
+
+  <!-- SECTION BILANS -->
+  <div id="section-bilans" style="display:none">
+  <div class="card">
+    <div class="card-title">👤 Publier un bilan individuel</div>
+    <div class="drop-zone" id="drop-zone-bilan" onclick="document.getElementById('file-input-bilan').click()">
+      <input type="file" id="file-input-bilan" accept=".html" onchange="handleBilan(this.files[0])">
+      <div class="drop-zone-icon">📂</div>
+      <div class="drop-zone-text">Glissez le bilan HTML d'un joueur ici</div>
+      <div class="drop-zone-sub">Fichier Bilan_NomJoueur.html généré par votre script</div>
+    </div>
+    <div class="preview-card" id="preview-bilan-card">
+      <div class="preview-row">
+        <div style="font-size:2rem">👤</div>
+        <div class="preview-info">
+          <div class="preview-date" id="preview-bilan-nom">—</div>
+          <div class="preview-meta" id="preview-bilan-meta">—</div>
+          <div class="preview-cats" id="preview-bilan-cats"></div>
+        </div>
+      </div>
+      <div class="publish-row">
+        <button class="btn btn-primary" id="publish-bilan-btn" onclick="publishBilan()">✓ Publier le bilan</button>
+        <span class="publish-status" id="publish-bilan-status"></span>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">📁 Bilans en ligne</div>
+    <div id="bilans-list"><div class="empty-list">Chargement...</div></div>
+  </div>
+  </div><!-- fin section-bilans -->
 
 </div>
 
@@ -446,6 +483,98 @@ async function confirmDelete(){
   delete manifest[target.name];
   await saveManifest();
   await loadManifest();
+}
+
+// ── ONGLETS ────────────────────────────────────────────────────────────────
+function showTab(tab){
+  document.getElementById('section-rapports').style.display = tab==='rapports' ? '' : 'none';
+  document.getElementById('section-bilans').style.display   = tab==='bilans'   ? '' : 'none';
+  var tr=document.getElementById('tab-rapports'), tb=document.getElementById('tab-bilans');
+  tr.style.color=tab==='rapports'?'#2D2660':'#888'; tr.style.borderBottom=tab==='rapports'?'3px solid #2D2660':'3px solid transparent'; tr.style.fontWeight=tab==='rapports'?'700':'600';
+  tb.style.color=tab==='bilans'?'#2D2660':'#888';   tb.style.borderBottom=tab==='bilans'?'3px solid #2D2660':'3px solid transparent';   tb.style.fontWeight=tab==='bilans'?'700':'600';
+  if(tab==='bilans') loadBilans();
+}
+document.addEventListener('DOMContentLoaded', function(){
+  var dz=document.getElementById('drop-zone-bilan');
+  if(!dz) return;
+  dz.addEventListener('dragover',function(e){e.preventDefault();dz.classList.add('drag-over');});
+  dz.addEventListener('dragleave',function(){dz.classList.remove('drag-over');});
+  dz.addEventListener('drop',function(e){e.preventDefault();dz.classList.remove('drag-over');var f=e.dataTransfer.files[0];if(f&&f.name.endsWith('.html'))handleBilan(f);});
+});
+
+var currentBilanFile=null, currentBilanMeta=null;
+
+function handleBilan(file){
+  if(!file) return;
+  currentBilanFile=file;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    var html=e.target.result;
+    function getMeta(name){var m=html.match(new RegExp('name="'+name+'"\s+content="([^"]+)"'));return m?m[1]:'';}
+    var joueur=getMeta('tfc-joueur')||file.name.replace('Bilan_','').replace('.html','').replace(/_/g,' ');
+    var cat=getMeta('tfc-categorie')||'', statut=getMeta('tfc-statut')||'', rri=getMeta('tfc-rri')||'', date=getMeta('tfc-date')||'';
+    currentBilanMeta={joueur:joueur,cat:cat,statut:statut,rri:rri,date:date};
+    document.getElementById('preview-bilan-nom').textContent=joueur;
+    document.getElementById('preview-bilan-meta').textContent=[cat,statut?'RRI '+rri+'/100':'',date].filter(Boolean).join(' · ');
+    var cols={'PRET':'#22C55E','SURVEILLANCE':'#FB923C','VIGILANCE':'#EF4444'};
+    var st2=statut.replace('É','E').replace('Ê','E');
+    document.getElementById('preview-bilan-cats').innerHTML=statut?'<span class="cat-badge" style="background:'+(cols[st2]||'#6B5CA5')+'">'+statut+'</span>':'';
+    document.getElementById('preview-bilan-card').style.display='block';
+    document.getElementById('publish-bilan-status').textContent='';
+  };
+  reader.readAsText(file);
+}
+
+async function publishBilan(){
+  if(!currentBilanFile||!currentBilanMeta) return;
+  if(!getToken()){alert('Configurez d\'abord votre token GitHub.');return;}
+  var st=document.getElementById('publish-bilan-status'), btn=document.getElementById('publish-bilan-btn');
+  btn.disabled=true; st.className='publish-status loading'; st.textContent='Publication en cours...';
+  try{
+    var nomFichier='Bilan_'+currentBilanMeta.joueur.replace(/ /g,'_')+'.html';
+    var filename='bilans/'+nomFichier;
+    var arrayBuffer=await currentBilanFile.arrayBuffer();
+    var existing=await ghGet(filename);
+    var sha=existing?existing.sha:null;
+    var ok=await ghPutBinary(filename,arrayBuffer,sha);
+    if(!ok) throw new Error('Echec upload bilan');
+    manifest['bilan_'+nomFichier]={joueur:currentBilanMeta.joueur,cat:currentBilanMeta.cat,statut:currentBilanMeta.statut,rri:currentBilanMeta.rri,date:currentBilanMeta.date,fichier:nomFichier,type:'bilan'};
+    await saveManifest();
+    st.className='publish-status ok'; st.textContent='Bilan publie ! Disponible dans 1-2 min.';
+    await loadBilans();
+  } catch(e){ st.className='publish-status err'; st.textContent='Erreur : '+e.message; }
+  btn.disabled=false;
+}
+
+async function loadBilans(){
+  var list=document.getElementById('bilans-list');
+  if(!list) return;
+  list.innerHTML='<div class="empty-list">Chargement...</div>';
+  try{
+    var files=await ghGet('bilans');
+    if(!files||!files.length){list.innerHTML='<div class="empty-list">Aucun bilan publie.</div>';return;}
+    var htmlFiles=files.filter(function(f){return f.name.endsWith('.html');}).sort(function(a,b){return a.name.localeCompare(b.name);});
+    if(!htmlFiles.length){list.innerHTML='<div class="empty-list">Aucun bilan publie.</div>';return;}
+    list.innerHTML='';
+    var cols2={'PRET':'#22C55E','SURVEILLANCE':'#FB923C','VIGILANCE':'#EF4444'};
+    htmlFiles.forEach(function(file){
+      var key='bilan_'+file.name, info=manifest[key]||{};
+      var joueur=info.joueur||file.name.replace('Bilan_','').replace('.html','').replace(/_/g,' ');
+      var statut=info.statut||'', cat=info.cat||'', rri=info.rri||'';
+      var url=SITE+'/bilans/'+file.name;
+      var st2b=statut.replace('É','E').replace('Ê','E');
+      var col2=cols2[st2b]||'#6B5CA5';
+      var div=document.createElement('div'); div.className='report-item';
+      div.innerHTML='<div style="flex:1;min-width:0"><div style="display:flex;align-items:center;gap:8px"><span class="report-item-date">'+joueur+'</span>'+(statut?'<span class="latest-tag" style="background:'+col2+'">'+statut+'</span>':'')+'</div><div class="report-item-meta">'+[cat,rri?'RRI '+rri+'/100':''].filter(Boolean).join(' · ')+'</div></div><div class="item-actions"><a class="btn-view" href="'+url+'" target="_blank">Voir</a><button class="btn-del" onclick="askDeleteBilan(\''+file.name+'\',\''+file.sha+'\',\''+joueur+'\')">Supprimer</button></div>';
+      list.appendChild(div);
+    });
+  } catch(e){ list.innerHTML='<div class="empty-list">Erreur : '+e.message+'</div>'; }
+}
+
+function askDeleteBilan(name,sha,joueur){
+  deleteTarget={name:name,sha:sha,isBilan:true};
+  document.getElementById('confirm-msg').textContent='Supprimer le bilan de '+joueur+' ? Cette action est irréversible.';
+  document.getElementById('confirm-overlay').classList.add('active');
 }
 </script>
 </body>
