@@ -77,5 +77,14 @@
     "date": "",
     "fichier": "Bilan_Sacha_Vivent.html",
     "type": "bilan"
+  },
+  "bilan_Bilan_Malamini_Dansoko.html": {
+    "joueur": "Malamini Dansoko",
+    "cat": "",
+    "statut": "",
+    "rri": "",
+    "date": "",
+    "fichier": "Bilan_Malamini_Dansoko.html",
+    "type": "bilan"
   }
 }
