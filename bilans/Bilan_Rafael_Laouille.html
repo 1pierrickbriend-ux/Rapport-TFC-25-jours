@@ -242,8 +242,8 @@ tr:nth-child(even) td{background:rgba(255,255,255,0.03)}
   </div>
 
   <!-- ROW 4 : TIMELINE -->
-  <div class="card section-full">
-    <div class="card-title">■ Frise chronologique — Phases · Douleur · Alertes · Matchs</div>
+  <div class="card section-full" style="position:relative">
+    <div class="card-title">■ Frise chronologique — cliquez sur un point pour le détail</div>
     <svg viewBox="0 0 860 240" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block">
 <rect width="860" height="240" fill="#1E1A50" rx="8"/>
 <rect x="382" y="16" width="121" height="179" fill="rgba(100,80,160,0.3)" rx="3"/>
@@ -272,19 +272,17 @@ tr:nth-child(even) td{background:rgba(255,255,255,0.03)}
 <line x1="382" y1="12" x2="382" y2="200" stroke="#D4AF37" stroke-width="1.5" stroke-dasharray="5,3"/>
 <text x="382" y="211" text-anchor="middle" font-size="8" fill="#D4AF37" font-family="system-ui" font-weight="700">1er match 15/03</text>
 <path d="M 451,195 L 538,195 L 590,195 L 659,195 L 711,195 L 781,195 L 833,195" fill="none" stroke="#4ADE80" stroke-width="2.5"/>
-<g class="pt-douleur" style="cursor:pointer"><circle cx="451" cy="195" r="5" fill="#22C55E" stroke="#1E1A50" stroke-width="1.5"/><title>19/03 — Douleur : 0/10</title></g>
-<g class="pt-douleur" style="cursor:pointer"><circle cx="538" cy="195" r="5" fill="#22C55E" stroke="#1E1A50" stroke-width="1.5"/><title>24/03 — Douleur : 0/10</title></g>
-<g class="pt-douleur" style="cursor:pointer"><circle cx="590" cy="195" r="5" fill="#22C55E" stroke="#1E1A50" stroke-width="1.5"/><title>27/03 — Douleur : 0/10</title></g>
-<g class="pt-douleur" style="cursor:pointer"><circle cx="659" cy="195" r="5" fill="#22C55E" stroke="#1E1A50" stroke-width="1.5"/><title>31/03 — Douleur : 0/10</title></g>
-<g class="pt-douleur" style="cursor:pointer"><circle cx="711" cy="195" r="5" fill="#22C55E" stroke="#1E1A50" stroke-width="1.5"/><title>03/04 — Douleur : 0/10</title></g>
-<g class="pt-douleur" style="cursor:pointer"><circle cx="781" cy="195" r="5" fill="#22C55E" stroke="#1E1A50" stroke-width="1.5"/><title>07/04 — Douleur : 0/10</title></g>
-<g class="pt-douleur" style="cursor:pointer"><circle cx="833" cy="195" r="5" fill="#22C55E" stroke="#1E1A50" stroke-width="1.5"/><title>10/04 — Douleur : 0/10</title></g>
-<g style="cursor:pointer"><polygon points="382,190 376,200 382,209 388,200" fill="#D4AF37" stroke="#1E1A50" stroke-width="1"/>
+<g onclick="showPopup(event,'19/03 — Douleur : 0/10')" style="cursor:pointer"><circle cx="451" cy="195" r="7" fill="#22C55E" stroke="#1E1A50" stroke-width="1.5" opacity="0.9"/></g>
+<g onclick="showPopup(event,'24/03 — Douleur : 0/10')" style="cursor:pointer"><circle cx="538" cy="195" r="7" fill="#22C55E" stroke="#1E1A50" stroke-width="1.5" opacity="0.9"/></g>
+<g onclick="showPopup(event,'27/03 — Douleur : 0/10')" style="cursor:pointer"><circle cx="590" cy="195" r="7" fill="#22C55E" stroke="#1E1A50" stroke-width="1.5" opacity="0.9"/></g>
+<g onclick="showPopup(event,'31/03 — Douleur : 0/10')" style="cursor:pointer"><circle cx="659" cy="195" r="7" fill="#22C55E" stroke="#1E1A50" stroke-width="1.5" opacity="0.9"/></g>
+<g onclick="showPopup(event,'03/04 — Douleur : 0/10')" style="cursor:pointer"><circle cx="711" cy="195" r="7" fill="#22C55E" stroke="#1E1A50" stroke-width="1.5" opacity="0.9"/></g>
+<g onclick="showPopup(event,'07/04 — Douleur : 0/10')" style="cursor:pointer"><circle cx="781" cy="195" r="7" fill="#22C55E" stroke="#1E1A50" stroke-width="1.5" opacity="0.9"/></g>
+<g onclick="showPopup(event,'10/04 — Douleur : 0/10')" style="cursor:pointer"><circle cx="833" cy="195" r="7" fill="#22C55E" stroke="#1E1A50" stroke-width="1.5" opacity="0.9"/></g>
+<g onclick="showPopup(event,'Match 15/03/2026 — Agde — 6'')" style="cursor:pointer"><polygon points="382,189 375,200 382,210 389,200" fill="#D4AF37" stroke="#1E1A50" stroke-width="1"/></g>
 <text x="382" y="221" text-anchor="middle" font-size="7" fill="#D4AF37" font-family="system-ui">Agde 6'</text>
-<title>Match : Agde — 6'</title></g>
-<g style="cursor:pointer"><polygon points="486,190 480,200 486,209 492,200" fill="#D4AF37" stroke="#1E1A50" stroke-width="1"/>
+<g onclick="showPopup(event,'Match 21/03/2026 — Villenave — 30'')" style="cursor:pointer"><polygon points="486,189 479,200 486,210 493,200" fill="#D4AF37" stroke="#1E1A50" stroke-width="1"/></g>
 <text x="486" y="221" text-anchor="middle" font-size="7" fill="#D4AF37" font-family="system-ui">Villenav 30'</text>
-<title>Match : Villenave — 30'</title></g>
 <circle cx="35" cy="232" r="5" fill="#4ADE80"/>
 <text x="44" y="236" font-size="9" fill="#4ADE80" font-family="system-ui">Douleur</text>
 <polygon points="110,228 106,235 114,235" fill="#FB923C"/>
@@ -294,6 +292,7 @@ tr:nth-child(even) td{background:rgba(255,255,255,0.03)}
 <circle cx="270" cy="232" r="5" fill="#EF4444"/>
 <text x="279" y="236" font-size="9" fill="#EF4444" font-family="system-ui">Alerte</text>
 </svg>
+
   </div>
 
   <!-- ROW 5 : TEMPS DE JEU -->
@@ -344,6 +343,23 @@ function toggle(id){
       ? btn.textContent.replace('▶','▼')
       : btn.textContent.replace('▼','▶');
 }
+function showPopup(e, msg){
+  e.stopPropagation();
+  var pop = document.getElementById('frise-popup');
+  if(!pop) return;
+  pop.textContent = msg;
+  pop.style.display = 'block';
+  var px = (e.pageX || e.clientX); var py = (e.pageY || e.clientY);
+  var x = px + 12; var y = py - 42;
+  if(x + 290 > window.innerWidth) x = px - 295;
+  if(y < 8) y = py + 18;
+  pop.style.left = Math.max(8,x) + 'px';
+  pop.style.top  = Math.max(8,y) + 'px';
+  setTimeout(function(){ document.addEventListener('click', hidePopup, {once:true}); }, 50);
+}
+function hidePopup(){ var pop=document.getElementById('frise-popup'); if(pop) pop.style.display='none'; }
 </script>
+<div id="frise-popup" style="display:none;position:fixed;background:#2D2660;color:white;padding:9px 16px;border-radius:10px;font-size:.82rem;font-weight:600;border:2px solid #C9A84C;z-index:9999;pointer-events:none;max-width:300px;line-height:1.5;box-shadow:0 6px 24px rgba(0,0,0,.5)"></div>
+
 </body>
 </html>
