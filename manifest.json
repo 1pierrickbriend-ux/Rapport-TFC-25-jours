@@ -68,5 +68,14 @@
     "date": "",
     "fichier": "Bilan_Matthieu_De_Souza.html",
     "type": "bilan"
+  },
+  "bilan_Bilan_Rafael_Laouille.html": {
+    "joueur": "Rafael Laouille",
+    "cat": "",
+    "statut": "",
+    "rri": "",
+    "date": "",
+    "fichier": "Bilan_Rafael_Laouille.html",
+    "type": "bilan"
   }
 }
