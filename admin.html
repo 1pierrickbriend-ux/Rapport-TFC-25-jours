@@ -477,12 +477,15 @@ function closeConfirm(){
 }
 async function confirmDelete(){
   if(!deleteTarget) return;
-  const target = {name: deleteTarget.name, sha: deleteTarget.sha};
+  const target = {name: deleteTarget.name, sha: deleteTarget.sha, isBilan: deleteTarget.isBilan};
   closeConfirm();
-  await ghDelete(`rapports/${target.name}`, target.sha);
-  delete manifest[target.name];
+  const path = target.isBilan ? 'bilans/' + target.name : 'rapports/' + target.name;
+  const ok = await ghDelete(path, target.sha);
+  if(!ok){ alert('Erreur lors de la suppression. Vérifiez votre token.'); return; }
+  const key = target.isBilan ? 'bilan_' + target.name : target.name;
+  delete manifest[key];
   await saveManifest();
-  await loadManifest();
+  if(target.isBilan) await loadBilans(); else await loadManifest();
 }
 
 // ── ONGLETS ────────────────────────────────────────────────────────────────
