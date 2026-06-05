@@ -217,8 +217,8 @@ tr:nth-child(even) td{background:rgba(255,255,255,0.03)}
   </div>
 
   <!-- ROW 4 : TIMELINE -->
-  <div class="card section-full">
-    <div class="card-title">■ Frise chronologique — Phases · Douleur · Alertes · Matchs</div>
+  <div class="card section-full" style="position:relative">
+    <div class="card-title">■ Frise chronologique — cliquez sur un point pour le détail</div>
     <svg viewBox="0 0 860 240" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block">
 <rect width="860" height="240" fill="#1E1A50" rx="8"/>
 <rect x="162" y="16" width="178" height="179" fill="rgba(100,80,160,0.3)" rx="3"/>
@@ -247,31 +247,26 @@ tr:nth-child(even) td{background:rgba(255,255,255,0.03)}
 <line x1="162" y1="12" x2="162" y2="200" stroke="#D4AF37" stroke-width="1.5" stroke-dasharray="5,3"/>
 <text x="162" y="211" text-anchor="middle" font-size="8" fill="#D4AF37" font-family="system-ui" font-weight="700">1er match 10/05</text>
 <path d="M 35,195 L 86,195 L 213,195 L 468,195 L 595,195 L 748,195 L 825,195" fill="none" stroke="#4ADE80" stroke-width="2.5"/>
-<g class="pt-douleur" style="cursor:pointer"><circle cx="35" cy="195" r="5" fill="#22C55E" stroke="#1E1A50" stroke-width="1.5"/><title>05/05 — Douleur : 0/10</title></g>
-<g class="pt-douleur" style="cursor:pointer"><circle cx="86" cy="195" r="5" fill="#22C55E" stroke="#1E1A50" stroke-width="1.5"/><title>07/05 — Douleur : 0/10</title></g>
-<g class="pt-douleur" style="cursor:pointer"><circle cx="213" cy="195" r="5" fill="#22C55E" stroke="#1E1A50" stroke-width="1.5"/><title>12/05 — Douleur : 0/10</title></g>
-<g class="pt-douleur" style="cursor:pointer"><circle cx="468" cy="195" r="5" fill="#22C55E" stroke="#1E1A50" stroke-width="1.5"/><title>22/05 — Douleur : 0/10</title></g>
-<g class="pt-douleur" style="cursor:pointer"><circle cx="595" cy="195" r="5" fill="#22C55E" stroke="#1E1A50" stroke-width="1.5"/><title>27/05 — Douleur : 0/10</title></g>
-<g class="pt-douleur" style="cursor:pointer"><circle cx="748" cy="195" r="5" fill="#22C55E" stroke="#1E1A50" stroke-width="1.5"/><title>02/06 — Douleur : 0/10</title></g>
-<g class="pt-douleur" style="cursor:pointer"><circle cx="825" cy="195" r="5" fill="#22C55E" stroke="#1E1A50" stroke-width="1.5"/><title>05/06 — Douleur : 0/10</title></g>
+<g onclick="showPopup(event,'05/05 — Douleur : 0/10')" style="cursor:pointer"><circle cx="35" cy="195" r="7" fill="#22C55E" stroke="#1E1A50" stroke-width="1.5" opacity="0.9"/></g>
+<g onclick="showPopup(event,'07/05 — Douleur : 0/10')" style="cursor:pointer"><circle cx="86" cy="195" r="7" fill="#22C55E" stroke="#1E1A50" stroke-width="1.5" opacity="0.9"/></g>
+<g onclick="showPopup(event,'12/05 — Douleur : 0/10')" style="cursor:pointer"><circle cx="213" cy="195" r="7" fill="#22C55E" stroke="#1E1A50" stroke-width="1.5" opacity="0.9"/></g>
+<g onclick="showPopup(event,'22/05 — Douleur : 0/10')" style="cursor:pointer"><circle cx="468" cy="195" r="7" fill="#22C55E" stroke="#1E1A50" stroke-width="1.5" opacity="0.9"/></g>
+<g onclick="showPopup(event,'27/05 — Douleur : 0/10')" style="cursor:pointer"><circle cx="595" cy="195" r="7" fill="#22C55E" stroke="#1E1A50" stroke-width="1.5" opacity="0.9"/></g>
+<g onclick="showPopup(event,'02/06 — Douleur : 0/10')" style="cursor:pointer"><circle cx="748" cy="195" r="7" fill="#22C55E" stroke="#1E1A50" stroke-width="1.5" opacity="0.9"/></g>
+<g onclick="showPopup(event,'05/06 — Douleur : 0/10')" style="cursor:pointer"><circle cx="825" cy="195" r="7" fill="#22C55E" stroke="#1E1A50" stroke-width="1.5" opacity="0.9"/></g>
 <path d="M 468,150 L 595,165" fill="none" stroke="#FB923C" stroke-width="2" stroke-dasharray="7,4"/>
-<g style="cursor:pointer"><polygon points="468,145 464,153 472,153" fill="#FB923C" stroke="#1E1A50" stroke-width="1"/><title>22/05 — Courbatures : 3/10</title></g>
-<g style="cursor:pointer"><polygon points="595,160 591,168 599,168" fill="#FB923C" stroke="#1E1A50" stroke-width="1"/><title>27/05 — Courbatures : 2/10</title></g>
-<g style="cursor:pointer"><polygon points="162,190 156,200 162,209 168,200" fill="#D4AF37" stroke="#1E1A50" stroke-width="1"/>
+<g onclick="showPopup(event,'22/05 — Courbatures : 3/10')" style="cursor:pointer"><polygon points="468,144 463,154 473,154" fill="#FB923C" stroke="#1E1A50" stroke-width="1"/></g>
+<g onclick="showPopup(event,'27/05 — Courbatures : 2/10')" style="cursor:pointer"><polygon points="595,159 590,169 600,169" fill="#FB923C" stroke="#1E1A50" stroke-width="1"/></g>
+<g onclick="showPopup(event,'Match 10/05/2026 — Air bel — 35'')" style="cursor:pointer"><polygon points="162,189 155,200 162,210 169,200" fill="#D4AF37" stroke="#1E1A50" stroke-width="1"/></g>
 <text x="162" y="221" text-anchor="middle" font-size="7" fill="#D4AF37" font-family="system-ui">Air bel 35'</text>
-<title>Match : Air bel — 35'</title></g>
-<g style="cursor:pointer"><polygon points="442,190 436,200 442,209 448,200" fill="#D4AF37" stroke="#1E1A50" stroke-width="1"/>
+<g onclick="showPopup(event,'Match 21/05/2026 — Orleans — 60'')" style="cursor:pointer"><polygon points="442,189 436,200 442,210 450,200" fill="#D4AF37" stroke="#1E1A50" stroke-width="1"/></g>
 <text x="442" y="221" text-anchor="middle" font-size="7" fill="#D4AF37" font-family="system-ui">Orleans 60'</text>
-<title>Match : Orleans — 60'</title></g>
-<g style="cursor:pointer"><polygon points="570,190 564,200 570,209 576,200" fill="#D4AF37" stroke="#1E1A50" stroke-width="1"/>
+<g onclick="showPopup(event,'Match 26/05/2026 — Italie — 90'')" style="cursor:pointer"><polygon points="570,189 563,200 570,210 577,200" fill="#D4AF37" stroke="#1E1A50" stroke-width="1"/></g>
 <text x="570" y="221" text-anchor="middle" font-size="7" fill="#D4AF37" font-family="system-ui">Italie 90'</text>
-<title>Match : Italie — 90'</title></g>
-<g style="cursor:pointer"><polygon points="646,190 640,200 646,209 652,200" fill="#D4AF37" stroke="#1E1A50" stroke-width="1"/>
+<g onclick="showPopup(event,'Match 29/05/2026 — Danemark — 20'')" style="cursor:pointer"><polygon points="646,189 639,200 646,210 653,200" fill="#D4AF37" stroke="#1E1A50" stroke-width="1"/></g>
 <text x="646" y="221" text-anchor="middle" font-size="7" fill="#D4AF37" font-family="system-ui">Danemark 20'</text>
-<title>Match : Danemark — 20'</title></g>
-<g style="cursor:pointer"><polygon points="723,190 717,200 723,209 729,200" fill="#D4AF37" stroke="#1E1A50" stroke-width="1"/>
+<g onclick="showPopup(event,'Match 01/06/2026 — Montenegro — 60'')" style="cursor:pointer"><polygon points="723,189 716,200 723,210 730,200" fill="#D4AF37" stroke="#1E1A50" stroke-width="1"/></g>
 <text x="723" y="221" text-anchor="middle" font-size="7" fill="#D4AF37" font-family="system-ui">Monteneg 60'</text>
-<title>Match : Montenegro — 60'</title></g>
 <circle cx="35" cy="232" r="5" fill="#4ADE80"/>
 <text x="44" y="236" font-size="9" fill="#4ADE80" font-family="system-ui">Douleur</text>
 <polygon points="110,228 106,235 114,235" fill="#FB923C"/>
@@ -281,6 +276,7 @@ tr:nth-child(even) td{background:rgba(255,255,255,0.03)}
 <circle cx="270" cy="232" r="5" fill="#EF4444"/>
 <text x="279" y="236" font-size="9" fill="#EF4444" font-family="system-ui">Alerte</text>
 </svg>
+
   </div>
 
   <!-- ROW 5 : TEMPS DE JEU -->
@@ -355,6 +351,23 @@ function toggle(id){
       ? btn.textContent.replace('▶','▼')
       : btn.textContent.replace('▼','▶');
 }
+function showPopup(e, msg){
+  e.stopPropagation();
+  var pop = document.getElementById('frise-popup');
+  if(!pop) return;
+  pop.textContent = msg;
+  pop.style.display = 'block';
+  var px = (e.pageX || e.clientX); var py = (e.pageY || e.clientY);
+  var x = px + 12; var y = py - 42;
+  if(x + 290 > window.innerWidth) x = px - 295;
+  if(y < 8) y = py + 18;
+  pop.style.left = Math.max(8,x) + 'px';
+  pop.style.top  = Math.max(8,y) + 'px';
+  setTimeout(function(){ document.addEventListener('click', hidePopup, {once:true}); }, 50);
+}
+function hidePopup(){ var pop=document.getElementById('frise-popup'); if(pop) pop.style.display='none'; }
 </script>
+<div id="frise-popup" style="display:none;position:fixed;background:#2D2660;color:white;padding:9px 16px;border-radius:10px;font-size:.82rem;font-weight:600;border:2px solid #C9A84C;z-index:9999;pointer-events:none;max-width:300px;line-height:1.5;box-shadow:0 6px 24px rgba(0,0,0,.5)"></div>
+
 </body>
 </html>
