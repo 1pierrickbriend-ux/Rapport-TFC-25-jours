@@ -50,5 +50,14 @@
     "date": "",
     "fichier": "Bilan_Mahé_Angely.html",
     "type": "bilan"
+  },
+  "bilan_Bilan_Fred_Hebrard.html": {
+    "joueur": "Fred Hebrard",
+    "cat": "",
+    "statut": "",
+    "rri": "",
+    "date": "",
+    "fichier": "Bilan_Fred_Hebrard.html",
+    "type": "bilan"
   }
 }
