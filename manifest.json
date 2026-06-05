@@ -86,5 +86,14 @@
     "date": "",
     "fichier": "Bilan_Steeve_Delarue.html",
     "type": "bilan"
+  },
+  "bilan_Bilan_Thibo_Negre.html": {
+    "joueur": "Thibo Negre",
+    "cat": "",
+    "statut": "",
+    "rri": "",
+    "date": "",
+    "fichier": "Bilan_Thibo_Negre.html",
+    "type": "bilan"
   }
 }
