@@ -32,5 +32,14 @@
     "date": "—",
     "categories": [],
     "players": 0
+  },
+  "bilan_Bilan_Aymen_Amaouch.html": {
+    "joueur": "Aymen Amaouch",
+    "cat": "",
+    "statut": "",
+    "rri": "",
+    "date": "",
+    "fichier": "Bilan_Aymen_Amaouch.html",
+    "type": "bilan"
   }
 }
