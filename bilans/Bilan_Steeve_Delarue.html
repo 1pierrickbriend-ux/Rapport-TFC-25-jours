@@ -242,8 +242,8 @@ tr:nth-child(even) td{background:rgba(255,255,255,0.03)}
   </div>
 
   <!-- ROW 4 : TIMELINE -->
-  <div class="card section-full">
-    <div class="card-title">■ Frise chronologique — Phases · Douleur · Alertes · Matchs</div>
+  <div class="card section-full" style="position:relative">
+    <div class="card-title">■ Frise chronologique — cliquez sur un point pour le détail</div>
     <svg viewBox="0 0 860 240" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block">
 <rect width="860" height="240" fill="#1E1A50" rx="8"/>
 <rect x="140" y="16" width="184" height="179" fill="rgba(100,80,160,0.3)" rx="3"/>
@@ -271,30 +271,26 @@ tr:nth-child(even) td{background:rgba(255,255,255,0.03)}
 <line x1="35" y1="195" x2="850" y2="195" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
 <line x1="140" y1="12" x2="140" y2="200" stroke="#D4AF37" stroke-width="1.5" stroke-dasharray="5,3"/>
 <text x="140" y="211" text-anchor="middle" font-size="8" fill="#D4AF37" font-family="system-ui" font-weight="700">1er match 15/03</text>
-<g class="al-marker" style="cursor:pointer">
+<g onclick="showPopup(event,'Alerte ORANGE — 10/04/2026 : douleur courbature à 3/10 adducteur droit')" style="cursor:pointer">
 <line x1="824" y1="16" x2="824" y2="195" stroke="#FB923C" stroke-width="1" stroke-dasharray="3,2" opacity="0.7"/>
-<circle cx="824" cy="13" r="5" fill="#FB923C"/>
-<text x="824" y="16" text-anchor="middle" font-size="7" fill="white" font-family="system-ui" font-weight="700">!</text>
-<title>ORANGE — douleur courbature à 3/10 adducteur droi</title>
+<circle cx="824" cy="13" r="6" fill="#FB923C"/>
+<text x="824" y="17" text-anchor="middle" font-size="8" fill="white" font-family="system-ui" font-weight="700">!</text>
 </g>
 <path d="M 245,165 L 377,195 L 456,195 L 587,195 L 640,195 L 745,195 L 824,195" fill="none" stroke="#4ADE80" stroke-width="2.5"/>
-<g class="pt-douleur" style="cursor:pointer"><circle cx="245" cy="165" r="5" fill="#FB923C" stroke="#1E1A50" stroke-width="1.5"/><title>19/03 — Douleur : 2/10</title></g>
+<g onclick="showPopup(event,'19/03 — Douleur : 2/10')" style="cursor:pointer"><circle cx="245" cy="165" r="7" fill="#FB923C" stroke="#1E1A50" stroke-width="1.5" opacity="0.9"/></g>
 <text x="245" y="156" text-anchor="middle" font-size="8" fill="#FB923C" font-family="system-ui" font-weight="700">2</text>
-<g class="pt-douleur" style="cursor:pointer"><circle cx="377" cy="195" r="5" fill="#22C55E" stroke="#1E1A50" stroke-width="1.5"/><title>24/03 — Douleur : 0/10</title></g>
-<g class="pt-douleur" style="cursor:pointer"><circle cx="456" cy="195" r="5" fill="#22C55E" stroke="#1E1A50" stroke-width="1.5"/><title>27/03 — Douleur : 0/10</title></g>
-<g class="pt-douleur" style="cursor:pointer"><circle cx="587" cy="195" r="5" fill="#22C55E" stroke="#1E1A50" stroke-width="1.5"/><title>01/04 — Douleur : 0/10</title></g>
-<g class="pt-douleur" style="cursor:pointer"><circle cx="640" cy="195" r="5" fill="#22C55E" stroke="#1E1A50" stroke-width="1.5"/><title>03/04 — Douleur : 0/10</title></g>
-<g class="pt-douleur" style="cursor:pointer"><circle cx="745" cy="195" r="5" fill="#22C55E" stroke="#1E1A50" stroke-width="1.5"/><title>07/04 — Douleur : 0/10</title></g>
-<g class="pt-douleur" style="cursor:pointer"><circle cx="824" cy="195" r="5" fill="#22C55E" stroke="#1E1A50" stroke-width="1.5"/><title>10/04 — Douleur : 0/10</title></g>
-<g style="cursor:pointer"><polygon points="140,190 134,200 140,209 146,200" fill="#D4AF37" stroke="#1E1A50" stroke-width="1"/>
+<g onclick="showPopup(event,'24/03 — Douleur : 0/10')" style="cursor:pointer"><circle cx="377" cy="195" r="7" fill="#22C55E" stroke="#1E1A50" stroke-width="1.5" opacity="0.9"/></g>
+<g onclick="showPopup(event,'27/03 — Douleur : 0/10')" style="cursor:pointer"><circle cx="456" cy="195" r="7" fill="#22C55E" stroke="#1E1A50" stroke-width="1.5" opacity="0.9"/></g>
+<g onclick="showPopup(event,'01/04 — Douleur : 0/10')" style="cursor:pointer"><circle cx="587" cy="195" r="7" fill="#22C55E" stroke="#1E1A50" stroke-width="1.5" opacity="0.9"/></g>
+<g onclick="showPopup(event,'03/04 — Douleur : 0/10')" style="cursor:pointer"><circle cx="640" cy="195" r="7" fill="#22C55E" stroke="#1E1A50" stroke-width="1.5" opacity="0.9"/></g>
+<g onclick="showPopup(event,'07/04 — Douleur : 0/10')" style="cursor:pointer"><circle cx="745" cy="195" r="7" fill="#22C55E" stroke="#1E1A50" stroke-width="1.5" opacity="0.9"/></g>
+<g onclick="showPopup(event,'10/04 — Douleur : 0/10')" style="cursor:pointer"><circle cx="824" cy="195" r="7" fill="#22C55E" stroke="#1E1A50" stroke-width="1.5" opacity="0.9"/></g>
+<g onclick="showPopup(event,'Match 15/03/2026 — Gazelec_Ajaccio — 19'')" style="cursor:pointer"><polygon points="140,189 133,200 140,210 147,200" fill="#D4AF37" stroke="#1E1A50" stroke-width="1"/></g>
 <text x="140" y="221" text-anchor="middle" font-size="7" fill="#D4AF37" font-family="system-ui">Gazelec_ 19'</text>
-<title>Match : Gazelec_Ajaccio — 19'</title></g>
-<g style="cursor:pointer"><polygon points="324,190 318,200 324,209 330,200" fill="#D4AF37" stroke="#1E1A50" stroke-width="1"/>
+<g onclick="showPopup(event,'Match 22/03/2026 — Monaco — 20'')" style="cursor:pointer"><polygon points="324,189 317,200 324,210 331,200" fill="#D4AF37" stroke="#1E1A50" stroke-width="1"/></g>
 <text x="324" y="221" text-anchor="middle" font-size="7" fill="#D4AF37" font-family="system-ui">Monaco 20'</text>
-<title>Match : Monaco — 20'</title></g>
-<g style="cursor:pointer"><polygon points="508,190 502,200 508,209 514,200" fill="#D4AF37" stroke="#1E1A50" stroke-width="1"/>
+<g onclick="showPopup(event,'Match 29/03/2026 — Millwall — 45'')" style="cursor:pointer"><polygon points="508,189 501,200 508,210 515,200" fill="#D4AF37" stroke="#1E1A50" stroke-width="1"/></g>
 <text x="508" y="221" text-anchor="middle" font-size="7" fill="#D4AF37" font-family="system-ui">Millwall 45'</text>
-<title>Match : Millwall — 45'</title></g>
 <circle cx="35" cy="232" r="5" fill="#4ADE80"/>
 <text x="44" y="236" font-size="9" fill="#4ADE80" font-family="system-ui">Douleur</text>
 <polygon points="110,228 106,235 114,235" fill="#FB923C"/>
@@ -304,6 +300,7 @@ tr:nth-child(even) td{background:rgba(255,255,255,0.03)}
 <circle cx="270" cy="232" r="5" fill="#EF4444"/>
 <text x="279" y="236" font-size="9" fill="#EF4444" font-family="system-ui">Alerte</text>
 </svg>
+
   </div>
 
   <!-- ROW 5 : TEMPS DE JEU -->
@@ -362,6 +359,23 @@ function toggle(id){
       ? btn.textContent.replace('▶','▼')
       : btn.textContent.replace('▼','▶');
 }
+function showPopup(e, msg){
+  e.stopPropagation();
+  var pop = document.getElementById('frise-popup');
+  if(!pop) return;
+  pop.textContent = msg;
+  pop.style.display = 'block';
+  var px = (e.pageX || e.clientX); var py = (e.pageY || e.clientY);
+  var x = px + 12; var y = py - 42;
+  if(x + 290 > window.innerWidth) x = px - 295;
+  if(y < 8) y = py + 18;
+  pop.style.left = Math.max(8,x) + 'px';
+  pop.style.top  = Math.max(8,y) + 'px';
+  setTimeout(function(){ document.addEventListener('click', hidePopup, {once:true}); }, 50);
+}
+function hidePopup(){ var pop=document.getElementById('frise-popup'); if(pop) pop.style.display='none'; }
 </script>
+<div id="frise-popup" style="display:none;position:fixed;background:#2D2660;color:white;padding:9px 16px;border-radius:10px;font-size:.82rem;font-weight:600;border:2px solid #C9A84C;z-index:9999;pointer-events:none;max-width:300px;line-height:1.5;box-shadow:0 6px 24px rgba(0,0,0,.5)"></div>
+
 </body>
 </html>
