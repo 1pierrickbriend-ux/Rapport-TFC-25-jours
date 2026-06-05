@@ -174,8 +174,9 @@ function applyFilter(){
   const cards  = document.querySelectorAll('#'+listId+' .report-card');
   let visible  = 0;
   cards.forEach(card=>{
-    const cats = (card.dataset.cats||'').split(',');
-    const show = currentFilter==='Tous' || cats.includes(currentFilter);
+    const cats = (card.dataset.cats||'').split(',').filter(c=>c&&c!=='—');
+    // Si pas de catégorie connue → visible pour tous les filtres
+    const show = currentFilter==='Tous' || cats.length===0 || cats.includes(currentFilter);
     card.classList.toggle('hidden', !show);
     if(show) visible++;
   });

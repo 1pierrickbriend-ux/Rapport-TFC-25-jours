@@ -518,7 +518,7 @@ function handleBilan(file){
     var html=e.target.result;
     function getMeta(name){var m=html.match(new RegExp('name="'+name+'"\s+content="([^"]+)"'));return m?m[1]:'';}
     var joueur=getMeta('tfc-joueur')||file.name.replace('Bilan_','').replace('.html','').replace(/_/g,' ');
-    var cat=getMeta('tfc-categorie')||'', statut=getMeta('tfc-statut')||'', rri=getMeta('tfc-rri')||'', date=getMeta('tfc-date')||'';
+    var catRaw=getMeta('tfc-categorie')||''; var cat=(['','—','nan','None'].includes(catRaw)?'':catRaw), statut=getMeta('tfc-statut')||'', rri=getMeta('tfc-rri')||'', date=getMeta('tfc-date')||'';
     currentBilanMeta={joueur:joueur,cat:cat,statut:statut,rri:rri,date:date};
     document.getElementById('preview-bilan-nom').textContent=joueur;
     document.getElementById('preview-bilan-meta').textContent=[cat,statut?'RRI '+rri+'/100':'',date].filter(Boolean).join(' · ');
