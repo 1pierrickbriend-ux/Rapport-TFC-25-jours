@@ -95,5 +95,14 @@
     "date": "",
     "fichier": "Bilan_Thibo_Negre.html",
     "type": "bilan"
+  },
+  "bilan_Bilan_Wassim_Dardake.html": {
+    "joueur": "Wassim Dardake",
+    "cat": "",
+    "statut": "",
+    "rri": "",
+    "date": "",
+    "fichier": "Bilan_Wassim_Dardake.html",
+    "type": "bilan"
   }
 }
