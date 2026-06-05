@@ -50,5 +50,14 @@
     "date": "",
     "fichier": "Bilan_Isaack_Ahamadi.html",
     "type": "bilan"
+  },
+  "bilan_Bilan_Mattéo_Mach.html": {
+    "joueur": "Mattéo Mach",
+    "cat": "",
+    "statut": "",
+    "rri": "",
+    "date": "",
+    "fichier": "Bilan_Mattéo_Mach.html",
+    "type": "bilan"
   }
 }
