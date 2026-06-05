@@ -77,5 +77,14 @@
     "date": "",
     "fichier": "Bilan_Rafael_Laouille.html",
     "type": "bilan"
+  },
+  "bilan_Bilan_Steeve_Delarue.html": {
+    "joueur": "Steeve Delarue",
+    "cat": "",
+    "statut": "",
+    "rri": "",
+    "date": "",
+    "fichier": "Bilan_Steeve_Delarue.html",
+    "type": "bilan"
   }
 }
