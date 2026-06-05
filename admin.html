@@ -411,7 +411,10 @@ async function loadReports(){
       return;
     }
     const htmlFiles = files.filter(f=>f.name.endsWith('.html'))
-                           .sort((a,b)=>b.name.localeCompare(a.name));
+                           .sort((a,b)=>{
+      function d(n){var m=n.match(/(\d{2})(\d{2})(\d{4})/);return m?m[3]+m[2]+m[1]:'0';}
+      return d(b.name).localeCompare(d(a.name));
+    });
     if(!htmlFiles.length){
       list.innerHTML = '<div class="empty-list">Aucun rapport publié.</div>';
       return;
@@ -556,7 +559,10 @@ async function loadBilans(){
   try{
     var files=await ghGet('bilans');
     if(!files||!files.length){list.innerHTML='<div class="empty-list">Aucun bilan publie.</div>';return;}
-    var htmlFiles=files.filter(function(f){return f.name.endsWith('.html');}).sort(function(a,b){return a.name.localeCompare(b.name);});
+    var htmlFiles=files.filter(function(f){return f.name.endsWith('.html');}).sort(function(a,b){
+      function d(f){var inf=manifest['bilan_'+f.name]||{};var dt=inf.date||'';var m=dt.match(/(\d{2})\/(\d{2})\/(\d{4})/);return m?m[3]+m[2]+m[1]:'0';}
+      return d(b).localeCompare(d(a));
+    });
     if(!htmlFiles.length){list.innerHTML='<div class="empty-list">Aucun bilan publie.</div>';return;}
     list.innerHTML='';
     var cols2={'PRET':'#22C55E','SURVEILLANCE':'#FB923C','VIGILANCE':'#EF4444'};
