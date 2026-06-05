@@ -42,22 +42,13 @@
     "fichier": "Bilan_Aymen_Amaouch.html",
     "type": "bilan"
   },
-  "bilan_Bilan_Mahé_Angely.html": {
-    "joueur": "Mahé Angely",
+  "bilan_Bilan_Isaack_Ahamadi.html": {
+    "joueur": "Isaack Ahamadi",
     "cat": "",
     "statut": "",
     "rri": "",
     "date": "",
-    "fichier": "Bilan_Mahé_Angely.html",
-    "type": "bilan"
-  },
-  "bilan_Bilan_Fred_Hebrard.html": {
-    "joueur": "Fred Hebrard",
-    "cat": "",
-    "statut": "",
-    "rri": "",
-    "date": "",
-    "fichier": "Bilan_Fred_Hebrard.html",
+    "fichier": "Bilan_Isaack_Ahamadi.html",
     "type": "bilan"
   }
 }
