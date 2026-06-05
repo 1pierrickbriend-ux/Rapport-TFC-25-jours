@@ -42,22 +42,67 @@
     "fichier": "Bilan_Aymen_Amaouch.html",
     "type": "bilan"
   },
-  "bilan_Bilan_Mahé_Angely.html": {
-    "joueur": "Mahé Angely",
+  "bilan_Bilan_Isaack_Ahamadi.html": {
+    "joueur": "Isaack Ahamadi",
     "cat": "",
     "statut": "",
     "rri": "",
     "date": "",
-    "fichier": "Bilan_Mahé_Angely.html",
+    "fichier": "Bilan_Isaack_Ahamadi.html",
     "type": "bilan"
   },
-  "bilan_Bilan_Fred_Hebrard.html": {
-    "joueur": "Fred Hebrard",
+  "bilan_Bilan_Mattéo_Mach.html": {
+    "joueur": "Mattéo Mach",
     "cat": "",
     "statut": "",
     "rri": "",
     "date": "",
-    "fichier": "Bilan_Fred_Hebrard.html",
+    "fichier": "Bilan_Mattéo_Mach.html",
+    "type": "bilan"
+  },
+  "bilan_Bilan_Matthieu_De_Souza.html": {
+    "joueur": "Matthieu De Souza",
+    "cat": "",
+    "statut": "",
+    "rri": "",
+    "date": "",
+    "fichier": "Bilan_Matthieu_De_Souza.html",
+    "type": "bilan"
+  },
+  "bilan_Bilan_Rafael_Laouille.html": {
+    "joueur": "Rafael Laouille",
+    "cat": "",
+    "statut": "",
+    "rri": "",
+    "date": "",
+    "fichier": "Bilan_Rafael_Laouille.html",
+    "type": "bilan"
+  },
+  "bilan_Bilan_Steeve_Delarue.html": {
+    "joueur": "Steeve Delarue",
+    "cat": "",
+    "statut": "",
+    "rri": "",
+    "date": "",
+    "fichier": "Bilan_Steeve_Delarue.html",
+    "type": "bilan"
+  },
+  "bilan_Bilan_Thibo_Negre.html": {
+    "joueur": "Thibo Negre",
+    "cat": "",
+    "statut": "",
+    "rri": "",
+    "date": "",
+    "fichier": "Bilan_Thibo_Negre.html",
+    "type": "bilan"
+  },
+  "bilan_Bilan_Wassim_Dardake.html": {
+    "joueur": "Wassim Dardake",
+    "cat": "",
+    "statut": "",
+    "rri": "",
+    "date": "",
+    "fichier": "Bilan_Wassim_Dardake.html",
     "type": "bilan"
   },
   "bilan_Bilan_Enzo_Faty.html": {
@@ -67,33 +112,6 @@
     "rri": "",
     "date": "",
     "fichier": "Bilan_Enzo_Faty.html",
-    "type": "bilan"
-  },
-  "bilan_Bilan_Sacha_Vivent.html": {
-    "joueur": "Sacha Vivent",
-    "cat": "",
-    "statut": "",
-    "rri": "",
-    "date": "",
-    "fichier": "Bilan_Sacha_Vivent.html",
-    "type": "bilan"
-  },
-  "bilan_Bilan_Malamini_Dansoko.html": {
-    "joueur": "Malamini Dansoko",
-    "cat": "",
-    "statut": "",
-    "rri": "",
-    "date": "",
-    "fichier": "Bilan_Malamini_Dansoko.html",
-    "type": "bilan"
-  },
-  "bilan_Bilan_Naziahri_Siaka.html": {
-    "joueur": "Naziahri Siaka",
-    "cat": "",
-    "statut": "",
-    "rri": "",
-    "date": "",
-    "fichier": "Bilan_Naziahri_Siaka.html",
     "type": "bilan"
   }
 }
