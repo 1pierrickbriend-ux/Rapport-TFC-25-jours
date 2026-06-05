@@ -217,10 +217,10 @@ tr:nth-child(even) td{background:rgba(255,255,255,0.03)}
   </div>
 
   <!-- ROW 4 : TIMELINE -->
-  <div class="card section-full" style="position:relative">
+  <div class="card section-full">
     <div class="card-title">■ Frise chronologique — cliquez sur un point pour le détail</div>
     <div style="color:#aaa;font-style:italic;text-align:center;padding:20px">Date du 1er match non renseignée</div>
-
+    <div id="frise-info-box" style="display:none;margin-top:10px;padding:10px 14px;background:#2D2660;color:white;border-radius:8px;font-size:.82rem;font-weight:600;border:2px solid #C9A84C;line-height:1.5"></div>
   </div>
 
   <!-- ROW 5 : TEMPS DE JEU -->
@@ -265,21 +265,12 @@ function toggle(id){
 }
 function showPopup(e, msg){
   e.stopPropagation();
-  var pop = document.getElementById('frise-popup');
-  if(!pop) return;
-  pop.textContent = msg;
-  pop.style.display = 'block';
-  var px = (e.pageX || e.clientX); var py = (e.pageY || e.clientY);
-  var x = px + 12; var y = py - 42;
-  if(x + 290 > window.innerWidth) x = px - 295;
-  if(y < 8) y = py + 18;
-  pop.style.left = Math.max(8,x) + 'px';
-  pop.style.top  = Math.max(8,y) + 'px';
-  setTimeout(function(){ document.addEventListener('click', hidePopup, {once:true}); }, 50);
+  var box = document.getElementById('frise-info-box');
+  if(!box) return;
+  box.textContent = msg;
+  box.style.display = 'block';
+  box.style.opacity = '1';
 }
-function hidePopup(){ var pop=document.getElementById('frise-popup'); if(pop) pop.style.display='none'; }
 </script>
-<div id="frise-popup" style="display:none;position:fixed;background:#2D2660;color:white;padding:9px 16px;border-radius:10px;font-size:.82rem;font-weight:600;border:2px solid #C9A84C;z-index:9999;pointer-events:none;max-width:300px;line-height:1.5;box-shadow:0 6px 24px rgba(0,0,0,.5)"></div>
-
 </body>
 </html>
