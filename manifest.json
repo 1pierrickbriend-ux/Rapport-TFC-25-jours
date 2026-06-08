@@ -137,14 +137,5 @@
       "FFF"
     ],
     "players": 1
-  },
-  "bilan_Bilan_Isaack_Ahamadi.html": {
-    "joueur": "Isaack Ahamadi",
-    "cat": "N3",
-    "statut": "PRÊT",
-    "rri": "86",
-    "date": "08/06/2026",
-    "fichier": "Bilan_Isaack_Ahamadi.html",
-    "type": "bilan"
   }
 }
