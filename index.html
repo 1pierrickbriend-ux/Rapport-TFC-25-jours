@@ -58,6 +58,12 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);min-height
   .header h1{font-size:.95rem}
   .tab-btn{padding:11px 14px;font-size:.78rem}
   .card-date{font-size:.88rem}
+  .card-inner{align-items:flex-start;padding:12px 14px;gap:10px}
+  .card-arrow{margin-top:2px;flex-shrink:0;align-self:flex-start}
+  .card-inner>div[style*="flex:1"]{min-width:0;overflow:hidden}
+  .card-inner>div[style*="flex:1"] div[style*="display:flex"]{max-width:100%;flex-wrap:wrap;row-gap:4px}
+  .statut-badge,.latest-badge,.nouveau-badge{white-space:nowrap}
+  .cat-badge{white-space:nowrap}
 }
 </style>
 </head>
