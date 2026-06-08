@@ -15,12 +15,12 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);min-height
 .header p{color:var(--gold);font-size:.72rem;margin-top:2px}
 
 /* ONGLETS */
-.tabs{background:white;border-bottom:2px solid #E5E3F5;padding:0 20px;display:flex;gap:0;position:sticky;top:0;z-index:10;box-shadow:0 2px 8px rgba(45,38,96,.06)}
+.tabs{background:white;border-bottom:2px solid #E5E3F5;padding:0 20px;display:flex;gap:0;position:sticky;top:0;z-index:20;box-shadow:0 2px 8px rgba(45,38,96,.06)}
 .tab-btn{padding:13px 22px;border:none;background:none;cursor:pointer;font-weight:600;font-size:.85rem;color:#888;border-bottom:3px solid transparent;transition:.15s;white-space:nowrap}
 .tab-btn.active{color:var(--dark);border-bottom:3px solid var(--dark);font-weight:700}
 
 /* FILTRES */
-.filter-bar{background:white;padding:12px 20px;border-bottom:1px solid #E5E3F5;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.filter-bar{background:white;padding:12px 20px;border-bottom:1px solid #E5E3F5;display:flex;align-items:center;gap:8px;flex-wrap:wrap;position:sticky;top:46px;z-index:19;box-shadow:0 2px 6px rgba(45,38,96,.04)}
 .filter-label{font-size:.72rem;font-weight:700;color:var(--mid);letter-spacing:.06em;text-transform:uppercase;margin-right:4px;white-space:nowrap}
 .filter-btn{padding:5px 14px;border:2px solid #DDD;border-radius:20px;background:white;cursor:pointer;font-size:.75rem;font-weight:600;color:#666;transition:.15s;white-space:nowrap}
 .filter-btn:hover{border-color:var(--mid);color:var(--mid)}
@@ -43,6 +43,8 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);min-height
 .cat-badge{font-size:.6rem;font-weight:700;color:white;padding:2px 8px;border-radius:20px}
 .card-arrow{margin-left:auto;color:var(--mid);font-size:1.1rem;flex-shrink:0}
 .latest-badge{background:var(--gold);color:white;font-size:.58rem;font-weight:700;padding:2px 8px;border-radius:20px}
+.nouveau-badge{background:#E91E63;color:white;font-size:.58rem;font-weight:700;padding:2px 8px;border-radius:20px;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.7}}
 
 /* BILAN BADGE STATUT */
 .statut-badge{font-size:.6rem;font-weight:700;color:white;padding:2px 9px;border-radius:20px}
@@ -67,6 +69,11 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);min-height
     <h1>TOULOUSE FOOTBALL CLUB</h1>
     <p>Cellule Performance & Réathlétisation — Suivi de reprise</p>
   </div>
+</div>
+
+<!-- BANNIÈRE STATUT DU JOUR -->
+<div id="banner-statut" style="background:white;border-bottom:1px solid #E5E3F5;padding:12px 24px;display:flex;align-items:center;gap:20px;flex-wrap:wrap">
+  <div id="banner-loading" style="color:#aaa;font-size:.8rem;font-style:italic">Chargement du statut...</div>
 </div>
 
 <!-- ONGLETS -->
@@ -113,6 +120,23 @@ const STATUT_COLORS = {'PRÊT':'#22C55E','SURVEILLANCE':'#FB923C','VIGILANCE':'#
 
 function catColor(c){ for(const[k,v] of Object.entries(CAT_COLORS)) if(c.toUpperCase().includes(k)) return v; return '#374151'; }
 
+function isNouveau(dateStr, formatDMY){
+  if(!dateStr) return false;
+  try{
+    var d;
+    if(formatDMY){
+      var p=dateStr.match(/(\d{2})\/(\d{2})\/(\d{4})/);
+      if(!p) return false;
+      d=new Date(p[3],p[2]-1,p[1]);
+    } else {
+      var p2=dateStr.match(/(\d{2})(\d{2})(\d{4})/);
+      if(!p2) return false;
+      d=new Date(p2[3],p2[2]-1,p2[1]);
+    }
+    return (Date.now()-d.getTime()) < 48*3600*1000;
+  } catch(e){ return false; }
+}
+
 // ── État ──────────────────────────────────────────────────────────────────────
 let currentTab    = localStorage.getItem('tfc_tab')    || 'rapports';
 let currentFilter = localStorage.getItem('tfc_filter') || 'Tous';
@@ -127,9 +151,58 @@ async function loadLogo(){
     const r = await fetch(RAW+'/manifest.json?t='+Date.now());
     if(r.ok) manifest = await r.json();
   } catch{}
-  // Logo depuis manifest ou direct
   const logoEl = document.getElementById('tfc-logo');
   logoEl.onerror = function(){ this.style.display='none'; };
+}
+
+// ── Bannière statut du jour ────────────────────────────────────────────────
+async function buildBanner(){
+  const banner = document.getElementById('banner-statut');
+  if(!banner) return;
+  try{
+    // Compter les bilans par statut
+    const bkeys = Object.keys(manifest).filter(k=>manifest[k].type==='bilan');
+    const total = bkeys.length;
+    const pret  = bkeys.filter(k=>manifest[k].statut==='PRÊT').length;
+    const surv  = bkeys.filter(k=>manifest[k].statut==='SURVEILLANCE').length;
+    const vigil = bkeys.filter(k=>manifest[k].statut==='VIGILANCE').length;
+
+    // Dernier rapport
+    const rkeys = Object.keys(manifest).filter(k=>!manifest[k].type||manifest[k].type!=='bilan');
+    let dernierRapport = '—';
+    rkeys.forEach(k=>{
+      const d = manifest[k].date||'';
+      if(d && (!dernierRapport||d>dernierRapport)) dernierRapport = d;
+    });
+
+    // Bilans terminés cette saison
+    const bilansTermines = bkeys.length;
+
+    banner.innerHTML =
+      '<div style="display:flex;align-items:center;gap:6px;padding:4px 12px;background:#F0EEF8;border-radius:8px;flex-shrink:0">' +
+        '<span style="font-size:.65rem;font-weight:800;color:#2D2660;letter-spacing:.06em;text-transform:uppercase">Bilans</span>' +
+        '<span style="font-size:1.1rem;font-weight:800;color:#2D2660">' + bilansTermines + '</span>' +
+        '<span style="font-size:.65rem;color:#888">cette saison</span>' +
+      '</div>' +
+      (vigil>0?
+        '<div style="display:flex;align-items:center;gap:6px;padding:4px 12px;background:#FEE2E2;border-radius:8px;flex-shrink:0">' +
+          '<span style="width:8px;height:8px;border-radius:50%;background:#EF4444;display:inline-block"></span>' +
+          '<span style="font-size:.75rem;font-weight:700;color:#EF4444">' + vigil + ' VIGILANCE</span>' +
+        '</div>' : '') +
+      (surv>0?
+        '<div style="display:flex;align-items:center;gap:6px;padding:4px 12px;background:#FFEDD5;border-radius:8px;flex-shrink:0">' +
+          '<span style="width:8px;height:8px;border-radius:50%;background:#FB923C;display:inline-block"></span>' +
+          '<span style="font-size:.75rem;font-weight:700;color:#FB923C">' + surv + ' SURVEILLANCE</span>' +
+        '</div>' : '') +
+      (pret>0?
+        '<div style="display:flex;align-items:center;gap:6px;padding:4px 12px;background:#DCFCE7;border-radius:8px;flex-shrink:0">' +
+          '<span style="width:8px;height:8px;border-radius:50%;background:#22C55E;display:inline-block"></span>' +
+          '<span style="font-size:.75rem;font-weight:700;color:#22C55E">' + pret + ' PRÊT</span>' +
+        '</div>' : '') +
+      '<div style="margin-left:auto;font-size:.72rem;color:#aaa;white-space:nowrap">Dernier rapport : ' + dernierRapport + '</div>';
+  } catch(e){
+    banner.innerHTML='<div style="color:#aaa;font-size:.75rem">Statut indisponible</div>';
+  }
 }
 
 // ── Onglets ───────────────────────────────────────────────────────────────────
@@ -228,6 +301,7 @@ async function loadRapports(){
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
             <span class="card-date">Entretiens du ${date}</span>
             ${idx===0?'<span class="latest-badge">Dernier rapport</span>':''}
+            ${isNouveau(file.name,false)?'<span class="latest-badge" style="background:#E91E63">🔴 Nouveau</span>':''}
           </div>
           <div class="card-meta">${players?players+' joueur'+(players>1?'s':''):''}${players&&cats.length?' · ':''}${cats.length?'Catégories :':''}</div>
           ${cats.length?`<div class="card-cats">${catBadges}</div>`:''}
@@ -255,7 +329,10 @@ async function loadBilans(){
     const files = await r.json();
     const htmlFiles = files.filter(f=>f.name.endsWith('.html'))
       .sort((a,b)=>{
+        const SORD={'VIGILANCE':0,'SURVEILLANCE':1,'PRÊT':2,'':3};
         const ia=manifest['bilan_'+a.name]||{}, ib=manifest['bilan_'+b.name]||{};
+        const sa=SORD[ia.statut??'']??3, sb=SORD[ib.statut??'']??3;
+        if(sa!==sb) return sa-sb;
         return sortDateDMY(ib.date).localeCompare(sortDateDMY(ia.date));
       });
     if(!htmlFiles.length){
@@ -283,6 +360,7 @@ async function loadBilans(){
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
             <span class="card-date">${joueur}</span>
             ${statut?`<span class="statut-badge" style="background:${sc}">${statut}</span>`:''}
+            ${isNouveau(date,true)?'<span class="statut-badge" style="background:#E91E63">🔴 Nouveau</span>':''}
           </div>
           <div class="card-meta">${[cat, rri?'RRI '+rri+'/100':'', date?'Bilan du '+date:''].filter(Boolean).join(' · ')}</div>
         </div>
@@ -302,6 +380,7 @@ async function loadBilans(){
 window.addEventListener('load', async()=>{
   await loadLogo();
   showTab(currentTab);
+  buildBanner();
   await loadRapports();
   if(currentTab==='bilans') await loadBilans();
 });
