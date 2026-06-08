@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>TFC — Rapports de suivi</title>
 <style>
-:root{--dark:#2D2660;--mid:#6B5CA5;--gold:#C9A84C;--green:#22C55E;--orange:#FB923C;--red:#EF4444;--bg:#EEEAF6}
+:root{--dark:#2D2660;--mid:#6B5CA5;--gold:#C9A84C;--green:#22C55E;--orange:#FB923C;--red:#EF4444;--bg:#F4F3F9}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);min-height:100vh}
 
@@ -32,7 +32,8 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);min-height
 .section-title{font-size:.82rem;font-weight:800;color:var(--dark);letter-spacing:.08em;text-transform:uppercase;margin-bottom:14px}
 
 /* CARTES */
-.report-card{background:white;border-radius:12px;margin-bottom:10px;overflow:hidden;box-shadow:0 2px 10px rgba(45,38,96,.07);text-decoration:none;display:block;border:1.5px solid #E5E3F5;transition:transform .15s,box-shadow .15s}
+.report-card{background:white;border-radius:12px;margin-bottom:10px;overflow:hidden;box-shadow:0 2px 10px rgba(45,38,96,.07);text-decoration:none;display:block;border:1.5px solid #E5E3F5;transition:transform .15s,box-shadow .15s;animation:fadeInUp .3s ease both}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 .report-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(45,38,96,.14)}
 .report-card.hidden{display:none}
 .card-inner{display:flex;align-items:center;gap:14px;padding:14px 18px}
@@ -52,6 +53,10 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);min-height
 .empty{text-align:center;padding:50px 20px;color:#aaa}
 .empty-icon{font-size:2.5rem;margin-bottom:10px}
 .loading{text-align:center;padding:40px;color:#aaa;font-style:italic;font-size:.85rem}
+.skeleton{background:#E9E6F4;border-radius:6px;animation:shimmer 1.4s infinite}
+@keyframes shimmer{0%{opacity:.55}50%{opacity:1}100%{opacity:.55}}
+.skeleton-card{background:white;border-radius:12px;margin-bottom:10px;padding:16px 18px;border:1.5px solid #E5E3F5;display:flex;align-items:center;gap:14px}
+
 .footer{text-align:center;padding:28px;color:#aaa;font-size:.7rem}
 
 @media(max-width:600px){
@@ -78,7 +83,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);min-height
 </div>
 
 <!-- BANNIÈRE STATUT DU JOUR -->
-<div id="banner-statut" style="background:white;border-bottom:1px solid #E5E3F5;padding:12px 24px;display:flex;align-items:center;gap:20px;flex-wrap:wrap">
+<div id="banner-statut" style="background:white;border-bottom:1px solid #E5E3F5;padding:14px 24px;display:flex;align-items:stretch;gap:10px;flex-wrap:wrap">
   <div id="banner-loading" style="color:#aaa;font-size:.8rem;font-style:italic">Chargement du statut...</div>
 </div>
 
@@ -194,33 +199,22 @@ async function buildBanner(){
     // Bilans terminés cette saison
     const bilansTermines = bkeys.length;
 
+    const kpiCard = (val, label, bg, col, textCol) =>
+      `<div style="background:${bg};border-radius:10px;padding:10px 16px;display:flex;flex-direction:column;align-items:center;min-width:72px;flex-shrink:0;border:1.5px solid ${col}20">
+        <span style="font-size:1.5rem;font-weight:800;color:${textCol};line-height:1">${val}</span>
+        <span style="font-size:.58rem;font-weight:700;color:${textCol};letter-spacing:.04em;margin-top:3px;text-transform:uppercase">${label}</span>
+      </div>`;
     banner.innerHTML =
-      '<div style="display:flex;align-items:center;gap:6px;padding:4px 12px;background:#F0EEF8;border-radius:8px;flex-shrink:0">' +
-        '<span style="font-size:.65rem;font-weight:800;color:#2D2660;letter-spacing:.06em;text-transform:uppercase">Bilans</span>' +
-        '<span style="font-size:1.1rem;font-weight:800;color:#2D2660">' + bilansTermines + '</span>' +
-        '<span style="font-size:.65rem;color:#888">cette saison</span>' +
-      '</div>' +
-      (vigil>0?
-        '<div style="display:flex;align-items:center;gap:6px;padding:4px 12px;background:#FEE2E2;border-radius:8px;flex-shrink:0">' +
-          '<span style="width:8px;height:8px;border-radius:50%;background:#EF4444;display:inline-block"></span>' +
-          '<span style="font-size:.75rem;font-weight:700;color:#EF4444">' + vigil + ' VIGILANCE</span>' +
-        '</div>' : '') +
-      (surv>0?
-        '<div style="display:flex;align-items:center;gap:6px;padding:4px 12px;background:#FFEDD5;border-radius:8px;flex-shrink:0">' +
-          '<span style="width:8px;height:8px;border-radius:50%;background:#FB923C;display:inline-block"></span>' +
-          '<span style="font-size:.75rem;font-weight:700;color:#FB923C">' + surv + ' SURVEILLANCE</span>' +
-        '</div>' : '') +
-      (pret>0?
-        '<div style="display:flex;align-items:center;gap:6px;padding:4px 12px;background:#DCFCE7;border-radius:8px;flex-shrink:0">' +
-          '<span style="width:8px;height:8px;border-radius:50%;background:#22C55E;display:inline-block"></span>' +
-          '<span style="font-size:.75rem;font-weight:700;color:#22C55E">' + pret + ' PRÊT</span>' +
-        '</div>' : '') +
+      kpiCard(bilansTermines, 'Bilans saison', '#F0EEF8', '#6B5CA5', '#2D2660') +
+      (vigil>0 ? kpiCard(vigil, 'Vigilance', '#FEE2E2', '#EF4444', '#B91C1C') : '') +
+      (surv>0  ? kpiCard(surv,  'Surveillance', '#FFEDD5', '#FB923C', '#C2410C') : '') +
+      (pret>0  ? kpiCard(pret,  'Prêt', '#DCFCE7', '#22C55E', '#15803D') : '') +
       (vigil===0 && surv===0 && total>0 ?
-        '<div style="display:flex;align-items:center;gap:6px;padding:4px 12px;background:#DCFCE7;border-radius:8px;flex-shrink:0">' +
-          '<span style="width:8px;height:8px;border-radius:50%;background:#22C55E;display:inline-block"></span>' +
-          '<span style="font-size:.72rem;font-weight:700;color:#15803D">✓ Aucune vigilance active</span>' +
+        '<div style="background:#DCFCE7;border:1.5px solid #22C55E20;border-radius:10px;padding:10px 16px;display:flex;align-items:center;gap:6px;flex-shrink:0">' +
+          '<span style="font-size:.95rem">✓</span>' +
+          '<span style="font-size:.72rem;font-weight:700;color:#15803D">Aucune vigilance</span>' +
         '</div>' : '') +
-      '<div style="margin-left:auto;font-size:.72rem;color:#aaa;white-space:nowrap">Dernier rapport : ' + dernierRapport + '</div>';
+      '<div style="margin-left:auto;font-size:.68rem;color:#aaa;white-space:nowrap;align-self:center">Dernier rapport<br><strong style=\"color:#2D2660\">' + dernierRapport + '</strong></div>';
   } catch(e){
     banner.innerHTML='<div style="color:#aaa;font-size:.75rem">Statut indisponible</div>';
   }
@@ -322,6 +316,7 @@ function ageColor(dateStr){
 // ── Rapports ──────────────────────────────────────────────────────────────────
 async function loadRapports(){
   const list = document.getElementById('rapports-list');
+  list.innerHTML = '<div class="skeleton-card"><div class="skeleton" style="width:32px;height:32px;border-radius:8px;flex-shrink:0"></div><div style="flex:1"><div class="skeleton" style="height:14px;width:55%;margin-bottom:8px"></div><div class="skeleton" style="height:10px;width:35%"></div></div></div>'.repeat(3);
   try{
     const r = await fetch('https://api.github.com/repos/'+REPO+'/contents/rapports',
       {headers:{Accept:'application/vnd.github.v3+json'}});
@@ -351,6 +346,7 @@ async function loadRapports(){
       card.className = 'report-card';
       card.href = url; card.target = '_blank';
       card.dataset.cats = cats.join(',');
+      card.style.borderLeft = '4px solid ' + agecol;
       card.innerHTML = `<div class="card-inner">
         <div class="card-icon" style="width:32px;height:32px;border-radius:8px;background:${iconBg};display:flex;align-items:center;justify-content:center;font-size:.95rem;flex-shrink:0">📋</div>
         <div style="flex:1;min-width:0">
@@ -391,7 +387,7 @@ async function loadRapports(){
 // ── Bilans ────────────────────────────────────────────────────────────────────
 async function loadBilans(){
   const list = document.getElementById('bilans-list');
-  list.innerHTML = '<div class="loading">Chargement...</div>';
+  list.innerHTML = '<div class="skeleton-card"><div class="skeleton" style="width:32px;height:32px;border-radius:8px;flex-shrink:0"></div><div style="flex:1"><div class="skeleton" style="height:14px;width:55%;margin-bottom:8px"></div><div class="skeleton" style="height:10px;width:35%"></div></div></div>'.repeat(3);
   try{
     const r = await fetch('https://api.github.com/repos/'+REPO+'/contents/bilans',
       {headers:{Accept:'application/vnd.github.v3+json'}});
@@ -419,6 +415,8 @@ async function loadBilans(){
       const statut = info.statut|| '';
       const rri    = info.rri   || '';
       const date   = info.date  || '';
+      const jp     = info.jp !== undefined && info.jp !== '' ? parseInt(info.jp) : null;
+      const pct    = jp !== null ? Math.min(100, Math.round(jp/25*100)) : null;
       const url    = SITE+'/bilans/'+file.name;
       if(cat) allCats.add(cat);
       const sc = STATUT_COLORS[statut]||'#6B5CA5';
@@ -442,10 +440,13 @@ async function loadBilans(){
           }
         }
       }
+      const borderCol = statut==='VIGILANCE'?'#EF4444':statut==='SURVEILLANCE'?'#FB923C':statut==='PRÊT'?'#22C55E':'#E5E3F5';
       const card = document.createElement('a');
       card.className = 'report-card';
       card.href = url; card.target = '_blank';
       card.dataset.cats = cat;
+      card.style.borderLeft = '4px solid ' + borderCol;
+      card.style.animationDelay = (Array.from(card.parentNode?.children||[]).length * 40) + 'ms';
       card.innerHTML = `<div class="card-inner">
         <div class="card-icon">👤</div>
         <div style="flex:1;min-width:0">
@@ -456,6 +457,12 @@ async function loadBilans(){
             ${isNouveau(date,true)?'<span class="statut-badge" style="background:#E91E63">🔴 Nouveau</span>':''}
           </div>
           <div class="card-meta">${[cat, rri?'RRI '+rri+'/100':'', date?'Bilan du '+date:''].filter(Boolean).join(' · ')}</div>
+          ${pct!==null?`<div style="margin-top:6px;display:flex;align-items:center;gap:6px">
+            <div style="flex:1;height:4px;background:#E9E6F4;border-radius:4px;overflow:hidden">
+              <div style="width:${pct}%;height:100%;background:${statut==='VIGILANCE'?'#EF4444':statut==='SURVEILLANCE'?'#FB923C':'#22C55E'};border-radius:4px;transition:width .4s ease"></div>
+            </div>
+            <span style="font-size:.6rem;font-weight:700;color:#888;flex-shrink:0">J+${jp}/25</span>
+          </div>`:''}
         </div>
         <div class="card-arrow">›</div>
       </div>`;
