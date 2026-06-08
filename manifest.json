@@ -51,15 +51,6 @@
     "fichier": "Bilan_Mahé_Angely.html",
     "type": "bilan"
   },
-  "bilan_Bilan_Fred_Hebrard.html": {
-    "joueur": "Fred Hebrard",
-    "cat": "U16",
-    "statut": "SURVEILLANCE",
-    "rri": "62",
-    "date": "08/06/2026",
-    "fichier": "Bilan_Fred_Hebrard.html",
-    "type": "bilan"
-  },
   "bilan_Bilan_Enzo_Faty.html": {
     "joueur": "Enzo Faty",
     "cat": "N3",
