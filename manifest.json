@@ -174,15 +174,6 @@
     "fichier": "Bilan_Benjamin_Mabota.html",
     "type": "bilan"
   },
-  "bilan_Bilan_Thibo_Negre.html": {
-    "joueur": "Thibo Negre",
-    "cat": "U19",
-    "statut": "SURVEILLANCE",
-    "rri": "60",
-    "date": "08/06/2026",
-    "fichier": "Bilan_Thibo_Negre.html",
-    "type": "bilan"
-  },
   "bilan_Bilan_Isaack_Ahamadi.html": {
     "joueur": "Isaack Ahamadi",
     "cat": "N3",
