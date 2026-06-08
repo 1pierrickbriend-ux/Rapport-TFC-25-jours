@@ -122,15 +122,6 @@
     "fichier": "Bilan_Elijah_Girardin.html",
     "type": "bilan"
   },
-  "bilan_Bilan_Abdul_Guirasse.html": {
-    "joueur": "Abdul Guirasse",
-    "cat": "U16",
-    "statut": "SURVEILLANCE",
-    "rri": "60",
-    "date": "08/06/2026",
-    "fichier": "Bilan_Abdul_Guirasse.html",
-    "type": "bilan"
-  },
   "bilan_Bilan_Benjamin_Mabota.html": {
     "joueur": "Benjamin Mabota",
     "cat": "U16",
