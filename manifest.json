@@ -185,15 +185,6 @@
     "fichier": "Bilan_Wassim_Dardake.html",
     "type": "bilan"
   },
-  "bilan_Bilan_Daris_Zema.html": {
-    "joueur": "Daris Zema",
-    "cat": "",
-    "statut": "SURVEILLANCE",
-    "rri": "71",
-    "date": "08/06/2026",
-    "fichier": "Bilan_Daris_Zema.html",
-    "type": "bilan"
-  },
   "bilan_Bilan_Naziahry_Siaka.html": {
     "joueur": "Naziahry Siaka",
     "cat": "U19",
