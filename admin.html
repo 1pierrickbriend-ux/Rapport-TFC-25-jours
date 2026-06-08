@@ -97,19 +97,28 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);min-height
 
   <!-- CONFIG TOKEN -->
   <div class="setup-card" id="setup-section">
-    <div class="setup-title">🔑 Configuration GitHub (une seule fois)</div>
-    <div class="setup-desc">
-      Pour publier vos rapports automatiquement, créez un token GitHub :<br>
-      1. Allez sur <a href="https://github.com/settings/tokens/new" target="_blank">github.com/settings/tokens/new</a><br>
-      2. Note : "TFC Rapports" — Expiration : "No expiration"<br>
-      3. Cochez uniquement <strong>repo</strong> → cliquez <strong>Generate token</strong><br>
-      4. Copiez le token (commence par <code>ghp_</code>) et collez-le ici :
+    <!-- Vue réduite (token ok) -->
+    <div id="setup-collapsed" style="display:none;align-items:center;gap:10px">
+      <span style="font-size:.82rem;font-weight:700;color:var(--green)">🔑 GitHub connecté</span>
+      <span id="setup-collapsed-info" style="font-size:.72rem;color:#888;flex:1"></span>
+      <button onclick="expandSetup()" style="font-size:.7rem;color:var(--mid);background:none;border:none;cursor:pointer;text-decoration:underline">Modifier</button>
     </div>
-    <div class="input-row">
-      <input type="password" class="token-input" id="token-input" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx"/>
-      <button class="btn btn-primary" onclick="saveToken()">Enregistrer</button>
+    <!-- Vue complète -->
+    <div id="setup-expanded">
+      <div class="setup-title">🔑 Configuration GitHub (une seule fois)</div>
+      <div class="setup-desc">
+        Pour publier vos rapports automatiquement, créez un token GitHub :<br>
+        1. Allez sur <a href="https://github.com/settings/tokens/new" target="_blank">github.com/settings/tokens/new</a><br>
+        2. Note : "TFC Rapports" — Expiration : "No expiration"<br>
+        3. Cochez uniquement <strong>repo</strong> → cliquez <strong>Generate token</strong><br>
+        4. Copiez le token (commence par <code>ghp_</code>) et collez-le ici :
+      </div>
+      <div class="input-row">
+        <input type="password" class="token-input" id="token-input" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx"/>
+        <button class="btn btn-primary" onclick="saveToken()">Enregistrer</button>
+      </div>
+      <div class="token-status" id="token-status"></div>
     </div>
-    <div class="token-status" id="token-status"></div>
   </div>
 
   <div id="section-rapports">
@@ -141,7 +150,10 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);min-height
 
   <!-- LISTE DES RAPPORTS -->
   <div class="card">
-    <div class="card-title">📁 Rapports en ligne</div>
+    <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px">
+      <span>📁 Rapports en ligne</span>
+      <span id="reports-summary" style="font-weight:400"></span>
+    </div>
     <div id="reports-list"><div class="empty-list">Chargement...</div></div>
   </div>
   </div><!-- fin section-rapports -->
@@ -234,10 +246,26 @@ async function verifyToken(t){
     if(r.ok){
       setStatus('token-status','✓ Connecté — vous pouvez publier vos rapports','ok');
       document.getElementById('setup-section').style.border='2px solid var(--green)';
+      collapseSetup();
     } else {
       setStatus('token-status','✗ Token invalide — vérifiez et réessayez','err');
+      expandSetup();
     }
-  } catch{ setStatus('token-status','✗ Erreur réseau','err'); }
+  } catch{ setStatus('token-status','✗ Erreur réseau','err'); expandSetup(); }
+}
+
+function collapseSetup(){
+  const t = getToken();
+  const preview = t ? t.slice(0,8)+'…'+t.slice(-4) : '';
+  document.getElementById('setup-collapsed-info').textContent = preview;
+  document.getElementById('setup-collapsed').style.display='flex';
+  document.getElementById('setup-expanded').style.display='none';
+  document.getElementById('setup-section').style.padding='12px 20px';
+}
+function expandSetup(){
+  document.getElementById('setup-collapsed').style.display='none';
+  document.getElementById('setup-expanded').style.display='block';
+  document.getElementById('setup-section').style.padding='24px';
 }
 
 function setStatus(id, msg, type){
@@ -376,6 +404,12 @@ async function publishReport(){
     const d = currentMeta.date.replace(/\//g,'');
     const filename = `rapports/rapport_${d}.html`;
 
+    // Détection doublon (prop 5)
+    if(manifest[`rapport_${d}.html`]){
+      const confirm = window.confirm(`Un rapport du ${currentMeta.date} existe déjà en ligne.\n\nÉcraser ce rapport ?`);
+      if(!confirm){ btn.disabled=false; st.textContent=''; return; }
+    }
+
     // Lire le contenu binaire du fichier
     const arrayBuffer = await currentFile.arrayBuffer();
 
@@ -406,6 +440,29 @@ async function publishReport(){
 }
 
 // ── LISTE DES RAPPORTS ─────────────────────────────────────────────────────
+function relativeAge(dateStr){
+  const m = dateStr.match(/(\d{2})\/(\d{2})\/(\d{4})/);
+  if(!m) return '';
+  const d = new Date(m[3], m[2]-1, m[1]); d.setHours(0,0,0,0);
+  const today = new Date(); today.setHours(0,0,0,0);
+  const days = Math.round((today-d)/(1000*60*60*24));
+  if(days===0) return "aujourd'hui";
+  if(days===1) return 'hier';
+  if(days<7) return `il y a ${days} jours`;
+  if(days<14) return 'il y a 1 semaine';
+  return `il y a ${Math.round(days/7)} semaines`;
+}
+function ageColor(dateStr){
+  const m = dateStr.match(/(\d{2})\/(\d{2})\/(\d{4})/);
+  if(!m) return '#aaa';
+  const d = new Date(m[3], m[2]-1, m[1]); d.setHours(0,0,0,0);
+  const today = new Date(); today.setHours(0,0,0,0);
+  const days = Math.round((today-d)/(1000*60*60*24));
+  if(days<=7) return '#22C55E';
+  if(days<=14) return '#FB923C';
+  return '#EF4444';
+}
+
 async function loadReports(){
   const list = document.getElementById('reports-list');
   try{
@@ -423,6 +480,16 @@ async function loadReports(){
       list.innerHTML = '<div class="empty-list">Aucun rapport publié.</div>';
       return;
     }
+    // Compteur global (prop 2)
+    const totalJoueurs = htmlFiles.reduce((s,f)=>{const info=manifest[f.name]||{};return s+(info.players||0);},0);
+    const allCatsSet = new Set();
+    htmlFiles.forEach(f=>{const info=manifest[f.name]||{};(info.categories||[]).forEach(c=>allCatsSet.add(c));});
+    const summaryEl = document.getElementById('reports-summary');
+    if(summaryEl){
+      summaryEl.innerHTML = `<span style="font-size:.75rem;color:var(--mid);font-weight:700">${htmlFiles.length} rapport${htmlFiles.length>1?'s':''}</span>`
+        +(totalJoueurs?` <span style="font-size:.72rem;color:#888">· ${totalJoueurs} joueur${totalJoueurs>1?'s':''} suivis au total</span>`:'')
+        +(allCatsSet.size?` <span style="font-size:.72rem;color:#888">· ${allCatsSet.size} catégorie${allCatsSet.size>1?'s':''}</span>`:'');
+    }
     list.innerHTML = '';
     htmlFiles.forEach((file, idx) => {
       const info = manifest[file.name] || {};
@@ -431,15 +498,19 @@ async function loadReports(){
       const players = info.players || '';
       const url = `${SITE}/rapports/${file.name}`;
       const isLatest = idx === 0;
+      const age = relativeAge(date);
+      const col = ageColor(date);
 
       const catBadges = cats.map(c=>`<span class="cat-badge" style="background:${catColor(c)}">${c}</span>`).join('');
       const div = document.createElement('div');
       div.className = 'report-item';
+      if(isLatest) div.style.cssText='border:2px solid var(--dark);background:#F4F2FB';
       div.innerHTML = `
         <div style="flex:1;min-width:0">
-          <div style="display:flex;align-items:center;gap:8px">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
             <span class="report-item-date">Entretiens du ${date}</span>
-            ${isLatest?'<span class="latest-tag">En ligne</span>':''}
+            ${isLatest?'<span class="latest-tag" style="background:var(--dark)">Dernier rapport</span>':''}
+            <span style="font-size:.65rem;font-weight:600;color:${col}">${age}</span>
           </div>
           <div class="report-item-meta">${players?players+' joueur'+(players>1?'s':''):''}${players&&cats.length?' · ':''}${cats.length?'Catégories :':''}</div>
           ${cats.length?`<div class="report-item-cats">${catBadges}</div>`:''}
