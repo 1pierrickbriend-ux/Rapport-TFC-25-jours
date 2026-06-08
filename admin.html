@@ -9,13 +9,13 @@
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);min-height:100vh}
 
-.header{background:var(--dark);padding:18px 28px;display:flex;align-items:center;gap:16px;border-bottom:3px solid var(--gold)}
+.header{background:var(--dark);padding:16px 24px;display:flex;align-items:center;gap:14px;border-bottom:3px solid var(--gold)}
 .header-logo{width:46px;height:46px;border-radius:50%;background:var(--mid);display:flex;align-items:center;justify-content:center;font-weight:800;color:white;font-size:.65rem;text-align:center;border:2px solid var(--gold)}
 .header h1{color:white;font-size:1.1rem;font-weight:800}
 .header p{color:var(--gold);font-size:.72rem;margin-top:2px}
 .header-badge{margin-left:auto;background:var(--orange);color:white;font-size:.65rem;font-weight:700;padding:4px 10px;border-radius:20px}
 
-.main{max-width:860px;margin:0 auto;padding:28px 20px;display:flex;flex-direction:column;gap:20px}
+.main{max-width:840px;margin:0 auto;padding:24px 20px;display:flex;flex-direction:column;gap:20px}
 
 /* SETUP TOKEN */
 .setup-card{background:white;border-radius:12px;padding:24px;border:2px solid var(--gold);box-shadow:0 2px 12px rgba(45,38,96,.08)}
@@ -36,8 +36,8 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);min-height
 .token-status.err{color:var(--red)}
 
 /* UPLOAD */
-.card{background:white;border-radius:12px;padding:24px;box-shadow:0 2px 12px rgba(45,38,96,.08)}
-.card-title{font-size:.85rem;font-weight:800;color:var(--dark);letter-spacing:.06em;text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.card{background:white;border-radius:12px;padding:24px;box-shadow:0 2px 10px rgba(45,38,96,.07)}
+.card-title{font-size:.82rem;font-weight:800;color:var(--dark);letter-spacing:.08em;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:8px}
 
 .drop-zone{border:2px dashed #C5C0E8;border-radius:10px;padding:16px 20px;text-align:center;cursor:pointer;transition:.2s;background:#FAFAFE;display:flex;align-items:center;gap:14px}
 .drop-zone:hover,.drop-zone.drag-over{border-color:var(--mid);background:#F3F0FC}
@@ -60,14 +60,14 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);min-height
 .publish-status.loading{color:var(--mid)}
 
 /* LISTE */
-.report-item{display:flex;align-items:center;gap:12px;padding:12px 16px;background:#FAFAFE;border:1px solid #E5E3F5;border-radius:10px;margin-bottom:8px}
+.report-item{display:flex;align-items:center;gap:12px;padding:12px 16px;background:#FAFAFE;border:1.5px solid #E5E3F5;border-radius:10px;margin-bottom:8px}
 .report-item-name{font-weight:700;color:var(--dark);font-size:.95rem}.report-item-date{font-weight:700;color:var(--dark);font-size:.95rem;flex:1}
 .report-item-meta{font-size:.68rem;color:#aaa;margin-top:3px;line-height:1.4}
 .report-item-cats{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px}
 .item-actions{display:flex;gap:8px;flex-shrink:0}
 .btn-view{background:var(--mid);color:white;padding:5px 12px;border:none;border-radius:6px;cursor:pointer;font-size:.7rem;font-weight:600;text-decoration:none}
 .btn-del{background:#FEE2E2;color:var(--red);padding:5px 10px;border:1px solid var(--red);border-radius:6px;cursor:pointer;font-size:.7rem;font-weight:600}
-.latest-tag{background:var(--gold);color:white;font-size:.55rem;font-weight:700;padding:1px 7px;border-radius:20px}
+.latest-tag{background:var(--gold);color:white;font-size:.58rem;font-weight:700;padding:2px 8px;border-radius:20px}
 .empty-list{text-align:center;padding:30px;color:#aaa;font-style:italic;font-size:.82rem}
 
 .confirm-overlay{display:none;position:fixed;inset:0;background:rgba(20,15,50,.6);z-index:100;align-items:center;justify-content:center}
