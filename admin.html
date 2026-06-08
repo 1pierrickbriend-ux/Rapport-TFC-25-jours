@@ -39,11 +39,11 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);min-height
 .card{background:white;border-radius:12px;padding:24px;box-shadow:0 2px 12px rgba(45,38,96,.08)}
 .card-title{font-size:.85rem;font-weight:800;color:var(--dark);letter-spacing:.06em;text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:8px}
 
-.drop-zone{border:2.5px dashed #C5C0E8;border-radius:10px;padding:40px 20px;text-align:center;cursor:pointer;transition:.2s;background:#FAFAFE}
+.drop-zone{border:2px dashed #C5C0E8;border-radius:10px;padding:16px 20px;text-align:center;cursor:pointer;transition:.2s;background:#FAFAFE;display:flex;align-items:center;gap:14px}
 .drop-zone:hover,.drop-zone.drag-over{border-color:var(--mid);background:#F3F0FC}
-.drop-zone-icon{font-size:2.5rem;margin-bottom:10px}
-.drop-zone-text{font-size:.85rem;color:#555;margin-bottom:6px}
-.drop-zone-sub{font-size:.72rem;color:#aaa}
+.drop-zone-icon{font-size:1.6rem;flex-shrink:0}
+.drop-zone-text{font-size:.82rem;color:#555;margin-bottom:2px;text-align:left}
+.drop-zone-sub{font-size:.68rem;color:#aaa;text-align:left}
 .drop-zone input[type=file]{display:none}
 
 .preview-card{background:#F8F7FF;border:1.5px solid #E5E3F5;border-radius:10px;padding:16px;margin-top:14px;display:none}
@@ -61,9 +61,9 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);min-height
 
 /* LISTE */
 .report-item{display:flex;align-items:center;gap:12px;padding:12px 16px;background:#FAFAFE;border:1px solid #E5E3F5;border-radius:10px;margin-bottom:8px}
-.report-item-date{font-weight:700;color:var(--dark);font-size:.88rem;flex:1}
-.report-item-meta{font-size:.68rem;color:#aaa;margin-top:2px}
-.report-item-cats{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px}
+.report-item-name{font-weight:700;color:var(--dark);font-size:.95rem}.report-item-date{font-weight:700;color:var(--dark);font-size:.95rem;flex:1}
+.report-item-meta{font-size:.68rem;color:#aaa;margin-top:3px;line-height:1.4}
+.report-item-cats{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px}
 .item-actions{display:flex;gap:8px;flex-shrink:0}
 .btn-view{background:var(--mid);color:white;padding:5px 12px;border:none;border-radius:6px;cursor:pointer;font-size:.7rem;font-weight:600;text-decoration:none}
 .btn-del{background:#FEE2E2;color:var(--red);padding:5px 10px;border:1px solid var(--red);border-radius:6px;cursor:pointer;font-size:.7rem;font-weight:600}
@@ -76,6 +76,9 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);min-height
 .confirm-box h3{font-size:1rem;font-weight:700;color:var(--dark);margin-bottom:10px}
 .confirm-box p{font-size:.8rem;color:#555;margin-bottom:20px;line-height:1.5}
 .confirm-btns{display:flex;gap:10px;justify-content:center}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--dark);color:white;padding:10px 18px;border-radius:8px;font-size:.78rem;font-weight:600;z-index:200;opacity:0;transform:translateY(8px);transition:opacity .25s,transform .25s;pointer-events:none}
+.toast.show{opacity:1;transform:translateY(0)}
+.toast.err{background:var(--red)}
 </style>
 </head>
 <body>
@@ -268,6 +271,13 @@ function expandSetup(){
   document.getElementById('setup-section').style.padding='24px';
 }
 
+
+function showToast(msg, type=''){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast'+(type?' '+type:'');
+  requestAnimationFrame(()=>{ t.classList.add('show'); });
+  setTimeout(()=>{ t.classList.remove('show'); },2200);
+}
 function setStatus(id, msg, type){
   const el = document.getElementById(id);
   el.textContent = msg;
@@ -559,10 +569,11 @@ async function confirmDelete(){
   closeConfirm();
   const path = target.isBilan ? 'bilans/' + target.name : 'rapports/' + target.name;
   const ok = await ghDelete(path, target.sha);
-  if(!ok){ alert('Erreur lors de la suppression. Vérifiez votre token.'); return; }
+  if(!ok){ showToast('Erreur lors de la suppression','err'); return; }
   const key = target.isBilan ? 'bilan_' + target.name : target.name;
   delete manifest[key];
   await saveManifest();
+  showToast('✓ Supprimé');
   if(target.isBilan) await loadBilans(); else await loadManifest();
 }
 
@@ -677,5 +688,6 @@ function askDeleteBilan(name,sha,joueur){
   document.getElementById('confirm-overlay').classList.add('active');
 }
 </script>
+<div class="toast" id="toast"></div>
 </body>
 </html>
