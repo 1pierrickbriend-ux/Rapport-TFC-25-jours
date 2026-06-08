@@ -349,6 +349,26 @@ async function loadBilans(){
       const url    = SITE+'/bilans/'+file.name;
       if(cat) allCats.add(cat);
       const sc = STATUT_COLORS[statut]||'#6B5CA5';
+      // Badge fin protocole : prochain vendredi après J+25
+      let badgeFinProto = '';
+      const dfp = info.dateFinProto||'';
+      if(dfp){
+        const pm = dfp.match(/(\d{2})\/(\d{2})\/(\d{4})/);
+        if(pm){
+          const today = new Date(); today.setHours(0,0,0,0);
+          const dFin = new Date(pm[3], pm[2]-1, pm[1]); dFin.setHours(0,0,0,0);
+          if(dFin >= today){
+            // Prochain vendredi >= dFin
+            const vendr = new Date(dFin);
+            const dow = vendr.getDay(); // 0=dim,5=ven
+            const diff = (5 - dow + 7) % 7;
+            vendr.setDate(vendr.getDate() + diff);
+            const jj = String(vendr.getDate()).padStart(2,'0');
+            const mm = String(vendr.getMonth()+1).padStart(2,'0');
+            badgeFinProto = `<span class="statut-badge" style="background:#7C3AED">&#128197; Bilan ~vendredi ${jj}/${mm}</span>`;
+          }
+        }
+      }
       const card = document.createElement('a');
       card.className = 'report-card';
       card.href = url; card.target = '_blank';
@@ -359,6 +379,7 @@ async function loadBilans(){
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
             <span class="card-date">${joueur}</span>
             ${statut?`<span class="statut-badge" style="background:${sc}">${statut}</span>`:''}
+            ${badgeFinProto}
             ${isNouveau(date,true)?'<span class="statut-badge" style="background:#E91E63">🔴 Nouveau</span>':''}
           </div>
           <div class="card-meta">${[cat, rri?'RRI '+rri+'/100':'', date?'Bilan du '+date:''].filter(Boolean).join(' · ')}</div>

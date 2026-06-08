@@ -171,8 +171,12 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);min-height
       </div>
     </div>
   </div>
+  <div id="alerte-fin-proto" style="display:none;background:#FFF7ED;border:1.5px solid #FB923C;border-radius:10px;padding:12px 16px;margin-bottom:12px">
+    <div style="font-size:.75rem;font-weight:800;color:#C2410C;margin-bottom:6px">&#9888;&#65039; Protocole d&eacute;pass&eacute; &mdash; bilan &agrave; reg&eacute;n&eacute;rer</div>
+    <div id="alerte-fin-proto-list" style="display:flex;flex-direction:column;gap:4px"></div>
+  </div>
   <div class="card">
-    <div class="card-title">📁 Bilans en ligne</div>
+    <div class="card-title">&#128193; Bilans en ligne</div>
     <div id="bilans-list"><div class="empty-list">Chargement...</div></div>
   </div>
   </div><!-- fin section-bilans -->
@@ -519,7 +523,8 @@ function handleBilan(file){
     function getMeta(name){var m=html.match(new RegExp('name="'+name+'"\s+content="([^"]+)"'));return m?m[1]:'';}
     var joueur=getMeta('tfc-joueur')||file.name.replace('Bilan_','').replace('.html','').replace(/_/g,' ');
     var catRaw=getMeta('tfc-categorie')||''; var cat=(['','—','nan','None'].includes(catRaw)?'':catRaw), statut=getMeta('tfc-statut')||'', rri=getMeta('tfc-rri')||'', date=getMeta('tfc-date')||'';
-    currentBilanMeta={joueur:joueur,cat:cat,statut:statut,rri:rri,date:date};
+    var jp=getMeta('tfc-jp')||'', dateFinProto=getMeta('tfc-date-fin-proto')||'';
+    currentBilanMeta={joueur:joueur,cat:cat,statut:statut,rri:rri,date:date,jp:jp,dateFinProto:dateFinProto};
     document.getElementById('preview-bilan-nom').textContent=joueur;
     document.getElementById('preview-bilan-meta').textContent=[cat,statut?'RRI '+rri+'/100':'',date].filter(Boolean).join(' · ');
     var cols={'PRET':'#22C55E','SURVEILLANCE':'#FB923C','VIGILANCE':'#EF4444'};
@@ -544,7 +549,7 @@ async function publishBilan(){
     var sha=existing?existing.sha:null;
     var ok=await ghPutBinary(filename,arrayBuffer,sha);
     if(!ok) throw new Error('Echec upload bilan');
-    manifest['bilan_'+nomFichier]={joueur:currentBilanMeta.joueur,cat:currentBilanMeta.cat,statut:currentBilanMeta.statut,rri:currentBilanMeta.rri,date:currentBilanMeta.date,fichier:nomFichier,type:'bilan'};
+    manifest['bilan_'+nomFichier]={joueur:currentBilanMeta.joueur,cat:currentBilanMeta.cat,statut:currentBilanMeta.statut,rri:currentBilanMeta.rri,date:currentBilanMeta.date,jp:currentBilanMeta.jp,dateFinProto:currentBilanMeta.dateFinProto,fichier:nomFichier,type:'bilan'};
     await saveManifest();
     st.className='publish-status ok'; st.textContent='Bilan publie ! Disponible dans 1-2 min.';
     await loadBilans();
@@ -565,6 +570,9 @@ async function loadBilans(){
     });
     if(!htmlFiles.length){list.innerHTML='<div class="empty-list">Aucun bilan publie.</div>';return;}
     list.innerHTML='';
+    // Zone orange : joueurs dont J+25 est dépassé
+    var today=new Date(); today.setHours(0,0,0,0);
+    var alertes=[];
     var cols2={'PRET':'#22C55E','SURVEILLANCE':'#FB923C','VIGILANCE':'#EF4444'};
     htmlFiles.forEach(function(file){
       var key='bilan_'+file.name, info=manifest[key]||{};
@@ -575,8 +583,20 @@ async function loadBilans(){
       var col2=cols2[st2b]||'#6B5CA5';
       var div=document.createElement('div'); div.className='report-item';
       div.innerHTML='<div style="flex:1;min-width:0"><div style="display:flex;align-items:center;gap:8px"><span class="report-item-date">'+joueur+'</span>'+(statut?'<span class="latest-tag" style="background:'+col2+'">'+statut+'</span>':'')+'</div><div class="report-item-meta">'+[cat,rri?'RRI '+rri+'/100':''].filter(Boolean).join(' · ')+'</div></div><div class="item-actions"><a class="btn-view" href="'+url+'" target="_blank">Voir</a><button class="btn-del" onclick="askDeleteBilan(\''+file.name+'\',\''+file.sha+'\',\''+joueur+'\')">Supprimer</button></div>';
+      // Détection alerte fin protocole
+      var dfp=info.dateFinProto||'';
+      if(dfp){var pm=dfp.match(/(\d{2})\/(\d{2})\/(\d{4})/);if(pm){var dFin=new Date(pm[3],pm[2]-1,pm[1]);dFin.setHours(0,0,0,0);if(dFin<today) alertes.push({joueur:joueur,dateFinProto:dfp,jp:info.jp||'?'});}}
       list.appendChild(div);
     });
+    // Affichage zone orange
+    var alerteBox=document.getElementById('alerte-fin-proto');
+    var alerteList=document.getElementById('alerte-fin-proto-list');
+    if(alertes.length){
+      alerteList.innerHTML=alertes.map(function(a){return '<div style="font-size:.72rem;color:#92400E;padding:3px 0;border-bottom:1px solid #FED7AA">&#128100; <strong>'+a.joueur+'</strong> &mdash; J+25 atteint le '+a.dateFinProto+' (J+'+a.jp+' actuellement)</div>';}).join('');
+      alerteBox.style.display='';
+    } else {
+      alerteBox.style.display='none';
+    }
   } catch(e){ list.innerHTML='<div class="empty-list">Erreur : '+e.message+'</div>'; }
 }
 
