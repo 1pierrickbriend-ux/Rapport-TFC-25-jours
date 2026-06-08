@@ -140,15 +140,6 @@
     "fichier": "Bilan_Steeve_Delarue.html",
     "type": "bilan"
   },
-  "bilan_Bilan_Isaack_Ahamadi.html": {
-    "joueur": "Isaack Ahamadi",
-    "cat": "N3",
-    "statut": "PRÊT",
-    "rri": "86",
-    "date": "08/06/2026",
-    "fichier": "Bilan_Isaack_Ahamadi.html",
-    "type": "bilan"
-  },
   "bilan_Bilan_Matthieu_De_Souza.html": {
     "joueur": "Matthieu De Souza",
     "cat": "U17",
