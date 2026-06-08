@@ -27,9 +27,9 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);min-height
 .filter-btn.active{background:var(--dark);border-color:var(--dark);color:white}
 .filter-info{margin-left:auto;font-size:.68rem;color:#aaa;font-style:italic}
 
-.main{max-width:820px;margin:0 auto;padding:24px 18px}
+.main{max-width:840px;margin:0 auto;padding:24px 20px}
 .section{display:none}.section.active{display:block}
-.section-title{font-size:.78rem;font-weight:800;color:var(--dark);letter-spacing:.1em;text-transform:uppercase;margin-bottom:14px}
+.section-title{font-size:.82rem;font-weight:800;color:var(--dark);letter-spacing:.08em;text-transform:uppercase;margin-bottom:14px}
 
 /* CARTES */
 .report-card{background:white;border-radius:12px;margin-bottom:10px;overflow:hidden;box-shadow:0 2px 10px rgba(45,38,96,.07);text-decoration:none;display:block;border:1.5px solid #E5E3F5;transition:transform .15s,box-shadow .15s}
@@ -37,8 +37,8 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);min-height
 .report-card.hidden{display:none}
 .card-inner{display:flex;align-items:center;gap:14px;padding:14px 18px}
 .card-icon{font-size:1.3rem;flex-shrink:0}
-.card-date{font-size:.98rem;font-weight:700;color:var(--dark)}
-.card-meta{font-size:.7rem;color:#888;margin-top:3px}
+.card-date{font-size:.95rem;font-weight:700;color:var(--dark)}
+.card-meta{font-size:.68rem;color:#888;margin-top:3px;line-height:1.4}
 .card-cats{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}
 .cat-badge{font-size:.6rem;font-weight:700;color:white;padding:2px 8px;border-radius:20px}
 .card-arrow{margin-left:auto;color:var(--mid);font-size:1.1rem;flex-shrink:0}
@@ -139,7 +139,7 @@ function isNouveau(dateStr, formatDMY){
 
 // ── État ──────────────────────────────────────────────────────────────────────
 let currentTab    = localStorage.getItem('tfc_tab')    || 'rapports';
-let currentFilter = localStorage.getItem('tfc_filter') || 'Tous';
+let currentFilter = {rapports: localStorage.getItem('tfc_filter_rapports')||'Tous', bilans: localStorage.getItem('tfc_filter_bilans')||'Tous'};
 let manifest      = {};
 let allCats       = new Set();
 let rapportsDone  = false;
@@ -198,6 +198,11 @@ async function buildBanner(){
           '<span style="width:8px;height:8px;border-radius:50%;background:#22C55E;display:inline-block"></span>' +
           '<span style="font-size:.75rem;font-weight:700;color:#22C55E">' + pret + ' PRÊT</span>' +
         '</div>' : '') +
+      (vigil===0 && surv===0 && total>0 ?
+        '<div style="display:flex;align-items:center;gap:6px;padding:4px 12px;background:#DCFCE7;border-radius:8px;flex-shrink:0">' +
+          '<span style="width:8px;height:8px;border-radius:50%;background:#22C55E;display:inline-block"></span>' +
+          '<span style="font-size:.72rem;font-weight:700;color:#15803D">✓ Aucune vigilance active</span>' +
+        '</div>' : '') +
       '<div style="margin-left:auto;font-size:.72rem;color:#aaa;white-space:nowrap">Dernier rapport : ' + dernierRapport + '</div>';
   } catch(e){
     banner.innerHTML='<div style="color:#aaa;font-size:.75rem">Statut indisponible</div>';
@@ -214,6 +219,7 @@ function showTab(tab){
   document.getElementById('section-rapports').classList.toggle('active', tab==='rapports');
   document.getElementById('section-bilans').classList.toggle('active', tab==='bilans');
   if(tab==='bilans' && !bilansDone) loadBilans();
+  buildBanner();
   applyFilter();
 }
 
@@ -221,19 +227,22 @@ function showTab(tab){
 function buildFilterButtons(){
   const container = document.getElementById('filter-cats');
   container.innerHTML = '';
+  const cf = currentFilter[currentTab]||'Tous';
+  const filterBar = document.getElementById('filter-bar');
+  if(filterBar) filterBar.style.display = allCats.size <= 1 ? 'none' : '';
   [...allCats].sort().forEach(cat=>{
     const btn = document.createElement('button');
-    btn.className = 'filter-btn' + (currentFilter===cat?' active':'');
+    btn.className = 'filter-btn' + (cf===cat?' active':'');
     btn.textContent = cat;
     btn.onclick = ()=>setFilter(cat);
     container.appendChild(btn);
   });
-  document.querySelector('.filter-btn').className = 'filter-btn' + (currentFilter==='Tous'?' active':'');
+  document.querySelector('.filter-btn').className = 'filter-btn' + (cf==='Tous'?' active':'');
 }
 
 function setFilter(cat){
-  currentFilter = cat;
-  localStorage.setItem('tfc_filter', cat);
+  currentFilter[currentTab] = cat;
+  localStorage.setItem('tfc_filter_'+currentTab, cat);
   document.querySelectorAll('.filter-btn').forEach(b=>{
     b.classList.toggle('active', b.textContent===cat);
   });
@@ -248,12 +257,14 @@ function applyFilter(){
   cards.forEach(card=>{
     const cats = (card.dataset.cats||'').split(',').filter(c=>c&&c!=='—');
     // Si pas de catégorie connue → visible pour tous les filtres
-    const show = currentFilter==='Tous' || cats.length===0 || cats.includes(currentFilter);
+    const cf = currentFilter[tab]||'Tous';
+    const show = cf==='Tous' || cats.length===0 || cats.includes(cf);
     card.classList.toggle('hidden', !show);
     if(show) visible++;
   });
   const info = document.getElementById('filter-info');
-  if(currentFilter!=='Tous') info.textContent = visible + ' résultat' + (visible>1?'s':'') + ' pour ' + currentFilter;
+  const cfInfo = currentFilter[tab]||'Tous';
+  if(cfInfo!=='Tous') info.textContent = visible + ' résultat' + (visible>1?'s':'') + ' pour ' + cfInfo;
   else info.textContent = '';
 }
 
@@ -268,6 +279,29 @@ function sortDateDMY(dmy){
   return m ? m[3]+m[2]+m[1] : '0';
 }
 
+
+function relativeAge(dateStr){
+  const m = dateStr.match(/(\d{2})\/(\d{2})\/(\d{4})/);
+  if(!m) return '';
+  const d = new Date(m[3], m[2]-1, m[1]); d.setHours(0,0,0,0);
+  const today = new Date(); today.setHours(0,0,0,0);
+  const days = Math.round((today-d)/(1000*60*60*24));
+  if(days===0) return "aujourd'hui";
+  if(days===1) return 'hier';
+  if(days<7) return `il y a ${days} jours`;
+  if(days<14) return 'il y a 1 semaine';
+  return `il y a ${Math.round(days/7)} semaines`;
+}
+function ageColor(dateStr){
+  const m = dateStr.match(/(\d{2})\/(\d{2})\/(\d{4})/);
+  if(!m) return '#aaa';
+  const d = new Date(m[3], m[2]-1, m[1]); d.setHours(0,0,0,0);
+  const today = new Date(); today.setHours(0,0,0,0);
+  const days = Math.round((today-d)/(1000*60*60*24));
+  if(days<=7) return '#22C55E';
+  if(days<=14) return '#FB923C';
+  return '#EF4444';
+}
 // ── Rapports ──────────────────────────────────────────────────────────────────
 async function loadRapports(){
   const list = document.getElementById('rapports-list');
@@ -290,6 +324,8 @@ async function loadRapports(){
       const url   = SITE+'/rapports/'+file.name;
       cats.forEach(c=>allCats.add(c));
       const catBadges = cats.map(c=>`<span class="cat-badge" style="background:${catColor(c)}">${c}</span>`).join('');
+      const age = relativeAge(date);
+      const agecol = ageColor(date);
       const card = document.createElement('a');
       card.className = 'report-card';
       card.href = url; card.target = '_blank';
@@ -300,6 +336,7 @@ async function loadRapports(){
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
             <span class="card-date">Entretiens du ${date}</span>
             ${idx===0?'<span class="latest-badge">Dernier rapport</span>':''}
+            <span style="font-size:.65rem;font-weight:600;color:${agecol}">${age}</span>
             ${isNouveau(file.name,false)?'<span class="latest-badge" style="background:#E91E63">🔴 Nouveau</span>':''}
           </div>
           <div class="card-meta">${players?players+' joueur'+(players>1?'s':''):''}${players&&cats.length?' · ':''}${cats.length?'Catégories :':''}</div>
