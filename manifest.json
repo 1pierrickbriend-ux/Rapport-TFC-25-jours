@@ -138,15 +138,6 @@
     ],
     "players": 1
   },
-  "bilan_Bilan_Elijah_Girardin.html": {
-    "joueur": "Elijah Girardin",
-    "cat": "U16",
-    "statut": "VIGILANCE",
-    "rri": "46",
-    "date": "08/06/2026",
-    "fichier": "Bilan_Elijah_Girardin.html",
-    "type": "bilan"
-  },
   "bilan_Bilan_Fred_Hebrard.html": {
     "joueur": "Fred Hebrard",
     "cat": "U16",
