@@ -103,7 +103,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);min-height
   </div>
 </div>
 
-<div class="footer">Cellule Performance & Réathlétisation · Toulouse Football Club</div>
+<div class="footer" id="footer-bar">Cellule Performance &amp; Réathlétisation · TFC</div>
 
 <script>
 const REPO  = '1pierrickbriend-ux/Rapport-TFC-25-jours';
@@ -173,6 +173,17 @@ async function buildBanner(){
       const d = manifest[k].date||'';
       if(d && (!dernierRapport||d>dernierRapport)) dernierRapport = d;
     });
+    // Footer fonctionnel (prop 10)
+    const footerEl = document.getElementById('footer-bar');
+    if(footerEl){
+      const nBilans = bkeys.length;
+      const nRapports = rkeys.length;
+      footerEl.innerHTML = 'Cellule Performance &amp; R&eacute;athl&eacute;tisation &middot; TFC'
+        + (nRapports ? ' &middot; ' + nRapports + ' rapport' + (nRapports>1?'s':'') : '')
+        + (nBilans  ? ' &middot; ' + nBilans  + ' bilan'   + (nBilans>1?'s':'')   : '')
+        + (dernierRapport!=='—' ? ' &middot; Dernier rapport : ' + dernierRapport : '')
+        + ' &middot; <a href="' + SITE + '/admin.html" target="_blank" style="color:var(--mid);font-weight:600;text-decoration:none">Admin</a>';
+    }
 
     // Bilans terminés cette saison
     const bilansTermines = bkeys.length;
@@ -308,7 +319,9 @@ async function loadRapports(){
   try{
     const r = await fetch('https://api.github.com/repos/'+REPO+'/contents/rapports',
       {headers:{Accept:'application/vnd.github.v3+json'}});
-    if(!r.ok) throw new Error('Dossier rapports introuvable');
+    if(r.status===403) throw new Error('Accès refusé (rate limit GitHub ou repo privé). Réessayez dans quelques minutes.');
+    if(r.status===404) throw new Error('Dossier rapports introuvable sur le dépôt.');
+    if(!r.ok) throw new Error('Erreur GitHub (code ' + r.status + '). Réessayez.');
     const files = await r.json();
     const htmlFiles = files.filter(f=>f.name.endsWith('.html'))
       .sort((a,b)=>sortDate(b.name).localeCompare(sortDate(a.name)));
@@ -326,12 +339,14 @@ async function loadRapports(){
       const catBadges = cats.map(c=>`<span class="cat-badge" style="background:${catColor(c)}">${c}</span>`).join('');
       const age = relativeAge(date);
       const agecol = ageColor(date);
+      const domCat = cats.length===1 ? cats[0] : cats.length>1 ? cats[0] : '';
+      const iconBg = domCat ? catColor(domCat) : 'var(--mid)';
       const card = document.createElement('a');
       card.className = 'report-card';
       card.href = url; card.target = '_blank';
       card.dataset.cats = cats.join(',');
       card.innerHTML = `<div class="card-inner">
-        <div class="card-icon">📋</div>
+        <div class="card-icon" style="width:32px;height:32px;border-radius:8px;background:${iconBg};display:flex;align-items:center;justify-content:center;font-size:.95rem;flex-shrink:0">📋</div>
         <div style="flex:1;min-width:0">
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
             <span class="card-date">Entretiens du ${date}</span>
@@ -347,6 +362,19 @@ async function loadRapports(){
       list.appendChild(card);
     });
     rapportsDone = true;
+    // Compteur global rapports (prop 3)
+    const titleEl = document.querySelector('#section-rapports .section-title');
+    if(titleEl){
+      const oldest = htmlFiles.length ? (()=>{
+        const info = manifest[htmlFiles[htmlFiles.length-1].name]||{};
+        return info.date || '';
+      })() : '';
+      titleEl.innerHTML = 'Rapports collectifs'
+        + '<span style="font-size:.68rem;font-weight:400;color:#888;margin-left:8px;text-transform:none;letter-spacing:0">'
+        + htmlFiles.length + ' rapport' + (htmlFiles.length>1?'s':'')
+        + (oldest ? ' · depuis le ' + oldest : '')
+        + '</span>';
+    }
     buildFilterButtons();
     applyFilter();
   } catch(e){
@@ -361,7 +389,9 @@ async function loadBilans(){
   try{
     const r = await fetch('https://api.github.com/repos/'+REPO+'/contents/bilans',
       {headers:{Accept:'application/vnd.github.v3+json'}});
-    if(!r.ok) throw new Error('Aucun bilan publié pour le moment.');
+    if(r.status===403) throw new Error('Accès refusé (rate limit GitHub). Réessayez dans quelques minutes.');
+    if(r.status===404) throw new Error('Aucun bilan publié pour le moment.');
+    if(!r.ok) throw new Error('Erreur GitHub (code ' + r.status + '). Réessayez.');
     const files = await r.json();
     const htmlFiles = files.filter(f=>f.name.endsWith('.html'))
       .sort((a,b)=>{
