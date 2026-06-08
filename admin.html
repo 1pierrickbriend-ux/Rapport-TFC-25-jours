@@ -398,6 +398,32 @@ async function saveManifest(){
   await ghPut('manifest.json', JSON.stringify(manifest, null, 2), sha);
 }
 
+
+// ── VÉRIFICATION DÉPLOIEMENT GITHUB PAGES (prop 4) ────────────────────────
+async function pollDeployment(url, statusEl, maxWait=120, interval=10){
+  statusEl.className='publish-status loading';
+  statusEl.textContent='⏳ En attente du déploiement GitHub Pages...';
+  const start = Date.now();
+  while(Date.now()-start < maxWait*1000){
+    await new Promise(r=>setTimeout(r, interval*1000));
+    const elapsed = Math.round((Date.now()-start)/1000);
+    try{
+      await fetch(url, {method:'HEAD', mode:'no-cors', cache:'no-store'});
+      // no-cors : si on arrive ici sans exception = ressource joignable
+      statusEl.className='publish-status ok';
+      statusEl.textContent='✓ En ligne sur GitHub Pages ('+elapsed+'s)';
+      return true;
+    } catch(e){
+      const remaining = maxWait - elapsed;
+      if(remaining > 0){
+        statusEl.textContent='⏳ Déploiement en cours... ('+elapsed+'s écoulées)';
+      }
+    }
+  }
+  statusEl.className='publish-status loading';
+  statusEl.textContent='⏱ Déploiement non confirmé — vérifiez dans quelques minutes';
+  return false;
+}
 // ── PUBLIER ────────────────────────────────────────────────────────────────
 async function publishReport(){
   if(!currentFile || !currentMeta) return;
@@ -440,8 +466,10 @@ async function publishReport(){
     await saveManifest();
 
     st.className = 'publish-status ok';
-    st.textContent = '✓ Rapport publié ! Disponible dans 1-2 min sur GitHub Pages.';
+    st.textContent = '✓ Rapport envoyé sur GitHub — vérification du déploiement...';
     await loadManifest();
+    const reportUrl = `${SITE}/rapports/${filename.replace('rapports/','')}`;
+    pollDeployment(reportUrl, st);
   } catch(e){
     st.className = 'publish-status err';
     st.textContent = '✗ Erreur : ' + e.message;
@@ -633,8 +661,10 @@ async function publishBilan(){
     if(!ok) throw new Error('Echec upload bilan');
     manifest['bilan_'+nomFichier]={joueur:currentBilanMeta.joueur,cat:currentBilanMeta.cat,statut:currentBilanMeta.statut,rri:currentBilanMeta.rri,date:currentBilanMeta.date,jp:currentBilanMeta.jp,dateFinProto:currentBilanMeta.dateFinProto,fichier:nomFichier,type:'bilan'};
     await saveManifest();
-    st.className='publish-status ok'; st.textContent='Bilan publie ! Disponible dans 1-2 min.';
+    st.className='publish-status ok'; st.textContent='✓ Bilan envoyé sur GitHub — vérification du déploiement...';
     await loadBilans();
+    const bilanUrl=`${SITE}/bilans/${nomFichier}`;
+    pollDeployment(bilanUrl, st);
   } catch(e){ st.className='publish-status err'; st.textContent='Erreur : '+e.message; }
   btn.disabled=false;
 }
