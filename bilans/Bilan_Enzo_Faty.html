@@ -360,6 +360,40 @@ tr:nth-child(even) td{background:rgba(255,255,255,0.03)}
     <div id="frise-info-box" style="display:none;margin-top:10px;padding:10px 14px;background:#2D2660;color:white;border-radius:8px;font-size:.82rem;font-weight:600;border:2px solid #C9A84C;line-height:1.5"></div>
   </div>
 
+  <!-- ROW 4b : CHARGE MATCH CUMULÉE -->
+  <div class="card section-full" style="margin-bottom:16px">
+    <div class="card-title">■ Charge match cumulée — progression vers la cible saison</div>
+    <div style="display:flex;gap:20px;align-items:center;flex-wrap:wrap">
+      <div style="flex:1;min-width:200px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+          <span style="font-size:.75rem;color:#C8C4E8">Minutes jouées</span>
+          <span style="font-size:.75rem;font-weight:700;color:#22C55E">254' / 270'</span>
+        </div>
+        <div style="background:rgba(255,255,255,0.1);border-radius:8px;height:14px;overflow:hidden">
+          <div style="width:94%;height:100%;background:#22C55E;border-radius:8px;transition:width .6s"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:4px">
+          <span style="font-size:.65rem;color:#888">0'</span>
+          <span style="font-size:.7rem;font-weight:700;color:#22C55E">94% de la cible</span>
+          <span style="font-size:.65rem;color:#888">270'</span>
+        </div>
+      </div>
+      <div style="flex:1;min-width:200px">
+        <div style="font-size:.65rem;color:#C8C4E8;margin-bottom:6px;font-weight:600">Progression match par match</div>
+        <svg viewBox="0 0 500 70" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;overflow:visible">
+          <rect width="500" height="70" fill="rgba(255,255,255,0.05)" rx="4"/>
+          <line x1="0" y1="60" x2="500" y2="60" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+          <polyline points="0,54 125,47 250,37 375,19 500,5" fill="none" stroke="#22C55E" stroke-width="2.5" stroke-linejoin="round"/><circle cx="0" cy="54" r="4" fill="#22C55E" stroke="white" stroke-width="1.5"/><text x="0" y="46" text-anchor="middle" font-size="9" fill="#22C55E" font-family="system-ui" font-weight="700">23'</text><circle cx="125" cy="47" r="4" fill="#22C55E" stroke="white" stroke-width="1.5"/><text x="125" y="39" text-anchor="middle" font-size="9" fill="#22C55E" font-family="system-ui" font-weight="700">58'</text><circle cx="250" cy="37" r="4" fill="#22C55E" stroke="white" stroke-width="1.5"/><text x="250" y="29" text-anchor="middle" font-size="9" fill="#22C55E" font-family="system-ui" font-weight="700">103'</text><circle cx="375" cy="19" r="4" fill="#22C55E" stroke="white" stroke-width="1.5"/><text x="375" y="11" text-anchor="middle" font-size="9" fill="#22C55E" font-family="system-ui" font-weight="700">183'</text><circle cx="500" cy="5" r="4" fill="#22C55E" stroke="white" stroke-width="1.5"/><text x="500" y="-3" text-anchor="middle" font-size="9" fill="#22C55E" font-family="system-ui" font-weight="700">254'</text>
+        </svg>
+      </div>
+      <div style="background:rgba(255,255,255,0.06);border-radius:10px;padding:14px 18px;text-align:center;flex-shrink:0">
+        <div style="font-size:.62rem;color:#C8C4E8;margin-bottom:4px">Total cumulé</div>
+        <div style="font-size:2rem;font-weight:800;color:#22C55E">254'</div>
+        <div style="font-size:.65rem;color:#C8C4E8;margin-top:2px">5 matchs</div>
+      </div>
+    </div>
+  </div>
+
   <!-- ROW 5 : TEMPS DE JEU -->
   <div class="card section-full">
     <div class="card-title">Temps de jeu — progression par match</div>
