@@ -150,7 +150,7 @@ function isNouveau(dateStr, formatDMY){
       if(!p2) return false;
       d=new Date(p2[3],p2[2]-1,p2[1]);
     }
-    return (Date.now()-d.getTime()) < 7*24*3600*1000; // 7 jours
+    return (Date.now()-d.getTime()) < 3*24*3600*1000; // 3 jours
   } catch(e){ return false; }
 }
 
