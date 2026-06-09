@@ -378,15 +378,13 @@ async function loadRapports(){
       const catBadges = cats.map(c=>`<span class="cat-badge" style="background:${catColor(c)}">${c}</span>`).join('');
       const age = relativeAge(date);
       const agecol = ageColor(date);
-      const domCat = cats.length===1 ? cats[0] : cats.length>1 ? cats[0] : '';
-      const iconBg = domCat ? catColor(domCat) : 'var(--mid)';
       const card = document.createElement('a');
       card.className = 'report-card';
       card.href = url; card.target = '_blank';
       card.dataset.cats = cats.join(',');
       card.style.borderLeft = '4px solid ' + agecol;
       card.innerHTML = `<div class="card-inner">
-        <div class="card-icon" style="width:32px;height:32px;border-radius:8px;background:${iconBg};display:flex;align-items:center;justify-content:center;font-size:.95rem;flex-shrink:0">📋</div>
+        <div class="card-icon" style="width:32px;height:32px;border-radius:8px;background:var(--mid);display:flex;align-items:center;justify-content:center;font-size:.95rem;flex-shrink:0">📋</div>
         <div style="flex:1;min-width:0">
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
             <span class="card-date">Entretiens du ${date}</span>
