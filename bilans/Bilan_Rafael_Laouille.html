@@ -54,6 +54,16 @@ tr:nth-child(even) td{background:rgba(255,255,255,0.03)}
 
 <div class="main">
 
+  <!-- ROW 0 : COMMENTAIRE DU JOUR (priorité 1) -->
+  <div class="card section-full" style="margin-bottom:16px;border-left:3px solid #D4AF37;border-radius:0 12px 12px 0">
+    <div class="card-title" style="color:#D4AF37">Observations</div>
+    <div style="font-size:.8rem;color:#C8C4E8;font-style:italic;line-height:1.6">Seulement 2 séances cette semaine en raison de sortie aviron + RDV médipole . Pas de douleurs poignet.FIN DU PROCESSUS POUR RAFAEL</div>
+    <button class="toggle-btn" onclick="toggle('all-comments')">&#9660; Voir tout l&#39;historique des commentaires</button>
+    <div class="collapsible" id="all-comments">
+      <div style="margin-top:10px;max-height:250px;overflow-y:auto;border-radius:8px;border:1px solid rgba(255,255,255,0.08)"><div style="padding:8px 10px;border-bottom:1px solid rgba(255,255,255,0.07)"><div style="font-size:.65rem;color:#D4AF37;font-weight:700;margin-bottom:3px">10/04/2026</div><div style="font-size:.78rem;color:#C8C4E8;line-height:1.5">Seulement 2 séances cette semaine en raison de sortie aviron + RDV médipole . Pas de douleurs poignet.FIN DU PROCESSUS POUR RAFAEL</div></div><div style="padding:8px 10px;border-bottom:1px solid rgba(255,255,255,0.07)"><div style="font-size:.65rem;color:#D4AF37;font-weight:700;margin-bottom:3px">07/04/2026</div><div style="font-size:.78rem;color:#C8C4E8;line-height:1.5">45’ joué match amical – bon ressenti général, doc spécialiste jeudi pour le poignet</div></div><div style="padding:8px 10px;border-bottom:1px solid rgba(255,255,255,0.07)"><div style="font-size:.65rem;color:#D4AF37;font-weight:700;margin-bottom:3px">03/04/2026</div><div style="font-size:.78rem;color:#C8C4E8;line-height:1.5">IRM ce matin poignet – frappe dans la tête ce matin – ok fin de séance</div></div><div style="padding:8px 10px;border-bottom:1px solid rgba(255,255,255,0.07)"><div style="font-size:.65rem;color:#D4AF37;font-weight:700;margin-bottom:3px">31/03/2026</div><div style="font-size:.78rem;color:#C8C4E8;line-height:1.5">douleur au poignet depuis vendredi matin (3/10 douleur)</div></div><div style="padding:8px 10px;border-bottom:1px solid rgba(255,255,255,0.07)"><div style="font-size:.65rem;color:#D4AF37;font-weight:700;margin-bottom:3px">27/03/2026</div><div style="font-size:.78rem;color:#C8C4E8;line-height:1.5">courbatures aux fessiers (force mercredi)</div></div><div style="padding:8px 10px;border-bottom:1px solid rgba(255,255,255,0.07)"><div style="font-size:.65rem;color:#D4AF37;font-weight:700;margin-bottom:3px">24/03/2026</div><div style="font-size:.78rem;color:#C8C4E8;line-height:1.5">pas de match à venir => faire un maximum de fiche préventions</div></div><div style="padding:8px 10px;border-bottom:1px solid rgba(255,255,255,0.07)"><div style="font-size:.65rem;color:#D4AF37;font-weight:700;margin-bottom:3px">19/03/2026</div><div style="font-size:.78rem;color:#C8C4E8;line-height:1.5">Douleurs à 2/10 sur le terrain sur extension jambe / sprint</div></div></div>
+    </div>
+  </div>
+
   <!-- ROW 1 : INFOS + RRI + PHOTO -->
   <div style="display:grid;grid-template-columns:1.2fr 1.2fr .8fr;gap:16px;margin-bottom:16px">
 
@@ -267,20 +277,10 @@ tr:nth-child(even) td{background:rgba(255,255,255,0.03)}
     </div>
   </div>
 
-  <!-- ROW 3 : ALERTES + COMMENTAIRES -->
-  <div class="grid-2">
-    <div class="card">
+  <!-- ROW 3 : ALERTES -->
+  <div class="card section-full" style="margin-bottom:16px">
       <div class="card-title">Alertes identifiées</div>
       <div style="color:#4ADE80;font-size:.78rem;font-style:italic">Aucune alerte identifiée</div>
-    </div>
-    <div class="card">
-      <div class="card-title">Observations</div>
-      <div style="font-size:.8rem;color:#C8C4E8;font-style:italic;line-height:1.6">Seulement 2 séances cette semaine en raison de sortie aviron + RDV médipole . Pas de douleurs poignet.FIN DU PROCESSUS POUR RAFAEL</div>
-      <button class="toggle-btn" onclick="toggle('all-comments')">&#9660; Voir tout l&#39;historique des commentaires</button>
-      <div class="collapsible" id="all-comments">
-        <div style="margin-top:10px;max-height:250px;overflow-y:auto;border-radius:8px;border:1px solid rgba(255,255,255,0.08)"><div style="padding:8px 10px;border-bottom:1px solid rgba(255,255,255,0.07)"><div style="font-size:.65rem;color:#D4AF37;font-weight:700;margin-bottom:3px">10/04/2026</div><div style="font-size:.78rem;color:#C8C4E8;line-height:1.5">Seulement 2 séances cette semaine en raison de sortie aviron + RDV médipole . Pas de douleurs poignet.FIN DU PROCESSUS POUR RAFAEL</div></div><div style="padding:8px 10px;border-bottom:1px solid rgba(255,255,255,0.07)"><div style="font-size:.65rem;color:#D4AF37;font-weight:700;margin-bottom:3px">07/04/2026</div><div style="font-size:.78rem;color:#C8C4E8;line-height:1.5">45’ joué match amical – bon ressenti général, doc spécialiste jeudi pour le poignet</div></div><div style="padding:8px 10px;border-bottom:1px solid rgba(255,255,255,0.07)"><div style="font-size:.65rem;color:#D4AF37;font-weight:700;margin-bottom:3px">03/04/2026</div><div style="font-size:.78rem;color:#C8C4E8;line-height:1.5">IRM ce matin poignet – frappe dans la tête ce matin – ok fin de séance</div></div><div style="padding:8px 10px;border-bottom:1px solid rgba(255,255,255,0.07)"><div style="font-size:.65rem;color:#D4AF37;font-weight:700;margin-bottom:3px">31/03/2026</div><div style="font-size:.78rem;color:#C8C4E8;line-height:1.5">douleur au poignet depuis vendredi matin (3/10 douleur)</div></div><div style="padding:8px 10px;border-bottom:1px solid rgba(255,255,255,0.07)"><div style="font-size:.65rem;color:#D4AF37;font-weight:700;margin-bottom:3px">27/03/2026</div><div style="font-size:.78rem;color:#C8C4E8;line-height:1.5">courbatures aux fessiers (force mercredi)</div></div><div style="padding:8px 10px;border-bottom:1px solid rgba(255,255,255,0.07)"><div style="font-size:.65rem;color:#D4AF37;font-weight:700;margin-bottom:3px">24/03/2026</div><div style="font-size:.78rem;color:#C8C4E8;line-height:1.5">pas de match à venir => faire un maximum de fiche préventions</div></div><div style="padding:8px 10px;border-bottom:1px solid rgba(255,255,255,0.07)"><div style="font-size:.65rem;color:#D4AF37;font-weight:700;margin-bottom:3px">19/03/2026</div><div style="font-size:.78rem;color:#C8C4E8;line-height:1.5">Douleurs à 2/10 sur le terrain sur extension jambe / sprint</div></div></div>
-      </div>
-    </div>
   </div>
 
   <!-- ROW 3b : ÉVOLUTION RRI -->
