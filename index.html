@@ -483,8 +483,16 @@ async function loadBilans(){
       card.dataset.cats = cat;
       card.style.borderLeft = '4px solid ' + borderCol;
       card.style.animationDelay = (Array.from(card.parentNode?.children||[]).length * 40) + 'ms';
+      const initiales = joueur.split(' ').map(w=>w[0]||'').join('').slice(0,2).toUpperCase();
+      const photoName = joueur.replace(/ /g,'_');
+      const photoExts = ['jpg','jpeg','png','JPG','PNG'];
+      const photoUrl = SITE+'/photos/'+photoName+'.jpg';
+      const photoHtml = `<div style="width:40px;height:48px;border-radius:8px;overflow:hidden;flex-shrink:0;background:var(--mid);display:flex;align-items:center;justify-content:center">
+        <img src="${photoUrl}" alt="${joueur}" style="width:100%;height:100%;object-fit:cover;object-position:top center;display:block"
+          onerror="this.style.display='none';this.parentNode.innerHTML='<span style=\\'font-size:11px;font-weight:700;color:white\\'>${initiales}</span>'">
+      </div>`;
       card.innerHTML = `<div class="card-inner">
-        <div class="card-icon">👤</div>
+        ${photoHtml}
         <div style="flex:1;min-width:0">
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
             <span class="card-date">${joueur}</span>
