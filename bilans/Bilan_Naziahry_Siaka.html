@@ -16,25 +16,25 @@
 body{font-family:'Segoe UI',system-ui,sans-serif;background:#F4F2FA;color:#1E1A50;min-height:100vh}
 .header{background:#261C5E;padding:16px 24px;display:flex;align-items:center;gap:16px;border-bottom:3px solid #D4AF37}
 .h-title{font-size:1.25rem;font-weight:800;letter-spacing:.04em}
-.h-sub{font-size:.75rem;color:#C8C4E8;margin-top:3px}
-.badge{font-size:.65rem;font-weight:700;color:white;padding:3px 10px;border-radius:20px;flex-shrink:0}
+.h-sub{font-size:.75rem;color:#DDD9F5;margin-top:3px}
+.badge{font-size:.72rem;font-weight:700;color:white;padding:3px 10px;border-radius:20px;flex-shrink:0}
 .main{max-width:1100px;margin:0 auto;padding:20px 20px}
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
 .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px}
 .grid-4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:16px;margin-bottom:16px}
 .card{background:#261C5E;border-radius:12px;padding:16px;border:1px solid rgba(255,255,255,0.08)}
-.card-title{font-size:.7rem;font-weight:800;color:#C8C4E8;letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px}
+.card-title{font-size:.7rem;font-weight:800;color:#DDD9F5;letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px}
 .kpi-val{font-size:1.8rem;font-weight:800}
-.kpi-lbl{font-size:.65rem;color:#C8C4E8;margin-top:3px;text-transform:uppercase}
+.kpi-lbl{font-size:.72rem;color:#DDD9F5;margin-top:3px;text-transform:uppercase}
 .bar{background:rgba(255,255,255,0.1);border-radius:4px;height:6px;overflow:hidden;margin-top:5px}
 .bar-fill{height:100%;border-radius:4px}
 .section-full{margin-bottom:16px}
-.toggle-btn{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#C8C4E8;padding:6px 14px;border-radius:20px;cursor:pointer;font-size:.75rem;font-weight:600;margin-top:10px;display:inline-block}
+.toggle-btn{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#DDD9F5;padding:6px 14px;border-radius:20px;cursor:pointer;font-size:.75rem;font-weight:600;margin-top:10px;display:inline-block}
 .toggle-btn:hover{background:rgba(255,255,255,0.15)}
 .collapsible{max-height:0;overflow:hidden;transition:max-height .4s ease}
 .collapsible.open{max-height:2000px}
 .rri-score{font-size:3rem;font-weight:800;line-height:1}
-.footer{background:#261C5E;border-top:1px solid rgba(255,255,255,0.1);padding:12px 24px;display:flex;justify-content:space-between;font-size:.7rem;color:#888;margin-top:24px}
+.footer{background:#261C5E;border-top:1px solid rgba(255,255,255,0.1);padding:12px 24px;display:flex;justify-content:space-between;font-size:.75rem;color:#B0ACCC;margin-top:24px}
 table{width:100%;border-collapse:collapse}
 tr:nth-child(even) td{background:rgba(255,255,255,0.03)}
 @media(max-width:700px){.grid-2,.grid-3,.grid-4{grid-template-columns:1fr}}
@@ -57,10 +57,10 @@ tr:nth-child(even) td{background:rgba(255,255,255,0.03)}
   <!-- ROW 0 : COMMENTAIRE DU JOUR (priorité 1) -->
   <div class="card section-full" style="margin-bottom:16px;border-left:3px solid #D4AF37;border-radius:0 12px 12px 0">
     <div class="card-title" style="color:#D4AF37">Observations</div>
-    <div style="font-size:.8rem;color:#C8C4E8;font-style:italic;line-height:1.6">Fin de protocole, très bon suivi général</div>
+    <div style="font-size:.8rem;color:#DDD9F5;font-style:italic;line-height:1.6">Fin de protocole, très bon suivi général</div>
     <button class="toggle-btn" onclick="toggle('all-comments')">&#9660; Voir tout l&#39;historique des commentaires</button>
     <div class="collapsible" id="all-comments">
-      <div style="margin-top:10px;max-height:250px;overflow-y:auto;border-radius:8px;border:1px solid rgba(255,255,255,0.08)"><div style="padding:8px 10px;border-bottom:1px solid rgba(255,255,255,0.07)"><div style="font-size:.65rem;color:#D4AF37;font-weight:700;margin-bottom:3px">22/05/2026</div><div style="font-size:.78rem;color:#C8C4E8;line-height:1.5">Fin de protocole, très bon suivi général</div></div><div style="padding:8px 10px;border-bottom:1px solid rgba(255,255,255,0.07)"><div style="font-size:.65rem;color:#D4AF37;font-weight:700;margin-bottom:3px">19/05/2026</div><div style="font-size:.78rem;color:#C8C4E8;line-height:1.5">Toujours de bonnes sensations, aucune gênes ni douleurs.</div></div><div style="padding:8px 10px;border-bottom:1px solid rgba(255,255,255,0.07)"><div style="font-size:.65rem;color:#D4AF37;font-weight:700;margin-bottom:3px">15/05/2026</div><div style="font-size:.78rem;color:#C8C4E8;line-height:1.5">Séance pro ce jeudi matin . Bonne confiance retrouvée, force et explosivité également. Content se sa semaine.</div></div><div style="padding:8px 10px;border-bottom:1px solid rgba(255,255,255,0.07)"><div style="font-size:.65rem;color:#D4AF37;font-weight:700;margin-bottom:3px">12/05/2026</div><div style="font-size:.78rem;color:#C8C4E8;line-height:1.5">Premier match joué ce week-end. Très bon ressenti général, bonnes sensations avant, pendant et après le match</div></div><div style="padding:8px 10px;border-bottom:1px solid rgba(255,255,255,0.07)"><div style="font-size:.65rem;color:#D4AF37;font-weight:700;margin-bottom:3px">07/05/2026</div><div style="font-size:.78rem;color:#C8C4E8;line-height:1.5">séance terrain aujourd’hui – RASSéance salle muscu mercredi– vélo – RAS.Reprend de très bonnes sensation, plaisir à l’entraînement et a hâte de rejouer .</div></div><div style="padding:8px 10px;border-bottom:1px solid rgba(255,255,255,0.07)"><div style="font-size:.65rem;color:#D4AF37;font-weight:700;margin-bottom:3px">05/05/2026</div><div style="font-size:.78rem;color:#C8C4E8;line-height:1.5">RAS, joueur se sent en confiance, à 100 % de ses capacités d’avant blessure, prêt à rejouer. Il se sent plus en forme aujourd’hui que avant sa blessure (état de fatigue).</div></div></div>
+      <div style="margin-top:10px;max-height:250px;overflow-y:auto;border-radius:8px;border:1px solid rgba(255,255,255,0.08)"><div style="padding:8px 10px;border-bottom:1px solid rgba(255,255,255,0.07)"><div style="font-size:.72rem;color:#D4AF37;font-weight:700;margin-bottom:3px">22/05/2026</div><div style="font-size:.78rem;color:#DDD9F5;line-height:1.5">Fin de protocole, très bon suivi général</div></div><div style="padding:8px 10px;border-bottom:1px solid rgba(255,255,255,0.07)"><div style="font-size:.72rem;color:#D4AF37;font-weight:700;margin-bottom:3px">19/05/2026</div><div style="font-size:.78rem;color:#DDD9F5;line-height:1.5">Toujours de bonnes sensations, aucune gênes ni douleurs.</div></div><div style="padding:8px 10px;border-bottom:1px solid rgba(255,255,255,0.07)"><div style="font-size:.72rem;color:#D4AF37;font-weight:700;margin-bottom:3px">15/05/2026</div><div style="font-size:.78rem;color:#DDD9F5;line-height:1.5">Séance pro ce jeudi matin . Bonne confiance retrouvée, force et explosivité également. Content se sa semaine.</div></div><div style="padding:8px 10px;border-bottom:1px solid rgba(255,255,255,0.07)"><div style="font-size:.72rem;color:#D4AF37;font-weight:700;margin-bottom:3px">12/05/2026</div><div style="font-size:.78rem;color:#DDD9F5;line-height:1.5">Premier match joué ce week-end. Très bon ressenti général, bonnes sensations avant, pendant et après le match</div></div><div style="padding:8px 10px;border-bottom:1px solid rgba(255,255,255,0.07)"><div style="font-size:.72rem;color:#D4AF37;font-weight:700;margin-bottom:3px">07/05/2026</div><div style="font-size:.78rem;color:#DDD9F5;line-height:1.5">séance terrain aujourd’hui – RASSéance salle muscu mercredi– vélo – RAS.Reprend de très bonnes sensation, plaisir à l’entraînement et a hâte de rejouer .</div></div><div style="padding:8px 10px;border-bottom:1px solid rgba(255,255,255,0.07)"><div style="font-size:.72rem;color:#D4AF37;font-weight:700;margin-bottom:3px">05/05/2026</div><div style="font-size:.78rem;color:#DDD9F5;line-height:1.5">RAS, joueur se sent en confiance, à 100 % de ses capacités d’avant blessure, prêt à rejouer. Il se sent plus en forme aujourd’hui que avant sa blessure (état de fatigue).</div></div></div>
     </div>
   </div>
 
@@ -71,14 +71,14 @@ tr:nth-child(even) td{background:rgba(255,255,255,0.03)}
     <div class="card">
       <div class="card-title">Informations protocole</div>
       <div style="display:flex;flex-direction:column;gap:8px">
-        <div><span style="font-size:.7rem;color:#C8C4E8">Blessure</span><div style="font-weight:700;font-size:.9rem;color:#D4AF37;margin-top:2px">Lésion grade 3 ischios droit</div></div>
-        <div><span style="font-size:.7rem;color:#C8C4E8">Date reprise</span><div style="font-weight:600;font-size:.85rem;margin-top:2px">05/05/2026</div></div>
-        <div><span style="font-size:.7rem;color:#C8C4E8">Date 1er match</span><div style="font-weight:600;font-size:.85rem;margin-top:2px">10/05/2026</div></div>
-        <div><span style="font-size:.7rem;color:#C8C4E8">Jours entraînement → 1er match</span>
+        <div><span style="font-size:.75rem;color:#DDD9F5">Blessure</span><div style="font-weight:700;font-size:.9rem;color:#D4AF37;margin-top:2px">Lésion grade 3 ischios droit</div></div>
+        <div><span style="font-size:.75rem;color:#DDD9F5">Date reprise</span><div style="font-weight:600;font-size:.85rem;margin-top:2px">05/05/2026</div></div>
+        <div><span style="font-size:.75rem;color:#DDD9F5">Date 1er match</span><div style="font-weight:600;font-size:.85rem;margin-top:2px">10/05/2026</div></div>
+        <div><span style="font-size:.75rem;color:#DDD9F5">Jours entraînement → 1er match</span>
           <div style="font-size:1.5rem;font-weight:800;color:#D4AF37;margin-top:2px">5 jours</div></div>
-        <div><span style="font-size:.7rem;color:#C8C4E8">Soins · Prévention</span>
-          <div style="font-weight:600;margin-top:2px">9 · 9 <span style="font-size:.65rem;color:#888">entretiens</span></div></div>
-        <div><span style="font-size:.7rem;color:#C8C4E8">Focus prévention</span>
+        <div><span style="font-size:.75rem;color:#DDD9F5">Soins · Prévention</span>
+          <div style="font-weight:600;margin-top:2px">9 · 9 <span style="font-size:.72rem;color:#B0ACCC">entretiens</span></div></div>
+        <div><span style="font-size:.75rem;color:#DDD9F5">Focus prévention</span>
           <div style="font-size:.8rem;margin-top:2px">tertiaire ischios</div></div>
       </div>
     </div>
@@ -86,8 +86,8 @@ tr:nth-child(even) td{background:rgba(255,255,255,0.03)}
     <!-- RRI -->
     <div class="card" style="text-align:center">
       <div class="card-title" style="text-align:left">RRI — Indice de Retour Compétition /100</div>
-      <div style="font-size:.72rem;color:#C8C4E8;text-align:left;margin-bottom:10px">Score composite : Psychologie · Condition physique · Alertes médicales</div>
-      <div class="rri-score" style="color:#22C55E">90<span style="font-size:1.2rem;color:#888;font-weight:400">/100</span></div>
+      <div style="font-size:.72rem;color:#DDD9F5;text-align:left;margin-bottom:10px">Score composite : Psychologie · Condition physique · Alertes médicales</div>
+      <div class="rri-score" style="color:#22C55E">90<span style="font-size:1.2rem;color:#B0ACCC;font-weight:400">/100</span></div>
       <div style="margin:8px auto;max-width:200px">
         <div class="bar" style="height:10px"><div class="bar-fill" style="width:90%;background:#22C55E"></div></div>
       </div>
@@ -97,48 +97,48 @@ tr:nth-child(even) td{background:rgba(255,255,255,0.03)}
       </div>
       <div class="collapsible" id="rri-detail" style="margin-top:10px">
         <table><thead><tr>
-          <th style="text-align:left;font-size:.65rem;color:#888;padding:4px 8px">Composante</th>
-          <th style="font-size:.65rem;color:#888;padding:4px 8px">Valeur</th>
-          <th style="font-size:.65rem;color:#888;padding:4px 8px">Progression</th>
-          <th style="font-size:.65rem;color:#888;padding:4px 8px">Score</th>
+          <th style="text-align:left;font-size:.72rem;color:#B0ACCC;padding:4px 8px">Composante</th>
+          <th style="font-size:.72rem;color:#B0ACCC;padding:4px 8px">Valeur</th>
+          <th style="font-size:.72rem;color:#B0ACCC;padding:4px 8px">Progression</th>
+          <th style="font-size:.72rem;color:#B0ACCC;padding:4px 8px">Score</th>
         </tr></thead><tbody><tr>
-          <td style="padding:5px 8px;font-size:.78rem;font-weight:600;color:#C8C4E8">Confiance Physique</td>
-          <td style="padding:5px 8px;font-style:italic;font-size:.72rem;color:#aaa">10/10</td>
+          <td style="padding:5px 8px;font-size:.78rem;font-weight:600;color:#DDD9F5">Confiance Physique</td>
+          <td style="padding:5px 8px;font-style:italic;font-size:.72rem;color:#C4C0E0">10/10</td>
           <td style="padding:5px 8px"><div style="background:rgba(255,255,255,0.1);border-radius:3px;height:6px;width:80px;overflow:hidden"><div style="width:100%;height:100%;background:#4ADE80;border-radius:3px"></div></div></td>
           <td style="padding:5px 8px;font-weight:700;font-size:.82rem;color:#4ADE80">15/15</td>
         </tr><tr>
-          <td style="padding:5px 8px;font-size:.78rem;font-weight:600;color:#C8C4E8">Confiance Mentale</td>
-          <td style="padding:5px 8px;font-style:italic;font-size:.72rem;color:#aaa">10/10</td>
+          <td style="padding:5px 8px;font-size:.78rem;font-weight:600;color:#DDD9F5">Confiance Mentale</td>
+          <td style="padding:5px 8px;font-style:italic;font-size:.72rem;color:#C4C0E0">10/10</td>
           <td style="padding:5px 8px"><div style="background:rgba(255,255,255,0.1);border-radius:3px;height:6px;width:80px;overflow:hidden"><div style="width:100%;height:100%;background:#4ADE80;border-radius:3px"></div></div></td>
           <td style="padding:5px 8px;font-weight:700;font-size:.82rem;color:#4ADE80">15/15</td>
         </tr><tr>
-          <td style="padding:5px 8px;font-size:.78rem;font-weight:600;color:#C8C4E8">Soins + Prévention</td>
-          <td style="padding:5px 8px;font-style:italic;font-size:.72rem;color:#aaa">18 pts</td>
+          <td style="padding:5px 8px;font-size:.78rem;font-weight:600;color:#DDD9F5">Soins + Prévention</td>
+          <td style="padding:5px 8px;font-style:italic;font-size:.72rem;color:#C4C0E0">18 pts</td>
           <td style="padding:5px 8px"><div style="background:rgba(255,255,255,0.1);border-radius:3px;height:6px;width:80px;overflow:hidden"><div style="width:66%;height:100%;background:#4ADE80;border-radius:3px"></div></div></td>
           <td style="padding:5px 8px;font-weight:700;font-size:.82rem;color:#4ADE80">10/15</td>
         </tr><tr>
-          <td style="padding:5px 8px;font-size:.78rem;font-weight:600;color:#C8C4E8">Douleur moyenne</td>
-          <td style="padding:5px 8px;font-style:italic;font-size:.72rem;color:#aaa">0.00/10</td>
+          <td style="padding:5px 8px;font-size:.78rem;font-weight:600;color:#DDD9F5">Douleur moyenne</td>
+          <td style="padding:5px 8px;font-style:italic;font-size:.72rem;color:#C4C0E0">0.00/10</td>
           <td style="padding:5px 8px"><div style="background:rgba(255,255,255,0.1);border-radius:3px;height:6px;width:80px;overflow:hidden"><div style="width:100%;height:100%;background:#4ADE80;border-radius:3px"></div></div></td>
           <td style="padding:5px 8px;font-weight:700;font-size:.82rem;color:#4ADE80">20/20</td>
         </tr><tr>
-          <td style="padding:5px 8px;font-size:.78rem;font-weight:600;color:#C8C4E8">Courbatures</td>
-          <td style="padding:5px 8px;font-style:italic;font-size:.72rem;color:#aaa">0.00/10</td>
+          <td style="padding:5px 8px;font-size:.78rem;font-weight:600;color:#DDD9F5">Courbatures</td>
+          <td style="padding:5px 8px;font-style:italic;font-size:.72rem;color:#C4C0E0">0.00/10</td>
           <td style="padding:5px 8px"><div style="background:rgba(255,255,255,0.1);border-radius:3px;height:6px;width:80px;overflow:hidden"><div style="width:100%;height:100%;background:#4ADE80;border-radius:3px"></div></div></td>
           <td style="padding:5px 8px;font-weight:700;font-size:.82rem;color:#4ADE80">15/15</td>
         </tr><tr>
-          <td style="padding:5px 8px;font-size:.78rem;font-weight:600;color:#C8C4E8">Fatigue</td>
-          <td style="padding:5px 8px;font-style:italic;font-size:.72rem;color:#aaa">1.00/5</td>
+          <td style="padding:5px 8px;font-size:.78rem;font-weight:600;color:#DDD9F5">Fatigue</td>
+          <td style="padding:5px 8px;font-style:italic;font-size:.72rem;color:#C4C0E0">1.00/5</td>
           <td style="padding:5px 8px"><div style="background:rgba(255,255,255,0.1);border-radius:3px;height:6px;width:80px;overflow:hidden"><div style="width:100%;height:100%;background:#4ADE80;border-radius:3px"></div></div></td>
           <td style="padding:5px 8px;font-weight:700;font-size:.82rem;color:#4ADE80">10/10</td>
         </tr><tr>
-          <td style="padding:5px 8px;font-size:.78rem;font-weight:600;color:#C8C4E8">Progression matchs</td>
-          <td style="padding:5px 8px;font-style:italic;font-size:.72rem;color:#aaa">35'</td>
+          <td style="padding:5px 8px;font-size:.78rem;font-weight:600;color:#DDD9F5">Progression matchs</td>
+          <td style="padding:5px 8px;font-style:italic;font-size:.72rem;color:#C4C0E0">35'</td>
           <td style="padding:5px 8px"><div style="background:rgba(255,255,255,0.1);border-radius:3px;height:6px;width:80px;overflow:hidden"><div style="width:60%;height:100%;background:#4ADE80;border-radius:3px"></div></div></td>
           <td style="padding:5px 8px;font-weight:700;font-size:.82rem;color:#4ADE80">3/5</td>
         </tr><tr>
-          <td style="padding:5px 8px;font-size:.78rem;font-weight:600;color:#C8C4E8">Alertes rouges</td>
-          <td style="padding:5px 8px;font-style:italic;font-size:.72rem;color:#aaa">0 rouge(s)</td>
+          <td style="padding:5px 8px;font-size:.78rem;font-weight:600;color:#DDD9F5">Alertes rouges</td>
+          <td style="padding:5px 8px;font-style:italic;font-size:.72rem;color:#C4C0E0">0 rouge(s)</td>
           <td style="padding:5px 8px"><div style="background:rgba(255,255,255,0.1);border-radius:3px;height:6px;width:80px;overflow:hidden"><div style="width:100%;height:100%;background:#4ADE80;border-radius:3px"></div></div></td>
           <td style="padding:5px 8px;font-weight:700;font-size:.82rem;color:#4ADE80">5/5</td>
         </tr></tbody></table>
@@ -163,21 +163,21 @@ tr:nth-child(even) td{background:rgba(255,255,255,0.03)}
       <div class="card-title">Moyennes sur 25 jours</div>
       <div style="margin-bottom:10px">
         <div style="display:flex;justify-content:space-between;align-items:baseline">
-          <span style="font-size:.75rem;color:#C8C4E8">Douleur moyenne</span>
+          <span style="font-size:.75rem;color:#DDD9F5">Douleur moyenne</span>
           <span style="font-size:1rem;font-weight:800;color:#4ADE80">0.0/10</span>
         </div>
         <div class="bar"><div class="bar-fill" style="width:0%;background:#4ADE80"></div></div>
       </div>
       <div style="margin-bottom:10px">
         <div style="display:flex;justify-content:space-between;align-items:baseline">
-          <span style="font-size:.75rem;color:#C8C4E8">Courbatures moyenne</span>
+          <span style="font-size:.75rem;color:#DDD9F5">Courbatures moyenne</span>
           <span style="font-size:1rem;font-weight:800;color:#4ADE80">0.0/10</span>
         </div>
         <div class="bar"><div class="bar-fill" style="width:0%;background:#4ADE80"></div></div>
       </div>
       <div>
         <div style="display:flex;justify-content:space-between;align-items:baseline">
-          <span style="font-size:.75rem;color:#C8C4E8">Fatigue moyenne</span>
+          <span style="font-size:.75rem;color:#DDD9F5">Fatigue moyenne</span>
           <span style="font-size:1rem;font-weight:800;color:#4ADE80">1.0/5</span>
         </div>
         <div class="bar"><div class="bar-fill" style="width:20%;background:#4ADE80"></div></div>
@@ -206,52 +206,52 @@ tr:nth-child(even) td{background:rgba(255,255,255,0.03)}
 <circle cx="90.0" cy="160.0" r="3" fill="#4ADE80"/>
 <circle cx="150.6" cy="125.0" r="3" fill="#4ADE80"/>
 <circle cx="150.6" cy="55.0" r="3" fill="#4ADE80"/>
-<text x="90" y="10" text-anchor="middle" font-size="8" fill="#C8C4E8" font-family="system-ui">Foot</text>
-<text x="17" y="52" text-anchor="middle" font-size="8" fill="#C8C4E8" font-family="system-ui">Sans douleur</text>
-<text x="17" y="136" text-anchor="middle" font-size="8" fill="#C8C4E8" font-family="system-ui">100%</text>
-<text x="90" y="178" text-anchor="middle" font-size="8" fill="#C8C4E8" font-family="system-ui">Pas penser</text>
-<text x="163" y="136" text-anchor="middle" font-size="8" fill="#C8C4E8" font-family="system-ui">Confiance</text>
-<text x="163" y="52" text-anchor="middle" font-size="8" fill="#C8C4E8" font-family="system-ui">Technique</text>
+<text x="90" y="10" text-anchor="middle" font-size="8" fill="#DDD9F5" font-family="system-ui">Foot</text>
+<text x="17" y="52" text-anchor="middle" font-size="8" fill="#DDD9F5" font-family="system-ui">Sans douleur</text>
+<text x="17" y="136" text-anchor="middle" font-size="8" fill="#DDD9F5" font-family="system-ui">100%</text>
+<text x="90" y="178" text-anchor="middle" font-size="8" fill="#DDD9F5" font-family="system-ui">Pas penser</text>
+<text x="163" y="136" text-anchor="middle" font-size="8" fill="#DDD9F5" font-family="system-ui">Confiance</text>
+<text x="163" y="52" text-anchor="middle" font-size="8" fill="#DDD9F5" font-family="system-ui">Technique</text>
 </svg>
         <div style="text-align:center">
-          <div style="font-size:2rem;font-weight:800;color:#4ADE80">60<span style="font-size:.9rem;color:#888">/60</span></div>
-          <div style="font-size:.65rem;color:#C8C4E8">Readiness compét.</div>
-          <button class="toggle-btn" onclick="toggle('iprrs-detail')" style="margin-top:8px;font-size:.65rem">▶ Détail des 6 questions</button>
+          <div style="font-size:2rem;font-weight:800;color:#4ADE80">60<span style="font-size:.9rem;color:#B0ACCC">/60</span></div>
+          <div style="font-size:.72rem;color:#DDD9F5">Readiness compét.</div>
+          <button class="toggle-btn" onclick="toggle('iprrs-detail')" style="margin-top:8px;font-size:.72rem">▶ Détail des 6 questions</button>
         </div>
       </div>
       <div class="collapsible" id="iprrs-detail" style="margin-top:10px">
         <div style="display:flex;align-items:center;gap:10px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.07)">
-          <span style="font-size:.75rem;color:#C8C4E8;flex:1">Football</span>
+          <span style="font-size:.75rem;color:#DDD9F5;flex:1">Football</span>
           <div style="background:rgba(255,255,255,0.1);border-radius:4px;height:6px;width:80px;overflow:hidden">
             <div style="width:100%;height:100%;background:#4ADE80;border-radius:4px"></div>
           </div>
           <span style="font-size:.78rem;font-weight:700;color:#4ADE80;min-width:32px;text-align:right">10/10</span>
         </div><div style="display:flex;align-items:center;gap:10px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.07)">
-          <span style="font-size:.75rem;color:#C8C4E8;flex:1">Sans douleur</span>
+          <span style="font-size:.75rem;color:#DDD9F5;flex:1">Sans douleur</span>
           <div style="background:rgba(255,255,255,0.1);border-radius:4px;height:6px;width:80px;overflow:hidden">
             <div style="width:100%;height:100%;background:#4ADE80;border-radius:4px"></div>
           </div>
           <span style="font-size:.78rem;font-weight:700;color:#4ADE80;min-width:32px;text-align:right">10/10</span>
         </div><div style="display:flex;align-items:center;gap:10px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.07)">
-          <span style="font-size:.75rem;color:#C8C4E8;flex:1">Donner 100%</span>
+          <span style="font-size:.75rem;color:#DDD9F5;flex:1">Donner 100%</span>
           <div style="background:rgba(255,255,255,0.1);border-radius:4px;height:6px;width:80px;overflow:hidden">
             <div style="width:100%;height:100%;background:#4ADE80;border-radius:4px"></div>
           </div>
           <span style="font-size:.78rem;font-weight:700;color:#4ADE80;min-width:32px;text-align:right">10/10</span>
         </div><div style="display:flex;align-items:center;gap:10px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.07)">
-          <span style="font-size:.75rem;color:#C8C4E8;flex:1">Pas penser blessure</span>
+          <span style="font-size:.75rem;color:#DDD9F5;flex:1">Pas penser blessure</span>
           <div style="background:rgba(255,255,255,0.1);border-radius:4px;height:6px;width:80px;overflow:hidden">
             <div style="width:100%;height:100%;background:#4ADE80;border-radius:4px"></div>
           </div>
           <span style="font-size:.78rem;font-weight:700;color:#4ADE80;min-width:32px;text-align:right">10/10</span>
         </div><div style="display:flex;align-items:center;gap:10px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.07)">
-          <span style="font-size:.75rem;color:#C8C4E8;flex:1">Confiance corps</span>
+          <span style="font-size:.75rem;color:#DDD9F5;flex:1">Confiance corps</span>
           <div style="background:rgba(255,255,255,0.1);border-radius:4px;height:6px;width:80px;overflow:hidden">
             <div style="width:100%;height:100%;background:#4ADE80;border-radius:4px"></div>
           </div>
           <span style="font-size:.78rem;font-weight:700;color:#4ADE80;min-width:32px;text-align:right">10/10</span>
         </div><div style="display:flex;align-items:center;gap:10px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.07)">
-          <span style="font-size:.75rem;color:#C8C4E8;flex:1">Capacités tech/phys</span>
+          <span style="font-size:.75rem;color:#DDD9F5;flex:1">Capacités tech/phys</span>
           <div style="background:rgba(255,255,255,0.1);border-radius:4px;height:6px;width:80px;overflow:hidden">
             <div style="width:100%;height:100%;background:#4ADE80;border-radius:4px"></div>
           </div>
@@ -264,13 +264,13 @@ tr:nth-child(even) td{background:rgba(255,255,255,0.03)}
       <div class="card-title">Évolution J+1 → J+25</div>
       <div style="display:flex;gap:10px">
           <div style="flex:1;background:rgba(255,255,255,0.06);border-radius:8px;padding:10px;text-align:center">
-            <div style="font-size:.62rem;color:#C8C4E8;margin-bottom:4px">Début (moy. 3 premiers j.)</div>
-            <div style="font-size:1.4rem;font-weight:800;color:#4ADE80">0.0<span style="font-size:.7rem;color:#888">/10</span></div>
+            <div style="font-size:.72rem;color:#DDD9F5;margin-bottom:4px">Début (moy. 3 premiers j.)</div>
+            <div style="font-size:1.4rem;font-weight:800;color:#4ADE80">0.0<span style="font-size:.75rem;color:#B0ACCC">/10</span></div>
           </div>
           <div style="display:flex;align-items:center;font-size:1.2rem;color:#FB923C">→</div>
           <div style="flex:1;background:rgba(255,255,255,0.06);border-radius:8px;padding:10px;text-align:center">
-            <div style="font-size:.62rem;color:#C8C4E8;margin-bottom:4px">Fin (moy. 3 derniers j.)</div>
-            <div style="font-size:1.4rem;font-weight:800;color:#4ADE80">0.0<span style="font-size:.7rem;color:#888">/10</span></div>
+            <div style="font-size:.72rem;color:#DDD9F5;margin-bottom:4px">Fin (moy. 3 derniers j.)</div>
+            <div style="font-size:1.4rem;font-weight:800;color:#4ADE80">0.0<span style="font-size:.75rem;color:#B0ACCC">/10</span></div>
           </div>
         </div>
         <div style="text-align:center;margin-top:8px;font-size:.82rem;font-weight:700;color:#FB923C">→ Stable</div>
@@ -287,7 +287,7 @@ tr:nth-child(even) td{background:rgba(255,255,255,0.03)}
   <div class="card section-full" style="margin-bottom:16px">
     <div class="card-title">■ Évolution du RRI séance par séance</div>
     <svg viewBox="0 0 700 130" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block"><rect width="700" height="130" fill="rgba(255,255,255,0.03)" rx="8"/><rect x="20" y="86" width="660" height="24" fill="rgba(34,197,94,0.08)" rx="2"/><rect x="20" y="181" width="660" height="-95" fill="rgba(251,146,60,0.08)" rx="2"/><line x1="20" y1="86" x2="680" y2="86" stroke="rgba(34,197,94,0.4)" stroke-width="1" stroke-dasharray="4,3"/><text x="22" y="83" font-size="8" fill="rgba(34,197,94,0.8)" font-family="system-ui">80</text><line x1="20" y1="181" x2="680" y2="181" stroke="rgba(251,146,60,0.4)" stroke-width="1" stroke-dasharray="4,3"/><text x="22" y="178" font-size="8" fill="rgba(251,146,60,0.8)" font-family="system-ui">60</text><polyline points="20,86 97,86 291,86 408,62 563,62 680,38" fill="none" stroke="#6B5CA5" stroke-width="2.5" stroke-linejoin="round"/><circle cx="20" cy="86" r="5" fill="#22C55E" stroke="white" stroke-width="1.5"/><text x="20" y="78" text-anchor="middle" font-size="8" fill="#22C55E" font-family="system-ui" font-weight="700">80</text><text x="20" y="124" text-anchor="middle" font-size="7" fill="rgba(200,196,232,0.7)" font-family="system-ui">05/05</text><circle cx="97" cy="86" r="5" fill="#22C55E" stroke="white" stroke-width="1.5"/><text x="97" y="78" text-anchor="middle" font-size="8" fill="#22C55E" font-family="system-ui" font-weight="700">80</text><text x="97" y="124" text-anchor="middle" font-size="7" fill="rgba(200,196,232,0.7)" font-family="system-ui">07/05</text><circle cx="291" cy="86" r="5" fill="#22C55E" stroke="white" stroke-width="1.5"/><text x="291" y="78" text-anchor="middle" font-size="8" fill="#22C55E" font-family="system-ui" font-weight="700">80</text><text x="291" y="124" text-anchor="middle" font-size="7" fill="rgba(200,196,232,0.7)" font-family="system-ui">12/05</text><circle cx="408" cy="62" r="5" fill="#22C55E" stroke="white" stroke-width="1.5"/><text x="408" y="54" text-anchor="middle" font-size="8" fill="#22C55E" font-family="system-ui" font-weight="700">85</text><text x="408" y="124" text-anchor="middle" font-size="7" fill="rgba(200,196,232,0.7)" font-family="system-ui">15/05</text><circle cx="563" cy="62" r="5" fill="#22C55E" stroke="white" stroke-width="1.5"/><text x="563" y="54" text-anchor="middle" font-size="8" fill="#22C55E" font-family="system-ui" font-weight="700">85</text><text x="563" y="124" text-anchor="middle" font-size="7" fill="rgba(200,196,232,0.7)" font-family="system-ui">19/05</text><circle cx="680" cy="38" r="5" fill="#22C55E" stroke="white" stroke-width="1.5"/><text x="680" y="30" text-anchor="middle" font-size="8" fill="#22C55E" font-family="system-ui" font-weight="700">90</text><text x="680" y="124" text-anchor="middle" font-size="7" fill="rgba(200,196,232,0.7)" font-family="system-ui">22/05</text></svg>
-    <div style="display:flex;gap:16px;margin-top:8px;font-size:.7rem">
+    <div style="display:flex;gap:16px;margin-top:8px;font-size:.75rem">
       <span style="color:#22C55E">● Zone PRÊT (≥80)</span>
       <span style="color:#FB923C">● Zone SURVEILLANCE (60-79)</span>
       <span style="color:#EF4444">● Zone VIGILANCE (&lt;60)</span>
@@ -351,20 +351,20 @@ tr:nth-child(even) td{background:rgba(255,255,255,0.03)}
     <div style="display:flex;gap:20px;align-items:center;flex-wrap:wrap">
       <div style="flex:1;min-width:200px">
         <div style="display:flex;justify-content:space-between;margin-bottom:6px">
-          <span style="font-size:.75rem;color:#C8C4E8">Minutes jouées</span>
+          <span style="font-size:.75rem;color:#DDD9F5">Minutes jouées</span>
           <span style="font-size:.75rem;font-weight:700;color:#EF4444">35' / 270'</span>
         </div>
         <div style="background:rgba(255,255,255,0.1);border-radius:8px;height:14px;overflow:hidden">
           <div style="width:12%;height:100%;background:#EF4444;border-radius:8px;transition:width .6s"></div>
         </div>
         <div style="display:flex;justify-content:space-between;margin-top:4px">
-          <span style="font-size:.65rem;color:#888">0'</span>
-          <span style="font-size:.7rem;font-weight:700;color:#EF4444">12% de la cible</span>
-          <span style="font-size:.65rem;color:#888">270'</span>
+          <span style="font-size:.72rem;color:#B0ACCC">0'</span>
+          <span style="font-size:.75rem;font-weight:700;color:#EF4444">12% de la cible</span>
+          <span style="font-size:.72rem;color:#B0ACCC">270'</span>
         </div>
       </div>
       <div style="flex:1;min-width:200px">
-        <div style="font-size:.65rem;color:#C8C4E8;margin-bottom:6px;font-weight:600">Progression match par match</div>
+        <div style="font-size:.72rem;color:#DDD9F5;margin-bottom:6px;font-weight:600">Progression match par match</div>
         <svg viewBox="0 0 500 70" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;overflow:visible">
           <rect width="500" height="70" fill="rgba(255,255,255,0.05)" rx="4"/>
           <line x1="0" y1="60" x2="500" y2="60" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
@@ -372,9 +372,9 @@ tr:nth-child(even) td{background:rgba(255,255,255,0.03)}
         </svg>
       </div>
       <div style="background:rgba(255,255,255,0.06);border-radius:10px;padding:14px 18px;text-align:center;flex-shrink:0">
-        <div style="font-size:.62rem;color:#C8C4E8;margin-bottom:4px">Total cumulé</div>
+        <div style="font-size:.72rem;color:#DDD9F5;margin-bottom:4px">Total cumulé</div>
         <div style="font-size:2rem;font-weight:800;color:#EF4444">35'</div>
-        <div style="font-size:.65rem;color:#C8C4E8;margin-top:2px">1 match</div>
+        <div style="font-size:.72rem;color:#DDD9F5;margin-top:2px">1 match</div>
       </div>
     </div>
   </div>
@@ -385,17 +385,17 @@ tr:nth-child(even) td{background:rgba(255,255,255,0.03)}
     <div style="display:flex;gap:20px;align-items:flex-start">
       <div style="flex:1"><div style="display:flex;flex-direction:column;gap:6px"><div style="display:flex;align-items:center;gap:8px">
               <img src="data:image/png;base64,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" style="width:22px;height:22px;object-fit:contain;border-radius:50%;flex-shrink:0"/>
-              <div style="font-size:.72rem;color:#C8C4E8;min-width:80px;white-space:nowrap">Air bel</div>
+              <div style="font-size:.72rem;color:#DDD9F5;min-width:80px;white-space:nowrap">Air bel</div>
               <div style="flex:1;background:rgba(255,255,255,0.1);border-radius:4px;height:8px;overflow:hidden">
                 <div style="width:100%;height:100%;background:#4ADE80;border-radius:4px;transition:width .5s"></div>
               </div>
               <div style="font-size:.78rem;font-weight:700;color:#4ADE80;min-width:30px;text-align:right">35'</div>
-              <div style="font-size:.62rem;color:#D4AF37;min-width:30px">U19</div>
+              <div style="font-size:.72rem;color:#D4AF37;min-width:30px">U19</div>
             </div></div></div>
       <div style="background:rgba(255,255,255,0.06);border-radius:10px;padding:16px;text-align:center;min-width:120px">
-        <div style="font-size:.65rem;color:#C8C4E8;margin-bottom:6px">Total minutes jouées</div>
+        <div style="font-size:.72rem;color:#DDD9F5;margin-bottom:6px">Total minutes jouées</div>
         <div style="font-size:2.5rem;font-weight:800;color:#4ADE80">35'</div>
-        <div style="font-size:.72rem;color:#C8C4E8;margin-top:4px">1 match</div>
+        <div style="font-size:.72rem;color:#DDD9F5;margin-top:4px">1 match</div>
       </div>
     </div>
   </div>
