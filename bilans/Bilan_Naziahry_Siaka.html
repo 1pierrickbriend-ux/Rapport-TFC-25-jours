@@ -54,6 +54,16 @@ tr:nth-child(even) td{background:rgba(255,255,255,0.03)}
 
 <div class="main">
 
+  <!-- ROW 0 : COMMENTAIRE DU JOUR (priorité 1) -->
+  <div class="card section-full" style="margin-bottom:16px;border-left:3px solid #D4AF37;border-radius:0 12px 12px 0">
+    <div class="card-title" style="color:#D4AF37">Observations</div>
+    <div style="font-size:.8rem;color:#C8C4E8;font-style:italic;line-height:1.6">Fin de protocole, très bon suivi général</div>
+    <button class="toggle-btn" onclick="toggle('all-comments')">&#9660; Voir tout l&#39;historique des commentaires</button>
+    <div class="collapsible" id="all-comments">
+      <div style="margin-top:10px;max-height:250px;overflow-y:auto;border-radius:8px;border:1px solid rgba(255,255,255,0.08)"><div style="padding:8px 10px;border-bottom:1px solid rgba(255,255,255,0.07)"><div style="font-size:.65rem;color:#D4AF37;font-weight:700;margin-bottom:3px">22/05/2026</div><div style="font-size:.78rem;color:#C8C4E8;line-height:1.5">Fin de protocole, très bon suivi général</div></div><div style="padding:8px 10px;border-bottom:1px solid rgba(255,255,255,0.07)"><div style="font-size:.65rem;color:#D4AF37;font-weight:700;margin-bottom:3px">19/05/2026</div><div style="font-size:.78rem;color:#C8C4E8;line-height:1.5">Toujours de bonnes sensations, aucune gênes ni douleurs.</div></div><div style="padding:8px 10px;border-bottom:1px solid rgba(255,255,255,0.07)"><div style="font-size:.65rem;color:#D4AF37;font-weight:700;margin-bottom:3px">15/05/2026</div><div style="font-size:.78rem;color:#C8C4E8;line-height:1.5">Séance pro ce jeudi matin . Bonne confiance retrouvée, force et explosivité également. Content se sa semaine.</div></div><div style="padding:8px 10px;border-bottom:1px solid rgba(255,255,255,0.07)"><div style="font-size:.65rem;color:#D4AF37;font-weight:700;margin-bottom:3px">12/05/2026</div><div style="font-size:.78rem;color:#C8C4E8;line-height:1.5">Premier match joué ce week-end. Très bon ressenti général, bonnes sensations avant, pendant et après le match</div></div><div style="padding:8px 10px;border-bottom:1px solid rgba(255,255,255,0.07)"><div style="font-size:.65rem;color:#D4AF37;font-weight:700;margin-bottom:3px">07/05/2026</div><div style="font-size:.78rem;color:#C8C4E8;line-height:1.5">séance terrain aujourd’hui – RASSéance salle muscu mercredi– vélo – RAS.Reprend de très bonnes sensation, plaisir à l’entraînement et a hâte de rejouer .</div></div><div style="padding:8px 10px;border-bottom:1px solid rgba(255,255,255,0.07)"><div style="font-size:.65rem;color:#D4AF37;font-weight:700;margin-bottom:3px">05/05/2026</div><div style="font-size:.78rem;color:#C8C4E8;line-height:1.5">RAS, joueur se sent en confiance, à 100 % de ses capacités d’avant blessure, prêt à rejouer. Il se sent plus en forme aujourd’hui que avant sa blessure (état de fatigue).</div></div></div>
+    </div>
+  </div>
+
   <!-- ROW 1 : INFOS + RRI + PHOTO -->
   <div style="display:grid;grid-template-columns:1.2fr 1.2fr .8fr;gap:16px;margin-bottom:16px">
 
@@ -267,20 +277,10 @@ tr:nth-child(even) td{background:rgba(255,255,255,0.03)}
     </div>
   </div>
 
-  <!-- ROW 3 : ALERTES + COMMENTAIRES -->
-  <div class="grid-2">
-    <div class="card">
+  <!-- ROW 3 : ALERTES -->
+  <div class="card section-full" style="margin-bottom:16px">
       <div class="card-title">Alertes identifiées</div>
       <div style="color:#4ADE80;font-size:.78rem;font-style:italic">Aucune alerte identifiée</div>
-    </div>
-    <div class="card">
-      <div class="card-title">Observations</div>
-      <div style="font-size:.8rem;color:#C8C4E8;font-style:italic;line-height:1.6">Fin de protocole, très bon suivi général</div>
-      <button class="toggle-btn" onclick="toggle('all-comments')">&#9660; Voir tout l&#39;historique des commentaires</button>
-      <div class="collapsible" id="all-comments">
-        <div style="margin-top:10px;max-height:250px;overflow-y:auto;border-radius:8px;border:1px solid rgba(255,255,255,0.08)"><div style="padding:8px 10px;border-bottom:1px solid rgba(255,255,255,0.07)"><div style="font-size:.65rem;color:#D4AF37;font-weight:700;margin-bottom:3px">22/05/2026</div><div style="font-size:.78rem;color:#C8C4E8;line-height:1.5">Fin de protocole, très bon suivi général</div></div><div style="padding:8px 10px;border-bottom:1px solid rgba(255,255,255,0.07)"><div style="font-size:.65rem;color:#D4AF37;font-weight:700;margin-bottom:3px">19/05/2026</div><div style="font-size:.78rem;color:#C8C4E8;line-height:1.5">Toujours de bonnes sensations, aucune gênes ni douleurs.</div></div><div style="padding:8px 10px;border-bottom:1px solid rgba(255,255,255,0.07)"><div style="font-size:.65rem;color:#D4AF37;font-weight:700;margin-bottom:3px">15/05/2026</div><div style="font-size:.78rem;color:#C8C4E8;line-height:1.5">Séance pro ce jeudi matin . Bonne confiance retrouvée, force et explosivité également. Content se sa semaine.</div></div><div style="padding:8px 10px;border-bottom:1px solid rgba(255,255,255,0.07)"><div style="font-size:.65rem;color:#D4AF37;font-weight:700;margin-bottom:3px">12/05/2026</div><div style="font-size:.78rem;color:#C8C4E8;line-height:1.5">Premier match joué ce week-end. Très bon ressenti général, bonnes sensations avant, pendant et après le match</div></div><div style="padding:8px 10px;border-bottom:1px solid rgba(255,255,255,0.07)"><div style="font-size:.65rem;color:#D4AF37;font-weight:700;margin-bottom:3px">07/05/2026</div><div style="font-size:.78rem;color:#C8C4E8;line-height:1.5">séance terrain aujourd’hui – RASSéance salle muscu mercredi– vélo – RAS.Reprend de très bonnes sensation, plaisir à l’entraînement et a hâte de rejouer .</div></div><div style="padding:8px 10px;border-bottom:1px solid rgba(255,255,255,0.07)"><div style="font-size:.65rem;color:#D4AF37;font-weight:700;margin-bottom:3px">05/05/2026</div><div style="font-size:.78rem;color:#C8C4E8;line-height:1.5">RAS, joueur se sent en confiance, à 100 % de ses capacités d’avant blessure, prêt à rejouer. Il se sent plus en forme aujourd’hui que avant sa blessure (état de fatigue).</div></div></div>
-      </div>
-    </div>
   </div>
 
   <!-- ROW 3b : ÉVOLUTION RRI -->
