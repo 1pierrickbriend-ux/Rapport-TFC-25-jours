@@ -16,25 +16,25 @@
 body{font-family:'Segoe UI',system-ui,sans-serif;background:#F4F2FA;color:#1E1A50;min-height:100vh}
 .header{background:#261C5E;padding:16px 24px;display:flex;align-items:center;gap:16px;border-bottom:3px solid #D4AF37}
 .h-title{font-size:1.25rem;font-weight:800;letter-spacing:.04em}
-.h-sub{font-size:.75rem;color:#DDD9F5;margin-top:3px}
+.h-sub{font-size:.75rem;color:#EAE7FC;margin-top:3px}
 .badge{font-size:.72rem;font-weight:700;color:white;padding:3px 10px;border-radius:20px;flex-shrink:0}
 .main{max-width:1100px;margin:0 auto;padding:20px 20px}
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
 .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px}
 .grid-4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:16px;margin-bottom:16px}
 .card{background:#261C5E;border-radius:12px;padding:16px;border:1px solid rgba(255,255,255,0.08)}
-.card-title{font-size:.7rem;font-weight:800;color:#DDD9F5;letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px}
+.card-title{font-size:.7rem;font-weight:800;color:#EAE7FC;letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px}
 .kpi-val{font-size:1.8rem;font-weight:800}
-.kpi-lbl{font-size:.72rem;color:#DDD9F5;margin-top:3px;text-transform:uppercase}
+.kpi-lbl{font-size:.72rem;color:#EAE7FC;margin-top:3px;text-transform:uppercase}
 .bar{background:rgba(255,255,255,0.1);border-radius:4px;height:6px;overflow:hidden;margin-top:5px}
 .bar-fill{height:100%;border-radius:4px}
 .section-full{margin-bottom:16px}
-.toggle-btn{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#DDD9F5;padding:6px 14px;border-radius:20px;cursor:pointer;font-size:.75rem;font-weight:600;margin-top:10px;display:inline-block}
+.toggle-btn{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#EAE7FC;padding:6px 14px;border-radius:20px;cursor:pointer;font-size:.75rem;font-weight:600;margin-top:10px;display:inline-block}
 .toggle-btn:hover{background:rgba(255,255,255,0.15)}
 .collapsible{max-height:0;overflow:hidden;transition:max-height .4s ease}
 .collapsible.open{max-height:2000px}
 .rri-score{font-size:3rem;font-weight:800;line-height:1}
-.footer{background:#261C5E;border-top:1px solid rgba(255,255,255,0.1);padding:12px 24px;display:flex;justify-content:space-between;font-size:.75rem;color:#B0ACCC;margin-top:24px}
+.footer{background:#261C5E;border-top:1px solid rgba(255,255,255,0.1);padding:12px 24px;display:flex;justify-content:space-between;font-size:.75rem;color:#E8E4F8;margin-top:24px}
 table{width:100%;border-collapse:collapse}
 tr:nth-child(even) td{background:rgba(255,255,255,0.03)}
 @media(max-width:700px){.grid-2,.grid-3,.grid-4{grid-template-columns:1fr}}
@@ -57,10 +57,10 @@ tr:nth-child(even) td{background:rgba(255,255,255,0.03)}
   <!-- ROW 0 : COMMENTAIRE DU JOUR (priorité 1) -->
   <div class="card section-full" style="margin-bottom:16px;border-left:3px solid #D4AF37;border-radius:0 12px 12px 0">
     <div class="card-title" style="color:#D4AF37">Observations</div>
-    <div style="font-size:.8rem;color:#DDD9F5;font-style:italic;line-height:1.6">Fin de protocole avancé étant donné les matchs non-joués. Il ressent encore des douleurs au genou, toujours craintif de devoir s’arrêter, il n’est pas allé voir Julien comme il était convenu, il a repris son traitement anti-inflammatoire sans en avertir le club.</div>
+    <div style="font-size:.8rem;color:#EAE7FC;font-style:italic;line-height:1.6">Fin de protocole avancé étant donné les matchs non-joués. Il ressent encore des douleurs au genou, toujours craintif de devoir s’arrêter, il n’est pas allé voir Julien comme il était convenu, il a repris son traitement anti-inflammatoire sans en avertir le club.</div>
     <button class="toggle-btn" onclick="toggle('all-comments')">&#9660; Voir tout l&#39;historique des commentaires</button>
     <div class="collapsible" id="all-comments">
-      <div style="margin-top:10px;max-height:250px;overflow-y:auto;border-radius:8px;border:1px solid rgba(255,255,255,0.08)"><div style="padding:8px 10px;border-bottom:1px solid rgba(255,255,255,0.07)"><div style="font-size:.72rem;color:#D4AF37;font-weight:700;margin-bottom:3px">15/05/2026</div><div style="font-size:.78rem;color:#DDD9F5;line-height:1.5">Fin de protocole avancé étant donné les matchs non-joués. Il ressent encore des douleurs au genou, toujours craintif de devoir s’arrêter, il n’est pas allé voir Julien comme il était convenu, il a repris son traitement anti-inflammatoire sans en avertir le club.</div></div><div style="padding:8px 10px;border-bottom:1px solid rgba(255,255,255,0.07)"><div style="font-size:.72rem;color:#D4AF37;font-weight:700;margin-bottom:3px">12/05/2026</div><div style="font-size:.78rem;color:#DDD9F5;line-height:1.5">Arrêt des anti-inflammatoires ⇒ conséquence = douleur décuplée au genou droit. Je lui ai demandé de voir avec Julien (Doc) pour évaluer son genou, également son traitement qu’il n’avait annoncé à personne avant, par peur d’être arrêté.</div></div><div style="padding:8px 10px;border-bottom:1px solid rgba(255,255,255,0.07)"><div style="font-size:.72rem;color:#D4AF37;font-weight:700;margin-bottom:3px">07/05/2026</div><div style="font-size:.78rem;color:#DDD9F5;line-height:1.5">sensibilité sur l’insertion haute du psoas gauche , ressenti à 3/10 mais en amélioration.</div></div><div style="padding:8px 10px;border-bottom:1px solid rgba(255,255,255,0.07)"><div style="font-size:.72rem;color:#D4AF37;font-weight:700;margin-bottom:3px">05/05/2026</div><div style="font-size:.78rem;color:#DDD9F5;line-height:1.5">Traitement anti-inflammatoire donné par médecin traitant. Se sent affecté par le traitement, manque de vivacité selon lui.</div></div><div style="padding:8px 10px;border-bottom:1px solid rgba(255,255,255,0.07)"><div style="font-size:.72rem;color:#D4AF37;font-weight:700;margin-bottom:3px">01/05/2026</div><div style="font-size:.78rem;color:#DDD9F5;line-height:1.5">Toujours une très faible gêne au psoas gauche, mais largement diminuée depuis mardi. Souvent en fin de séances. Courbature fessier Gauche.</div></div><div style="padding:8px 10px;border-bottom:1px solid rgba(255,255,255,0.07)"><div style="font-size:.72rem;color:#D4AF37;font-weight:700;margin-bottom:3px">28/04/2026</div><div style="font-size:.78rem;color:#DDD9F5;line-height:1.5">Bon retour de vacances, bonnes sensations, besoin de retrouver 100 % de sprint.</div></div><div style="padding:8px 10px;border-bottom:1px solid rgba(255,255,255,0.07)"><div style="font-size:.72rem;color:#D4AF37;font-weight:700;margin-bottom:3px">17/04/2026</div><div style="font-size:.78rem;color:#DDD9F5;line-height:1.5">sensibilité à 3/10 sur son adducteur gauche. Ne se sent pas prêt à reprendre la compétition – sensations de ne pas être adapté à la haute intensité aujourd’hui</div></div></div>
+      <div style="margin-top:10px;max-height:250px;overflow-y:auto;border-radius:8px;border:1px solid rgba(255,255,255,0.08)"><div style="padding:8px 10px;border-bottom:1px solid rgba(255,255,255,0.07)"><div style="font-size:.72rem;color:#D4AF37;font-weight:700;margin-bottom:3px">15/05/2026</div><div style="font-size:.78rem;color:#EAE7FC;line-height:1.5">Fin de protocole avancé étant donné les matchs non-joués. Il ressent encore des douleurs au genou, toujours craintif de devoir s’arrêter, il n’est pas allé voir Julien comme il était convenu, il a repris son traitement anti-inflammatoire sans en avertir le club.</div></div><div style="padding:8px 10px;border-bottom:1px solid rgba(255,255,255,0.07)"><div style="font-size:.72rem;color:#D4AF37;font-weight:700;margin-bottom:3px">12/05/2026</div><div style="font-size:.78rem;color:#EAE7FC;line-height:1.5">Arrêt des anti-inflammatoires ⇒ conséquence = douleur décuplée au genou droit. Je lui ai demandé de voir avec Julien (Doc) pour évaluer son genou, également son traitement qu’il n’avait annoncé à personne avant, par peur d’être arrêté.</div></div><div style="padding:8px 10px;border-bottom:1px solid rgba(255,255,255,0.07)"><div style="font-size:.72rem;color:#D4AF37;font-weight:700;margin-bottom:3px">07/05/2026</div><div style="font-size:.78rem;color:#EAE7FC;line-height:1.5">sensibilité sur l’insertion haute du psoas gauche , ressenti à 3/10 mais en amélioration.</div></div><div style="padding:8px 10px;border-bottom:1px solid rgba(255,255,255,0.07)"><div style="font-size:.72rem;color:#D4AF37;font-weight:700;margin-bottom:3px">05/05/2026</div><div style="font-size:.78rem;color:#EAE7FC;line-height:1.5">Traitement anti-inflammatoire donné par médecin traitant. Se sent affecté par le traitement, manque de vivacité selon lui.</div></div><div style="padding:8px 10px;border-bottom:1px solid rgba(255,255,255,0.07)"><div style="font-size:.72rem;color:#D4AF37;font-weight:700;margin-bottom:3px">01/05/2026</div><div style="font-size:.78rem;color:#EAE7FC;line-height:1.5">Toujours une très faible gêne au psoas gauche, mais largement diminuée depuis mardi. Souvent en fin de séances. Courbature fessier Gauche.</div></div><div style="padding:8px 10px;border-bottom:1px solid rgba(255,255,255,0.07)"><div style="font-size:.72rem;color:#D4AF37;font-weight:700;margin-bottom:3px">28/04/2026</div><div style="font-size:.78rem;color:#EAE7FC;line-height:1.5">Bon retour de vacances, bonnes sensations, besoin de retrouver 100 % de sprint.</div></div><div style="padding:8px 10px;border-bottom:1px solid rgba(255,255,255,0.07)"><div style="font-size:.72rem;color:#D4AF37;font-weight:700;margin-bottom:3px">17/04/2026</div><div style="font-size:.78rem;color:#EAE7FC;line-height:1.5">sensibilité à 3/10 sur son adducteur gauche. Ne se sent pas prêt à reprendre la compétition – sensations de ne pas être adapté à la haute intensité aujourd’hui</div></div></div>
     </div>
   </div>
 
@@ -71,14 +71,14 @@ tr:nth-child(even) td{background:rgba(255,255,255,0.03)}
     <div class="card">
       <div class="card-title">Informations protocole</div>
       <div style="display:flex;flex-direction:column;gap:8px">
-        <div><span style="font-size:.75rem;color:#DDD9F5">Blessure</span><div style="font-weight:700;font-size:.9rem;color:#D4AF37;margin-top:2px">Lésion Grade 2 psoas Gauche</div></div>
-        <div><span style="font-size:.75rem;color:#DDD9F5">Date reprise</span><div style="font-weight:600;font-size:.85rem;margin-top:2px">14/04/2026</div></div>
-        <div><span style="font-size:.75rem;color:#DDD9F5">Date 1er match</span><div style="font-weight:600;font-size:.85rem;margin-top:2px">—</div></div>
-        <div><span style="font-size:.75rem;color:#DDD9F5">Jours entraînement → 1er match</span>
+        <div><span style="font-size:.75rem;color:#EAE7FC">Blessure</span><div style="font-weight:700;font-size:.9rem;color:#D4AF37;margin-top:2px">Lésion Grade 2 psoas Gauche</div></div>
+        <div><span style="font-size:.75rem;color:#EAE7FC">Date reprise</span><div style="font-weight:600;font-size:.85rem;margin-top:2px">14/04/2026</div></div>
+        <div><span style="font-size:.75rem;color:#EAE7FC">Date 1er match</span><div style="font-weight:600;font-size:.85rem;margin-top:2px">—</div></div>
+        <div><span style="font-size:.75rem;color:#EAE7FC">Jours entraînement → 1er match</span>
           <div style="font-size:1.5rem;font-weight:800;color:#D4AF37;margin-top:2px">— jours</div></div>
-        <div><span style="font-size:.75rem;color:#DDD9F5">Soins · Prévention</span>
-          <div style="font-weight:600;margin-top:2px">5 · 13 <span style="font-size:.72rem;color:#B0ACCC">entretiens</span></div></div>
-        <div><span style="font-size:.75rem;color:#DDD9F5">Focus prévention</span>
+        <div><span style="font-size:.75rem;color:#EAE7FC">Soins · Prévention</span>
+          <div style="font-weight:600;margin-top:2px">5 · 13 <span style="font-size:.72rem;color:#E8E4F8">entretiens</span></div></div>
+        <div><span style="font-size:.75rem;color:#EAE7FC">Focus prévention</span>
           <div style="font-size:.8rem;margin-top:2px">mobilité hanches</div></div>
       </div>
     </div>
@@ -86,8 +86,8 @@ tr:nth-child(even) td{background:rgba(255,255,255,0.03)}
     <!-- RRI -->
     <div class="card" style="text-align:center">
       <div class="card-title" style="text-align:left">RRI — Indice de Retour Compétition /100</div>
-      <div style="font-size:.72rem;color:#DDD9F5;text-align:left;margin-bottom:10px">Score composite : Psychologie · Condition physique · Alertes médicales</div>
-      <div class="rri-score" style="color:#FB923C">79<span style="font-size:1.2rem;color:#B0ACCC;font-weight:400">/100</span></div>
+      <div style="font-size:.72rem;color:#EAE7FC;text-align:left;margin-bottom:10px">Score composite : Psychologie · Condition physique · Alertes médicales</div>
+      <div class="rri-score" style="color:#FB923C">79<span style="font-size:1.2rem;color:#E8E4F8;font-weight:400">/100</span></div>
       <div style="margin:8px auto;max-width:200px">
         <div class="bar" style="height:10px"><div class="bar-fill" style="width:79%;background:#FB923C"></div></div>
       </div>
@@ -97,48 +97,48 @@ tr:nth-child(even) td{background:rgba(255,255,255,0.03)}
       </div>
       <div class="collapsible" id="rri-detail" style="margin-top:10px">
         <table><thead><tr>
-          <th style="text-align:left;font-size:.72rem;color:#B0ACCC;padding:4px 8px">Composante</th>
-          <th style="font-size:.72rem;color:#B0ACCC;padding:4px 8px">Valeur</th>
-          <th style="font-size:.72rem;color:#B0ACCC;padding:4px 8px">Progression</th>
-          <th style="font-size:.72rem;color:#B0ACCC;padding:4px 8px">Score</th>
+          <th style="text-align:left;font-size:.72rem;color:#E8E4F8;padding:4px 8px">Composante</th>
+          <th style="font-size:.72rem;color:#E8E4F8;padding:4px 8px">Valeur</th>
+          <th style="font-size:.72rem;color:#E8E4F8;padding:4px 8px">Progression</th>
+          <th style="font-size:.72rem;color:#E8E4F8;padding:4px 8px">Score</th>
         </tr></thead><tbody><tr>
-          <td style="padding:5px 8px;font-size:.78rem;font-weight:600;color:#DDD9F5">Confiance Physique</td>
-          <td style="padding:5px 8px;font-style:italic;font-size:.72rem;color:#C4C0E0">6/10</td>
+          <td style="padding:5px 8px;font-size:.78rem;font-weight:600;color:#EAE7FC">Confiance Physique</td>
+          <td style="padding:5px 8px;font-style:italic;font-size:.72rem;color:#E8E4F8">6/10</td>
           <td style="padding:5px 8px"><div style="background:rgba(255,255,255,0.1);border-radius:3px;height:6px;width:80px;overflow:hidden"><div style="width:60%;height:100%;background:#4ADE80;border-radius:3px"></div></div></td>
           <td style="padding:5px 8px;font-weight:700;font-size:.82rem;color:#4ADE80">9/15</td>
         </tr><tr>
-          <td style="padding:5px 8px;font-size:.78rem;font-weight:600;color:#DDD9F5">Confiance Mentale</td>
-          <td style="padding:5px 8px;font-style:italic;font-size:.72rem;color:#C4C0E0">8/10</td>
+          <td style="padding:5px 8px;font-size:.78rem;font-weight:600;color:#EAE7FC">Confiance Mentale</td>
+          <td style="padding:5px 8px;font-style:italic;font-size:.72rem;color:#E8E4F8">8/10</td>
           <td style="padding:5px 8px"><div style="background:rgba(255,255,255,0.1);border-radius:3px;height:6px;width:80px;overflow:hidden"><div style="width:80%;height:100%;background:#4ADE80;border-radius:3px"></div></div></td>
           <td style="padding:5px 8px;font-weight:700;font-size:.82rem;color:#4ADE80">12/15</td>
         </tr><tr>
-          <td style="padding:5px 8px;font-size:.78rem;font-weight:600;color:#DDD9F5">Soins + Prévention</td>
-          <td style="padding:5px 8px;font-style:italic;font-size:.72rem;color:#C4C0E0">18 pts</td>
+          <td style="padding:5px 8px;font-size:.78rem;font-weight:600;color:#EAE7FC">Soins + Prévention</td>
+          <td style="padding:5px 8px;font-style:italic;font-size:.72rem;color:#E8E4F8">18 pts</td>
           <td style="padding:5px 8px"><div style="background:rgba(255,255,255,0.1);border-radius:3px;height:6px;width:80px;overflow:hidden"><div style="width:66%;height:100%;background:#4ADE80;border-radius:3px"></div></div></td>
           <td style="padding:5px 8px;font-weight:700;font-size:.82rem;color:#4ADE80">10/15</td>
         </tr><tr>
-          <td style="padding:5px 8px;font-size:.78rem;font-weight:600;color:#DDD9F5">Douleur moyenne</td>
-          <td style="padding:5px 8px;font-style:italic;font-size:.72rem;color:#C4C0E0">0.00/10</td>
+          <td style="padding:5px 8px;font-size:.78rem;font-weight:600;color:#EAE7FC">Douleur moyenne</td>
+          <td style="padding:5px 8px;font-style:italic;font-size:.72rem;color:#E8E4F8">0.00/10</td>
           <td style="padding:5px 8px"><div style="background:rgba(255,255,255,0.1);border-radius:3px;height:6px;width:80px;overflow:hidden"><div style="width:100%;height:100%;background:#4ADE80;border-radius:3px"></div></div></td>
           <td style="padding:5px 8px;font-weight:700;font-size:.82rem;color:#4ADE80">20/20</td>
         </tr><tr>
-          <td style="padding:5px 8px;font-size:.78rem;font-weight:600;color:#DDD9F5">Courbatures</td>
-          <td style="padding:5px 8px;font-style:italic;font-size:.72rem;color:#C4C0E0">0.86/10</td>
+          <td style="padding:5px 8px;font-size:.78rem;font-weight:600;color:#EAE7FC">Courbatures</td>
+          <td style="padding:5px 8px;font-style:italic;font-size:.72rem;color:#E8E4F8">0.86/10</td>
           <td style="padding:5px 8px"><div style="background:rgba(255,255,255,0.1);border-radius:3px;height:6px;width:80px;overflow:hidden"><div style="width:100%;height:100%;background:#4ADE80;border-radius:3px"></div></div></td>
           <td style="padding:5px 8px;font-weight:700;font-size:.82rem;color:#4ADE80">15/15</td>
         </tr><tr>
-          <td style="padding:5px 8px;font-size:.78rem;font-weight:600;color:#DDD9F5">Fatigue</td>
-          <td style="padding:5px 8px;font-style:italic;font-size:.72rem;color:#C4C0E0">1.43/5</td>
+          <td style="padding:5px 8px;font-size:.78rem;font-weight:600;color:#EAE7FC">Fatigue</td>
+          <td style="padding:5px 8px;font-style:italic;font-size:.72rem;color:#E8E4F8">1.43/5</td>
           <td style="padding:5px 8px"><div style="background:rgba(255,255,255,0.1);border-radius:3px;height:6px;width:80px;overflow:hidden"><div style="width:80%;height:100%;background:#4ADE80;border-radius:3px"></div></div></td>
           <td style="padding:5px 8px;font-weight:700;font-size:.82rem;color:#4ADE80">8/10</td>
         </tr><tr>
-          <td style="padding:5px 8px;font-size:.78rem;font-weight:600;color:#DDD9F5">Progression matchs</td>
-          <td style="padding:5px 8px;font-style:italic;font-size:.72rem;color:#C4C0E0">—</td>
+          <td style="padding:5px 8px;font-size:.78rem;font-weight:600;color:#EAE7FC">Progression matchs</td>
+          <td style="padding:5px 8px;font-style:italic;font-size:.72rem;color:#E8E4F8">—</td>
           <td style="padding:5px 8px"><div style="background:rgba(255,255,255,0.1);border-radius:3px;height:6px;width:80px;overflow:hidden"><div style="width:0%;height:100%;background:#4ADE80;border-radius:3px"></div></div></td>
           <td style="padding:5px 8px;font-weight:700;font-size:.82rem;color:#4ADE80">0/5</td>
         </tr><tr>
-          <td style="padding:5px 8px;font-size:.78rem;font-weight:600;color:#DDD9F5">Alertes rouges</td>
-          <td style="padding:5px 8px;font-style:italic;font-size:.72rem;color:#C4C0E0">0 rouge(s)</td>
+          <td style="padding:5px 8px;font-size:.78rem;font-weight:600;color:#EAE7FC">Alertes rouges</td>
+          <td style="padding:5px 8px;font-style:italic;font-size:.72rem;color:#E8E4F8">0 rouge(s)</td>
           <td style="padding:5px 8px"><div style="background:rgba(255,255,255,0.1);border-radius:3px;height:6px;width:80px;overflow:hidden"><div style="width:100%;height:100%;background:#4ADE80;border-radius:3px"></div></div></td>
           <td style="padding:5px 8px;font-weight:700;font-size:.82rem;color:#4ADE80">5/5</td>
         </tr></tbody></table>
@@ -163,21 +163,21 @@ tr:nth-child(even) td{background:rgba(255,255,255,0.03)}
       <div class="card-title">Moyennes sur 25 jours</div>
       <div style="margin-bottom:10px">
         <div style="display:flex;justify-content:space-between;align-items:baseline">
-          <span style="font-size:.75rem;color:#DDD9F5">Douleur moyenne</span>
+          <span style="font-size:.75rem;color:#EAE7FC">Douleur moyenne</span>
           <span style="font-size:1rem;font-weight:800;color:#4ADE80">0.0/10</span>
         </div>
         <div class="bar"><div class="bar-fill" style="width:0%;background:#4ADE80"></div></div>
       </div>
       <div style="margin-bottom:10px">
         <div style="display:flex;justify-content:space-between;align-items:baseline">
-          <span style="font-size:.75rem;color:#DDD9F5">Courbatures moyenne</span>
+          <span style="font-size:.75rem;color:#EAE7FC">Courbatures moyenne</span>
           <span style="font-size:1rem;font-weight:800;color:#4ADE80">0.9/10</span>
         </div>
         <div class="bar"><div class="bar-fill" style="width:8%;background:#4ADE80"></div></div>
       </div>
       <div>
         <div style="display:flex;justify-content:space-between;align-items:baseline">
-          <span style="font-size:.75rem;color:#DDD9F5">Fatigue moyenne</span>
+          <span style="font-size:.75rem;color:#EAE7FC">Fatigue moyenne</span>
           <span style="font-size:1rem;font-weight:800;color:#4ADE80">1.4/5</span>
         </div>
         <div class="bar"><div class="bar-fill" style="width:28%;background:#4ADE80"></div></div>
@@ -206,52 +206,52 @@ tr:nth-child(even) td{background:rgba(255,255,255,0.03)}
 <circle cx="90.0" cy="125.0" r="3" fill="#4ADE80"/>
 <circle cx="126.4" cy="111.0" r="3" fill="#4ADE80"/>
 <circle cx="132.4" cy="65.5" r="3" fill="#4ADE80"/>
-<text x="90" y="10" text-anchor="middle" font-size="8" fill="#DDD9F5" font-family="system-ui">Foot</text>
-<text x="17" y="52" text-anchor="middle" font-size="8" fill="#DDD9F5" font-family="system-ui">Sans douleur</text>
-<text x="17" y="136" text-anchor="middle" font-size="8" fill="#DDD9F5" font-family="system-ui">100%</text>
-<text x="90" y="178" text-anchor="middle" font-size="8" fill="#DDD9F5" font-family="system-ui">Pas penser</text>
-<text x="163" y="136" text-anchor="middle" font-size="8" fill="#DDD9F5" font-family="system-ui">Confiance</text>
-<text x="163" y="52" text-anchor="middle" font-size="8" fill="#DDD9F5" font-family="system-ui">Technique</text>
+<text x="90" y="10" text-anchor="middle" font-size="8" fill="#EAE7FC" font-family="system-ui">Foot</text>
+<text x="17" y="52" text-anchor="middle" font-size="8" fill="#EAE7FC" font-family="system-ui">Sans douleur</text>
+<text x="17" y="136" text-anchor="middle" font-size="8" fill="#EAE7FC" font-family="system-ui">100%</text>
+<text x="90" y="178" text-anchor="middle" font-size="8" fill="#EAE7FC" font-family="system-ui">Pas penser</text>
+<text x="163" y="136" text-anchor="middle" font-size="8" fill="#EAE7FC" font-family="system-ui">Confiance</text>
+<text x="163" y="52" text-anchor="middle" font-size="8" fill="#EAE7FC" font-family="system-ui">Technique</text>
 </svg>
         <div style="text-align:center">
-          <div style="font-size:2rem;font-weight:800;color:#4ADE80">39<span style="font-size:.9rem;color:#B0ACCC">/60</span></div>
-          <div style="font-size:.72rem;color:#DDD9F5">Readiness compét.</div>
+          <div style="font-size:2rem;font-weight:800;color:#4ADE80">39<span style="font-size:.9rem;color:#E8E4F8">/60</span></div>
+          <div style="font-size:.72rem;color:#EAE7FC">Readiness compét.</div>
           <button class="toggle-btn" onclick="toggle('iprrs-detail')" style="margin-top:8px;font-size:.72rem">▶ Détail des 6 questions</button>
         </div>
       </div>
       <div class="collapsible" id="iprrs-detail" style="margin-top:10px">
         <div style="display:flex;align-items:center;gap:10px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.07)">
-          <span style="font-size:.75rem;color:#DDD9F5;flex:1">Football</span>
+          <span style="font-size:.75rem;color:#EAE7FC;flex:1">Football</span>
           <div style="background:rgba(255,255,255,0.1);border-radius:4px;height:6px;width:80px;overflow:hidden">
             <div style="width:80%;height:100%;background:#FB923C;border-radius:4px"></div>
           </div>
           <span style="font-size:.78rem;font-weight:700;color:#FB923C;min-width:32px;text-align:right">8/10</span>
         </div><div style="display:flex;align-items:center;gap:10px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.07)">
-          <span style="font-size:.75rem;color:#DDD9F5;flex:1">Sans douleur</span>
+          <span style="font-size:.75rem;color:#EAE7FC;flex:1">Sans douleur</span>
           <div style="background:rgba(255,255,255,0.1);border-radius:4px;height:6px;width:80px;overflow:hidden">
             <div style="width:50%;height:100%;background:#EF4444;border-radius:4px"></div>
           </div>
           <span style="font-size:.78rem;font-weight:700;color:#EF4444;min-width:32px;text-align:right">5/10</span>
         </div><div style="display:flex;align-items:center;gap:10px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.07)">
-          <span style="font-size:.75rem;color:#DDD9F5;flex:1">Donner 100%</span>
+          <span style="font-size:.75rem;color:#EAE7FC;flex:1">Donner 100%</span>
           <div style="background:rgba(255,255,255,0.1);border-radius:4px;height:6px;width:80px;overflow:hidden">
             <div style="width:80%;height:100%;background:#FB923C;border-radius:4px"></div>
           </div>
           <span style="font-size:.78rem;font-weight:700;color:#FB923C;min-width:32px;text-align:right">8/10</span>
         </div><div style="display:flex;align-items:center;gap:10px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.07)">
-          <span style="font-size:.75rem;color:#DDD9F5;flex:1">Pas penser blessure</span>
+          <span style="font-size:.75rem;color:#EAE7FC;flex:1">Pas penser blessure</span>
           <div style="background:rgba(255,255,255,0.1);border-radius:4px;height:6px;width:80px;overflow:hidden">
             <div style="width:50%;height:100%;background:#EF4444;border-radius:4px"></div>
           </div>
           <span style="font-size:.78rem;font-weight:700;color:#EF4444;min-width:32px;text-align:right">5/10</span>
         </div><div style="display:flex;align-items:center;gap:10px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.07)">
-          <span style="font-size:.75rem;color:#DDD9F5;flex:1">Confiance corps</span>
+          <span style="font-size:.75rem;color:#EAE7FC;flex:1">Confiance corps</span>
           <div style="background:rgba(255,255,255,0.1);border-radius:4px;height:6px;width:80px;overflow:hidden">
             <div style="width:60%;height:100%;background:#EF4444;border-radius:4px"></div>
           </div>
           <span style="font-size:.78rem;font-weight:700;color:#EF4444;min-width:32px;text-align:right">6/10</span>
         </div><div style="display:flex;align-items:center;gap:10px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.07)">
-          <span style="font-size:.75rem;color:#DDD9F5;flex:1">Capacités tech/phys</span>
+          <span style="font-size:.75rem;color:#EAE7FC;flex:1">Capacités tech/phys</span>
           <div style="background:rgba(255,255,255,0.1);border-radius:4px;height:6px;width:80px;overflow:hidden">
             <div style="width:70%;height:100%;background:#FB923C;border-radius:4px"></div>
           </div>
@@ -264,13 +264,13 @@ tr:nth-child(even) td{background:rgba(255,255,255,0.03)}
       <div class="card-title">Évolution J+1 → J+25</div>
       <div style="display:flex;gap:10px">
           <div style="flex:1;background:rgba(255,255,255,0.06);border-radius:8px;padding:10px;text-align:center">
-            <div style="font-size:.72rem;color:#DDD9F5;margin-bottom:4px">Début (moy. 3 premiers j.)</div>
-            <div style="font-size:1.4rem;font-weight:800;color:#4ADE80">0.0<span style="font-size:.75rem;color:#B0ACCC">/10</span></div>
+            <div style="font-size:.72rem;color:#EAE7FC;margin-bottom:4px">Début (moy. 3 premiers j.)</div>
+            <div style="font-size:1.4rem;font-weight:800;color:#4ADE80">0.0<span style="font-size:.75rem;color:#E8E4F8">/10</span></div>
           </div>
           <div style="display:flex;align-items:center;font-size:1.2rem;color:#FB923C">→</div>
           <div style="flex:1;background:rgba(255,255,255,0.06);border-radius:8px;padding:10px;text-align:center">
-            <div style="font-size:.72rem;color:#DDD9F5;margin-bottom:4px">Fin (moy. 3 derniers j.)</div>
-            <div style="font-size:1.4rem;font-weight:800;color:#4ADE80">0.0<span style="font-size:.75rem;color:#B0ACCC">/10</span></div>
+            <div style="font-size:.72rem;color:#EAE7FC;margin-bottom:4px">Fin (moy. 3 derniers j.)</div>
+            <div style="font-size:1.4rem;font-weight:800;color:#4ADE80">0.0<span style="font-size:.75rem;color:#E8E4F8">/10</span></div>
           </div>
         </div>
         <div style="text-align:center;margin-top:8px;font-size:.82rem;font-weight:700;color:#FB923C">→ Stable</div>
@@ -280,7 +280,7 @@ tr:nth-child(even) td{background:rgba(255,255,255,0.03)}
   <!-- ROW 3 : ALERTES -->
   <div class="card section-full" style="margin-bottom:16px">
       <div class="card-title">Alertes identifiées</div>
-      <div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:rgba(255,255,255,0.05);border-radius:6px;border-left:3px solid #FB923C;margin-bottom:5px"><span style="font-size:.72rem;font-weight:700;color:white;background:#FB923C;padding:1px 6px;border-radius:10px;flex-shrink:0">ORANGE</span><span style="flex:1;font-size:.75rem;color:#DDD9F5">Sensibilité insertion haute du psoas gauche</span><span style="font-size:.72rem;color:#B0ACCC">07/05/2026</span></div><div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:rgba(255,255,255,0.05);border-radius:6px;border-left:3px solid #EF4444;margin-bottom:5px"><span style="font-size:.72rem;font-weight:700;color:white;background:#EF4444;padding:1px 6px;border-radius:10px;flex-shrink:0">ROUGE</span><span style="flex:1;font-size:.75rem;color:#DDD9F5">Confiance dégradée et douleur au genou droit augmentée</span><span style="font-size:.72rem;color:#B0ACCC">12/05/2026</span></div>
+      <div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:rgba(255,255,255,0.05);border-radius:6px;border-left:3px solid #FB923C;margin-bottom:5px"><span style="font-size:.72rem;font-weight:700;color:white;background:#FB923C;padding:1px 6px;border-radius:10px;flex-shrink:0">ORANGE</span><span style="flex:1;font-size:.75rem;color:#EAE7FC">Sensibilité insertion haute du psoas gauche</span><span style="font-size:.72rem;color:#E8E4F8">07/05/2026</span></div><div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:rgba(255,255,255,0.05);border-radius:6px;border-left:3px solid #EF4444;margin-bottom:5px"><span style="font-size:.72rem;font-weight:700;color:white;background:#EF4444;padding:1px 6px;border-radius:10px;flex-shrink:0">ROUGE</span><span style="flex:1;font-size:.75rem;color:#EAE7FC">Confiance dégradée et douleur au genou droit augmentée</span><span style="font-size:.72rem;color:#E8E4F8">12/05/2026</span></div>
   </div>
 
   <!-- ROW 3b : ÉVOLUTION RRI -->
@@ -297,7 +297,7 @@ tr:nth-child(even) td{background:rgba(255,255,255,0.03)}
   <!-- ROW 4 : TIMELINE -->
   <div class="card section-full">
     <div class="card-title">■ Frise chronologique — cliquez sur un point pour le détail</div>
-    <div style="color:#C4C0E0;font-style:italic;text-align:center;padding:20px">Date du 1er match non renseignée</div>
+    <div style="color:#E8E4F8;font-style:italic;text-align:center;padding:20px">Date du 1er match non renseignée</div>
     <div id="frise-info-box" style="display:none;margin-top:10px;padding:10px 14px;background:#2D2660;color:white;border-radius:8px;font-size:.82rem;font-weight:600;border:2px solid #C9A84C;line-height:1.5"></div>
   </div>
 
@@ -307,20 +307,20 @@ tr:nth-child(even) td{background:rgba(255,255,255,0.03)}
     <div style="display:flex;gap:20px;align-items:center;flex-wrap:wrap">
       <div style="flex:1;min-width:200px">
         <div style="display:flex;justify-content:space-between;margin-bottom:6px">
-          <span style="font-size:.75rem;color:#DDD9F5">Minutes jouées</span>
+          <span style="font-size:.75rem;color:#EAE7FC">Minutes jouées</span>
           <span style="font-size:.75rem;font-weight:700;color:#EF4444">0' / 270'</span>
         </div>
         <div style="background:rgba(255,255,255,0.1);border-radius:8px;height:14px;overflow:hidden">
           <div style="width:0%;height:100%;background:#EF4444;border-radius:8px;transition:width .6s"></div>
         </div>
         <div style="display:flex;justify-content:space-between;margin-top:4px">
-          <span style="font-size:.72rem;color:#B0ACCC">0'</span>
+          <span style="font-size:.72rem;color:#E8E4F8">0'</span>
           <span style="font-size:.75rem;font-weight:700;color:#EF4444">0% de la cible</span>
-          <span style="font-size:.72rem;color:#B0ACCC">270'</span>
+          <span style="font-size:.72rem;color:#E8E4F8">270'</span>
         </div>
       </div>
       <div style="flex:1;min-width:200px">
-        <div style="font-size:.72rem;color:#DDD9F5;margin-bottom:6px;font-weight:600">Progression match par match</div>
+        <div style="font-size:.72rem;color:#EAE7FC;margin-bottom:6px;font-weight:600">Progression match par match</div>
         <svg viewBox="0 0 500 70" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;overflow:visible">
           <rect width="500" height="70" fill="rgba(255,255,255,0.05)" rx="4"/>
           <line x1="0" y1="60" x2="500" y2="60" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
@@ -328,9 +328,9 @@ tr:nth-child(even) td{background:rgba(255,255,255,0.03)}
         </svg>
       </div>
       <div style="background:rgba(255,255,255,0.06);border-radius:10px;padding:14px 18px;text-align:center;flex-shrink:0">
-        <div style="font-size:.72rem;color:#DDD9F5;margin-bottom:4px">Total cumulé</div>
+        <div style="font-size:.72rem;color:#EAE7FC;margin-bottom:4px">Total cumulé</div>
         <div style="font-size:2rem;font-weight:800;color:#EF4444">0'</div>
-        <div style="font-size:.72rem;color:#DDD9F5;margin-top:2px">0 matchs</div>
+        <div style="font-size:.72rem;color:#EAE7FC;margin-top:2px">0 matchs</div>
       </div>
     </div>
   </div>
@@ -339,11 +339,11 @@ tr:nth-child(even) td{background:rgba(255,255,255,0.03)}
   <div class="card section-full">
     <div class="card-title">Temps de jeu — progression par match</div>
     <div style="display:flex;gap:20px;align-items:flex-start">
-      <div style="flex:1"><div style="color:#C4C0E0;font-style:italic">Aucun match enregistré</div></div>
+      <div style="flex:1"><div style="color:#E8E4F8;font-style:italic">Aucun match enregistré</div></div>
       <div style="background:rgba(255,255,255,0.06);border-radius:10px;padding:16px;text-align:center;min-width:120px">
-        <div style="font-size:.72rem;color:#DDD9F5;margin-bottom:6px">Total minutes jouées</div>
+        <div style="font-size:.72rem;color:#EAE7FC;margin-bottom:6px">Total minutes jouées</div>
         <div style="font-size:2.5rem;font-weight:800;color:#4ADE80">0'</div>
-        <div style="font-size:.72rem;color:#DDD9F5;margin-top:4px">0 matchs</div>
+        <div style="font-size:.72rem;color:#EAE7FC;margin-top:4px">0 matchs</div>
       </div>
     </div>
   </div>
