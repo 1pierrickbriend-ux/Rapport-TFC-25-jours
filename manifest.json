@@ -7,7 +7,43 @@
       "U17",
       "U19"
     ],
-    "players": 7
+    "players": 7,
+    "statuts": {
+      "PRÊT": 6,
+      "SURVEILLANCE": 1,
+      "VIGILANCE": 0
+    },
+    "joueurs": [
+      {
+        "nom": "Matthieu De Souza",
+        "statut": "SURVEILLANCE"
+      },
+      {
+        "nom": "Aymen Amaouch",
+        "statut": "PRÊT"
+      },
+      {
+        "nom": "Wassim Dardake",
+        "statut": "PRÊT"
+      },
+      {
+        "nom": "Fred Efuele",
+        "statut": "PRÊT"
+      },
+      {
+        "nom": "Enzo Faty",
+        "statut": "PRÊT"
+      },
+      {
+        "nom": "Naziahry Siaka",
+        "statut": "PRÊT"
+      },
+      {
+        "nom": "Mattéo Mach",
+        "statut": "PRÊT"
+      }
+    ],
+    "saison": "2025-2026"
   },
   "rapport_22052026.html": {
     "date": "22/05/2026",
@@ -16,7 +52,31 @@
       "N3",
       "U19"
     ],
-    "players": 4
+    "players": 4,
+    "statuts": {
+      "PRÊT": 4,
+      "SURVEILLANCE": 0,
+      "VIGILANCE": 0
+    },
+    "joueurs": [
+      {
+        "nom": "Aymen Amaouch",
+        "statut": "PRÊT"
+      },
+      {
+        "nom": "Fred Efuele",
+        "statut": "PRÊT"
+      },
+      {
+        "nom": "Enzo Faty",
+        "statut": "PRÊT"
+      },
+      {
+        "nom": "Naziahry Siaka",
+        "statut": "PRÊT"
+      }
+    ],
+    "saison": "2025-2026"
   },
   "rapport_05052026.html": {
     "date": "05/05/2026",
@@ -26,18 +86,57 @@
       "U17",
       "U19"
     ],
-    "players": 8
+    "players": 8,
+    "statuts": {
+      "PRÊT": 6,
+      "SURVEILLANCE": 2,
+      "VIGILANCE": 0
+    },
+    "joueurs": [
+      {
+        "nom": "Malamini Dansoko",
+        "statut": "SURVEILLANCE"
+      },
+      {
+        "nom": "Matthieu De Souza",
+        "statut": "SURVEILLANCE"
+      },
+      {
+        "nom": "Aymen Amaouch",
+        "statut": "PRÊT"
+      },
+      {
+        "nom": "Wassim Dardake",
+        "statut": "PRÊT"
+      },
+      {
+        "nom": "Fred Efuele",
+        "statut": "PRÊT"
+      },
+      {
+        "nom": "Enzo Faty",
+        "statut": "PRÊT"
+      },
+      {
+        "nom": "Naziahry Siaka",
+        "statut": "PRÊT"
+      },
+      {
+        "nom": "Mattéo Mach",
+        "statut": "PRÊT"
+      }
+    ],
+    "saison": "2025-2026"
   },
   "bilan_Bilan_Aymen_Amaouch.html": {
     "joueur": "Aymen Amaouch",
-    "cat": "",
-    "statut": "",
-    "rri": "",
-    "date": "",
-    "jp": "",
-    "dateFinProto": "",
+    "cat": "U17",
+    "statut": "PRÊT",
+    "rri": "80",
+    "date": "09/06/2026",
     "fichier": "Bilan_Aymen_Amaouch.html",
-    "type": "bilan"
+    "type": "bilan",
+    "saison": "2025-2026"
   },
   "bilan_Bilan_Enzo_Faty.html": {
     "joueur": "Enzo Faty",
@@ -46,7 +145,8 @@
     "rri": "88",
     "date": "09/06/2026",
     "fichier": "Bilan_Enzo_Faty.html",
-    "type": "bilan"
+    "type": "bilan",
+    "saison": "2025-2026"
   },
   "rapport_24042026.html": {
     "date": "24/04/2026",
@@ -54,7 +154,43 @@
       "N3",
       "U19"
     ],
-    "players": 7
+    "players": 7,
+    "statuts": {
+      "PRÊT": 6,
+      "SURVEILLANCE": 1,
+      "VIGILANCE": 0
+    },
+    "joueurs": [
+      {
+        "nom": "Daris Zema",
+        "statut": "SURVEILLANCE"
+      },
+      {
+        "nom": "Wassim Dardake",
+        "statut": "PRÊT"
+      },
+      {
+        "nom": "Fred Efuele",
+        "statut": "PRÊT"
+      },
+      {
+        "nom": "Isaack Ahamadi",
+        "statut": "PRÊT"
+      },
+      {
+        "nom": "Enzo Faty",
+        "statut": "PRÊT"
+      },
+      {
+        "nom": "Ismael Sylla Touré",
+        "statut": "PRÊT"
+      },
+      {
+        "nom": "Mattéo Mach",
+        "statut": "PRÊT"
+      }
+    ],
+    "saison": "2025-2026"
   },
   "rapport_01052026.html": {
     "date": "01/05/2026",
@@ -63,7 +199,39 @@
       "U17",
       "U19"
     ],
-    "players": 6
+    "players": 6,
+    "statuts": {
+      "PRÊT": 4,
+      "SURVEILLANCE": 2,
+      "VIGILANCE": 0
+    },
+    "joueurs": [
+      {
+        "nom": "Malamini Dansoko",
+        "statut": "SURVEILLANCE"
+      },
+      {
+        "nom": "Matthieu De Souza",
+        "statut": "SURVEILLANCE"
+      },
+      {
+        "nom": "Wassim Dardake",
+        "statut": "PRÊT"
+      },
+      {
+        "nom": "Fred Efuele",
+        "statut": "PRÊT"
+      },
+      {
+        "nom": "Enzo Faty",
+        "statut": "PRÊT"
+      },
+      {
+        "nom": "Mattéo Mach",
+        "statut": "PRÊT"
+      }
+    ],
+    "saison": "2025-2026"
   },
   "bilan_Bilan_Fred_Efuele.html": {
     "joueur": "Fred Efuele",
@@ -72,7 +240,8 @@
     "rri": "88",
     "date": "09/06/2026",
     "fichier": "Bilan_Fred_Efuele.html",
-    "type": "bilan"
+    "type": "bilan",
+    "saison": "2025-2026"
   },
   "bilan_Bilan_Rafael_Laouille.html": {
     "joueur": "Rafael Laouille",
@@ -81,7 +250,8 @@
     "rri": "88",
     "date": "09/06/2026",
     "fichier": "Bilan_Rafael_Laouille.html",
-    "type": "bilan"
+    "type": "bilan",
+    "saison": "2025-2026"
   },
   "bilan_Bilan_Steeve_Delarue.html": {
     "joueur": "Steeve Delarue",
@@ -90,7 +260,8 @@
     "rri": "87",
     "date": "09/06/2026",
     "fichier": "Bilan_Steeve_Delarue.html",
-    "type": "bilan"
+    "type": "bilan",
+    "saison": "2025-2026"
   },
   "bilan_Bilan_Matthieu_De_Souza.html": {
     "joueur": "Matthieu De Souza",
@@ -99,18 +270,18 @@
     "rri": "79",
     "date": "09/06/2026",
     "fichier": "Bilan_Matthieu_De_Souza.html",
-    "type": "bilan"
+    "type": "bilan",
+    "saison": "2025-2026"
   },
   "bilan_Bilan_Wassim_Dardake.html": {
     "joueur": "Wassim Dardake",
-    "cat": "",
-    "statut": "",
-    "rri": "",
-    "date": "",
-    "jp": "",
-    "dateFinProto": "",
+    "cat": "U19",
+    "statut": "PRÊT",
+    "rri": "80",
+    "date": "09/06/2026",
     "fichier": "Bilan_Wassim_Dardake.html",
-    "type": "bilan"
+    "type": "bilan",
+    "saison": "2025-2026"
   },
   "bilan_Bilan_Naziahry_Siaka.html": {
     "joueur": "Naziahry Siaka",
@@ -119,7 +290,8 @@
     "rri": "90",
     "date": "09/06/2026",
     "fichier": "Bilan_Naziahry_Siaka.html",
-    "type": "bilan"
+    "type": "bilan",
+    "saison": "2025-2026"
   },
   "rapport_19052026.html": {
     "date": "19/05/2026",
@@ -128,14 +300,54 @@
       "U17",
       "U19"
     ],
-    "players": 5
+    "players": 5,
+    "statuts": {
+      "PRÊT": 4,
+      "SURVEILLANCE": 1,
+      "VIGILANCE": 0
+    },
+    "joueurs": [
+      {
+        "nom": "Matthieu De Souza",
+        "statut": "SURVEILLANCE"
+      },
+      {
+        "nom": "Wassim Dardake",
+        "statut": "PRÊT"
+      },
+      {
+        "nom": "Fred Efuele",
+        "statut": "PRÊT"
+      },
+      {
+        "nom": "Enzo Faty",
+        "statut": "PRÊT"
+      },
+      {
+        "nom": "Naziahry Siaka",
+        "statut": "PRÊT"
+      }
+    ],
+    "saison": "2025-2026"
   },
   "rapport_05062026.html": {
     "date": "05/06/2026",
     "categories": [
       "FFF"
     ],
-    "players": 1
+    "players": 1,
+    "statuts": {
+      "PRÊT": 1,
+      "SURVEILLANCE": 0,
+      "VIGILANCE": 0
+    },
+    "joueurs": [
+      {
+        "nom": "Aymen Amaouch",
+        "statut": "PRÊT"
+      }
+    ],
+    "saison": "2025-2026"
   },
   "rapport_27052026.html": {
     "date": "27/05/2026",
@@ -144,6 +356,30 @@
       "N3",
       "U19"
     ],
-    "players": 4
+    "players": 4,
+    "statuts": {
+      "PRÊT": 4,
+      "SURVEILLANCE": 0,
+      "VIGILANCE": 0
+    },
+    "joueurs": [
+      {
+        "nom": "Aymen Amaouch",
+        "statut": "PRÊT"
+      },
+      {
+        "nom": "Fred Efuele",
+        "statut": "PRÊT"
+      },
+      {
+        "nom": "Enzo Faty",
+        "statut": "PRÊT"
+      },
+      {
+        "nom": "Naziahry Siaka",
+        "statut": "PRÊT"
+      }
+    ],
+    "saison": "2025-2026"
   }
 }

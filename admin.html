@@ -157,6 +157,9 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);min-height
       <span>📁 Rapports en ligne</span>
       <span id="reports-summary" style="font-weight:400"></span>
     </div>
+    <div style="margin-bottom:12px">
+      <select id="season-select-rapports" onchange="selectedSeasonRapports=this.value;loadReports()" style="padding:8px 12px;border:1.5px solid #DDD;border-radius:8px;font-size:.78rem;background:white;color:#333;font-weight:600"></select>
+    </div>
     <div id="reports-list"><div class="empty-list">Chargement...</div></div>
   </div>
   </div><!-- fin section-rapports -->
@@ -224,6 +227,9 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);min-height
   </div>
   <div class="card">
     <div class="card-title">&#128193; Bilans en ligne</div>
+    <div style="margin-bottom:12px">
+      <select id="season-select-bilans" onchange="selectedSeasonBilans=this.value;loadBilans()" style="padding:8px 12px;border:1.5px solid #DDD;border-radius:8px;font-size:.78rem;background:white;color:#333;font-weight:600"></select>
+    </div>
     <div id="bilans-list"><div class="empty-list">Chargement...</div></div>
   </div>
   </div><!-- fin section-bilans -->
@@ -256,6 +262,38 @@ const CAT_COLORS = {
 function catColor(c){
   for(const[k,v] of Object.entries(CAT_COLORS)) if(c.toUpperCase().includes(k)) return v;
   return '#374151';
+}
+
+// ── SAISONS ──────────────────────────────────────────────────────────────────
+function seasonOf(dateStr){
+  const m = (dateStr||'').match(/(\d{2})\/(\d{2})\/(\d{4})/);
+  if(!m) return null;
+  const mm = parseInt(m[2],10), yyyy = parseInt(m[3],10);
+  return mm >= 7 ? `${yyyy}-${yyyy+1}` : `${yyyy-1}-${yyyy}`;
+}
+function currentSeason(){
+  const now = new Date();
+  const mm = now.getMonth()+1, yyyy = now.getFullYear();
+  return mm >= 7 ? `${yyyy}-${yyyy+1}` : `${yyyy-1}-${yyyy}`;
+}
+function seasonLabel(s){
+  if(!s) return '—';
+  const p = s.split('-');
+  return `${p[0]}/${p[1].slice(2)}`;
+}
+let selectedSeasonRapports = currentSeason();
+let selectedSeasonBilans = currentSeason();
+
+function populateSeasonSelect(selectId, seasonsPresent, selected){
+  const sel = document.getElementById(selectId);
+  if(!sel) return;
+  const cur = currentSeason();
+  const all = new Set(seasonsPresent); all.add(cur);
+  const sorted = [...all].sort().reverse();
+  sel.innerHTML = sorted.map(s=>{
+    const tag = s===cur ? ' (en cours)' : ' (archives)';
+    return `<option value="${s}"${s===selected?' selected':''}>Saison ${seasonLabel(s)}${tag}</option>`;
+  }).join('');
 }
 
 let currentFile = null;
@@ -339,6 +377,24 @@ function setupDrop(){
   });
 }
 
+function extractJoueursStatuts(html){
+  const NORMALIZE = {'PRÊT':'PRÊT','SURV.':'SURVEILLANCE','SURVEILLANCE':'SURVEILLANCE','VIGIL.':'VIGILANCE','VIGILANCE':'VIGILANCE'};
+  const re = /<span class="pano-name">([^<]+)<\/span>[\s\S]*?<span class="rri-badge"[^>]*>([^<]+)<\/span>/g;
+  const seen = new Set();
+  const joueurs = [];
+  let m;
+  while((m = re.exec(html)) !== null){
+    const nom = m[1].trim();
+    if(seen.has(nom)) continue;
+    seen.add(nom);
+    const statutRaw = m[2].trim();
+    joueurs.push({nom, statut: NORMALIZE[statutRaw] || statutRaw});
+  }
+  const statuts = {'PRÊT':0,'SURVEILLANCE':0,'VIGILANCE':0};
+  joueurs.forEach(j=>{ if(statuts[j.statut] !== undefined) statuts[j.statut]++; });
+  return {joueurs, statuts};
+}
+
 function handleFile(file){
   if(!file) return;
   currentFile = file;
@@ -352,7 +408,8 @@ function handleFile(file){
     const date = getMeta('tfc-date') || '—';
     const cats = getMeta('tfc-categories').split(',').filter(Boolean);
     const players = getMeta('tfc-players') || '';
-    currentMeta = {date, cats, players};
+    const {joueurs, statuts} = extractJoueursStatuts(html);
+    currentMeta = {date, cats, players, joueurs, statuts};
 
     document.getElementById('preview-date').textContent = 'Entretiens du ' + date;
     document.getElementById('preview-meta').textContent =
@@ -495,7 +552,10 @@ async function publishReport(){
     manifest[`rapport_${d}.html`] = {
       date: currentMeta.date,
       categories: currentMeta.cats,
-      players: parseInt(currentMeta.players) || 0
+      players: parseInt(currentMeta.players) || 0,
+      statuts: currentMeta.statuts || {'PRÊT':0,'SURVEILLANCE':0,'VIGILANCE':0},
+      joueurs: currentMeta.joueurs || [],
+      saison: seasonOf(currentMeta.date)
     };
     await saveManifest();
 
@@ -541,15 +601,24 @@ async function loadReports(){
     const files = await ghGet('rapports');
     if(!files || !files.length){
       list.innerHTML = '<div class="empty-list">Aucun rapport publié.</div>';
+      populateSeasonSelect('season-select-rapports', [], selectedSeasonRapports);
       return;
     }
+    const allSeasons = new Set(files.filter(f=>f.name.endsWith('.html')).map(f=>(manifest[f.name]||{}).saison).filter(Boolean));
+    populateSeasonSelect('season-select-rapports', allSeasons, selectedSeasonRapports);
     const htmlFiles = files.filter(f=>f.name.endsWith('.html'))
+                           .filter(f=>{
+                             const s = (manifest[f.name]||{}).saison;
+                             return s ? s===selectedSeasonRapports : selectedSeasonRapports===currentSeason();
+                           })
                            .sort((a,b)=>{
       function d(n){var m=n.match(/(\d{2})(\d{2})(\d{4})/);return m?m[3]+m[2]+m[1]:'0';}
       return d(b.name).localeCompare(d(a.name));
     });
     if(!htmlFiles.length){
-      list.innerHTML = '<div class="empty-list">Aucun rapport publié.</div>';
+      list.innerHTML = `<div class="empty-list">Aucun rapport pour la saison ${seasonLabel(selectedSeasonRapports)}.</div>`;
+      const summaryEl0 = document.getElementById('reports-summary');
+      if(summaryEl0) summaryEl0.innerHTML = '';
       return;
     }
     // Compteur global (prop 2)
@@ -699,7 +768,7 @@ async function publishBilan(){
     var sha=existing?existing.sha:null;
     var ok=await ghPutBinary(filename,arrayBuffer,sha);
     if(!ok) throw new Error('Echec upload bilan');
-    manifest['bilan_'+nomFichier]={joueur:currentBilanMeta.joueur,cat:currentBilanMeta.cat,statut:currentBilanMeta.statut,rri:currentBilanMeta.rri,date:currentBilanMeta.date,jp:currentBilanMeta.jp,dateFinProto:currentBilanMeta.dateFinProto,fichier:nomFichier,type:'bilan'};
+    manifest['bilan_'+nomFichier]={joueur:currentBilanMeta.joueur,cat:currentBilanMeta.cat,statut:currentBilanMeta.statut,rri:currentBilanMeta.rri,date:currentBilanMeta.date,jp:currentBilanMeta.jp,dateFinProto:currentBilanMeta.dateFinProto,fichier:nomFichier,type:'bilan',saison:seasonOf(currentBilanMeta.date)};
     await saveManifest();
     st.className='publish-status ok'; st.textContent='✓ Bilan envoyé sur GitHub — vérification du déploiement...';
     await loadBilans();
@@ -715,12 +784,19 @@ async function loadBilans(){
   list.innerHTML='<div class="empty-list">Chargement...</div>';
   try{
     var files=await ghGet('bilans');
-    if(!files||!files.length){list.innerHTML='<div class="empty-list">Aucun bilan publie.</div>';return;}
-    var htmlFiles=files.filter(function(f){return f.name.endsWith('.html');}).sort(function(a,b){
+    if(!files||!files.length){list.innerHTML='<div class="empty-list">Aucun bilan publie.</div>';populateSeasonSelect('season-select-bilans',[],selectedSeasonBilans);return;}
+    var allSeasons=new Set(files.filter(function(f){return f.name.endsWith('.html');}).map(function(f){return (manifest['bilan_'+f.name]||{}).saison;}).filter(Boolean));
+    populateSeasonSelect('season-select-bilans', allSeasons, selectedSeasonBilans);
+    var htmlFiles=files.filter(function(f){return f.name.endsWith('.html');})
+      .filter(function(f){
+        var s=(manifest['bilan_'+f.name]||{}).saison;
+        return s ? s===selectedSeasonBilans : selectedSeasonBilans===currentSeason();
+      })
+      .sort(function(a,b){
       function d(f){var inf=manifest['bilan_'+f.name]||{};var dt=inf.date||'';var m=dt.match(/(\d{2})\/(\d{2})\/(\d{4})/);return m?m[3]+m[2]+m[1]:'0';}
       return d(b).localeCompare(d(a));
     });
-    if(!htmlFiles.length){list.innerHTML='<div class="empty-list">Aucun bilan publie.</div>';return;}
+    if(!htmlFiles.length){list.innerHTML=`<div class="empty-list">Aucun bilan pour la saison ${seasonLabel(selectedSeasonBilans)}.</div>`;document.getElementById('alerte-fin-proto').style.display='none';return;}
     list.innerHTML='';
     // Zone orange : joueurs dont J+25 est dépassé
     var today=new Date(); today.setHours(0,0,0,0);

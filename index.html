@@ -99,6 +99,12 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);min-height
   <div class="tab-indicator" id="tab-indicator"></div>
 </div>
 
+<!-- SAISON -->
+<div class="filter-bar" id="season-bar" style="border-bottom:1px solid #E5E3F5">
+  <span class="filter-label">🗓️ Saison</span>
+  <select id="season-select" onchange="onSeasonChange(this.value)" style="padding:5px 12px;border:2px solid #DDD;border-radius:20px;font-size:.75rem;font-weight:700;color:#666;background:white;cursor:pointer"></select>
+</div>
+
 <!-- FILTRE COMMUN -->
 <div class="filter-bar" id="filter-bar">
   <span class="filter-label">🔍 Catégorie</span>
@@ -173,6 +179,25 @@ setInterval(updateClock, 1000);
 // ── État ──────────────────────────────────────────────────────────────────────
 let currentTab    = localStorage.getItem('tfc_tab')    || 'rapports';
 let currentFilter = {rapports: localStorage.getItem('tfc_filter_rapports')||'Tous', bilans: localStorage.getItem('tfc_filter_bilans')||'Tous'};
+
+// ── SAISONS ──────────────────────────────────────────────────────────────────
+function seasonOf(dateStr){
+  const m = (dateStr||'').match(/(\d{2})\/(\d{2})\/(\d{4})/);
+  if(!m) return null;
+  const mm = parseInt(m[2],10), yyyy = parseInt(m[3],10);
+  return mm >= 7 ? `${yyyy}-${yyyy+1}` : `${yyyy-1}-${yyyy}`;
+}
+function currentSeason(){
+  const now = new Date();
+  const mm = now.getMonth()+1, yyyy = now.getFullYear();
+  return mm >= 7 ? `${yyyy}-${yyyy+1}` : `${yyyy-1}-${yyyy}`;
+}
+function seasonLabel(s){
+  if(!s) return '—';
+  const p = s.split('-');
+  return `${p[0]}/${p[1].slice(2)}`;
+}
+let selectedSeason = localStorage.getItem('tfc_saison') || currentSeason();
 let manifest      = {};
 let allCats       = new Set();
 let rapportsDone  = false;
@@ -185,6 +210,28 @@ async function loadLogo(){
     if(r.ok) manifest = await r.json();
   } catch{}
   // Logo embarqué en base64 — pas de chargement nécessaire
+  populateSeasonSelect();
+}
+
+function populateSeasonSelect(){
+  const sel = document.getElementById('season-select');
+  if(!sel) return;
+  const cur = currentSeason();
+  const seasons = new Set([cur]);
+  Object.values(manifest).forEach(v=>{ if(v.saison) seasons.add(v.saison); });
+  const sorted = [...seasons].sort().reverse();
+  sel.innerHTML = sorted.map(s=>{
+    const tag = s===cur ? ' (en cours)' : ' (archives)';
+    return `<option value="${s}"${s===selectedSeason?' selected':''}>${seasonLabel(s)}${tag}</option>`;
+  }).join('');
+}
+
+function onSeasonChange(v){
+  selectedSeason = v;
+  localStorage.setItem('tfc_saison', v);
+  rapportsDone = false; bilansDone = false;
+  loadRapports();
+  if(currentTab==='bilans') loadBilans();
 }
 
 // ── Bannière statut du jour ────────────────────────────────────────────────
@@ -192,21 +239,22 @@ async function buildBanner(){
   const banner = document.getElementById('banner-statut');
   if(!banner) return;
   try{
-    // Compter les bilans par statut
-    const bkeys = Object.keys(manifest).filter(k=>manifest[k].type==='bilan');
-    const total = bkeys.length;
-    const pret  = bkeys.filter(k=>manifest[k].statut==='PRÊT').length;
-    const surv  = bkeys.filter(k=>manifest[k].statut==='SURVEILLANCE').length;
-    const vigil = bkeys.filter(k=>manifest[k].statut==='VIGILANCE').length;
+    const saisonEnCours = currentSeason();
+    // Bilans saison : comptage informatif uniquement (finalité de fin de protocole), saison en cours seulement
+    const bkeys = Object.keys(manifest).filter(k=>manifest[k].type==='bilan' && manifest[k].saison===saisonEnCours);
+    const bilansTermines = bkeys.length;
 
-    // Dernier rapport
-    const rkeys = Object.keys(manifest).filter(k=>!manifest[k].type||manifest[k].type!=='bilan');
-    let dernierRapport = '—';
+    // Dernier rapport collectif publié + ses statuts par joueur (état du jour), saison en cours seulement
+    const rkeys = Object.keys(manifest).filter(k=>(!manifest[k].type||manifest[k].type!=='bilan') && manifest[k].saison===saisonEnCours);
+    let dernierRapportKey = null, dernierRapportSort = '0', dernierRapport = '—';
     rkeys.forEach(k=>{
       const d = manifest[k].date||'';
-      if(d && (!dernierRapport||d>dernierRapport)) dernierRapport = d;
+      const s = sortDateDMY(d);
+      if(d && s > dernierRapportSort){ dernierRapportSort = s; dernierRapport = d; dernierRapportKey = k; }
     });
-    // Footer fonctionnel (prop 10)
+    const rapportStatuts = dernierRapportKey ? (manifest[dernierRapportKey].statuts || null) : null;
+
+    // Footer fonctionnel
     const footerEl = document.getElementById('footer-bar');
     if(footerEl){
       const nBilans = bkeys.length;
@@ -218,25 +266,40 @@ async function buildBanner(){
         + ' &middot; <a href="' + SITE + '/admin.html" target="_blank" style="color:var(--mid);font-weight:600;text-decoration:none">Admin</a>';
     }
 
-    // Bilans terminés cette saison
-    const bilansTermines = bkeys.length;
-
     const kpiCard = (val, label, bg, col, textCol) =>
       `<div style="background:${bg};border-radius:10px;padding:10px 16px;display:flex;flex-direction:column;align-items:center;min-width:72px;flex-shrink:0;border:1.5px solid ${col}20">
         <span style="font-size:1.5rem;font-weight:800;color:${textCol};line-height:1">${val}</span>
         <span style="font-size:.58rem;font-weight:700;color:${textCol};letter-spacing:.04em;margin-top:3px;text-transform:uppercase">${label}</span>
       </div>`;
-    banner.innerHTML =
-      kpiCard(bilansTermines, 'Bilans saison', '#F0EEF8', '#6B5CA5', '#2D2660') +
-      (vigil>0 ? kpiCard(vigil, 'Vigilance', '#FEE2E2', '#EF4444', '#B91C1C') : '') +
-      (surv>0  ? kpiCard(surv,  'Surveillance', '#FFEDD5', '#FB923C', '#C2410C') : '') +
-      (pret>0  ? kpiCard(pret,  'Prêt', '#DCFCE7', '#22C55E', '#15803D') : '') +
-      (vigil===0 && surv===0 && total>0 ?
-        '<div style="background:#DCFCE7;border:1.5px solid #22C55E20;border-radius:10px;padding:10px 16px;display:flex;align-items:center;gap:6px;flex-shrink:0">' +
-          '<span style="font-size:.95rem">✓</span>' +
-          '<span style="font-size:.72rem;font-weight:700;color:#15803D">Aucune vigilance</span>' +
-        '</div>' : '') +
-      '<div style="margin-left:auto;font-size:.68rem;color:#aaa;white-space:nowrap;align-self:center">Dernier rapport<br><strong style=\"color:#2D2660\">' + dernierRapport + '</strong></div>';
+
+    // Groupe 1 : bilans saison — comptage informatif, pas un statut du jour
+    let html = `<div style="display:flex;flex-direction:column;gap:4px;flex-shrink:0">
+        <span style="font-size:.56rem;font-weight:700;color:#aaa;letter-spacing:.06em;text-transform:uppercase;padding-left:2px">Saison</span>
+        <div style="display:flex;gap:8px">${kpiCard(bilansTermines, 'Bilans', '#F0EEF8', '#6B5CA5', '#2D2660')}</div>
+      </div>`;
+
+    // Groupe 2 : statuts du dernier rapport publié — l'état réel du jour
+    html += `<div style="width:1.5px;align-self:stretch;background:#E5E3F5;flex-shrink:0"></div>`;
+    if(rapportStatuts){
+      const pret = rapportStatuts['PRÊT']||0, surv = rapportStatuts['SURVEILLANCE']||0, vigil = rapportStatuts['VIGILANCE']||0;
+      html += `<div style="display:flex;flex-direction:column;gap:4px;flex-shrink:0">
+          <span style="font-size:.56rem;font-weight:700;color:#aaa;letter-spacing:.06em;text-transform:uppercase;padding-left:2px">Rapport du ${dernierRapport}</span>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">`
+        + (vigil>0 ? kpiCard(vigil, 'Vigilance', '#FEE2E2', '#EF4444', '#B91C1C') : '')
+        + (surv>0  ? kpiCard(surv,  'Surveillance', '#FFEDD5', '#FB923C', '#C2410C') : '')
+        + (pret>0  ? kpiCard(pret,  'Prêt', '#DCFCE7', '#22C55E', '#15803D') : '')
+        + (vigil===0 && surv===0 && pret>0 ?
+            '<div style="background:#DCFCE7;border:1.5px solid #22C55E20;border-radius:10px;padding:10px 16px;display:flex;align-items:center;gap:6px;flex-shrink:0">' +
+              '<span style="font-size:.95rem">✓</span>' +
+              '<span style="font-size:.72rem;font-weight:700;color:#15803D">Aucune vigilance</span>' +
+            '</div>' : '')
+        + `</div>
+        </div>`;
+    } else {
+      html += `<div style="display:flex;align-items:center;gap:6px;font-size:.75rem;color:#aaa;font-style:italic">Aucun rapport publié pour la saison ${seasonLabel(saisonEnCours)}</div>`;
+    }
+
+    banner.innerHTML = html;
   } catch(e){
     banner.innerHTML='<div style="color:#aaa;font-size:.75rem">Statut indisponible</div>';
   }
@@ -363,9 +426,16 @@ async function loadRapports(){
     if(!r.ok) throw new Error('Erreur GitHub (code ' + r.status + '). Réessayez.');
     const files = await r.json();
     const htmlFiles = files.filter(f=>f.name.endsWith('.html'))
+      .filter(f=>{
+        const s = (manifest[f.name]||{}).saison;
+        return s ? s===selectedSeason : selectedSeason===currentSeason();
+      })
       .sort((a,b)=>sortDate(b.name).localeCompare(sortDate(a.name)));
+    allCats = new Set();
     if(!htmlFiles.length){
-      list.innerHTML='<div class="empty"><div class="empty-icon">📋</div><p>Aucun rapport disponible.</p></div>'; return;
+      list.innerHTML=`<div class="empty"><div class="empty-icon">📋</div><p>Aucun rapport pour la saison ${seasonLabel(selectedSeason)}.</p></div>`;
+      buildFilterButtons(); applyFilter();
+      return;
     }
     list.innerHTML='';
     htmlFiles.forEach((file,idx)=>{
@@ -432,6 +502,10 @@ async function loadBilans(){
     if(!r.ok) throw new Error('Erreur GitHub (code ' + r.status + '). Réessayez.');
     const files = await r.json();
     const htmlFiles = files.filter(f=>f.name.endsWith('.html'))
+      .filter(f=>{
+        const s = (manifest['bilan_'+f.name]||{}).saison;
+        return s ? s===selectedSeason : selectedSeason===currentSeason();
+      })
       .sort((a,b)=>{
         const SORD={'VIGILANCE':0,'SURVEILLANCE':1,'PRÊT':2,'':3};
         const ia=manifest['bilan_'+a.name]||{}, ib=manifest['bilan_'+b.name]||{};
@@ -439,8 +513,11 @@ async function loadBilans(){
         if(sa!==sb) return sa-sb;
         return sortDateDMY(ib.date).localeCompare(sortDateDMY(ia.date));
       });
+    allCats = new Set();
     if(!htmlFiles.length){
-      list.innerHTML='<div class="empty"><div class="empty-icon">👤</div><p>Aucun bilan publié.</p></div>'; return;
+      list.innerHTML=`<div class="empty"><div class="empty-icon">👤</div><p>Aucun bilan pour la saison ${seasonLabel(selectedSeason)}.</p></div>`;
+      buildFilterButtons(); applyFilter();
+      return;
     }
     list.innerHTML='';
     htmlFiles.forEach(file=>{
