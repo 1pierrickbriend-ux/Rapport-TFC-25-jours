@@ -80,6 +80,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);min-height
 .toast.show{opacity:1;transform:translateY(0)}
 .toast.err{background:var(--red)}
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
 
@@ -94,6 +95,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);min-height
 
 <div style="background:white;border-bottom:2px solid #E5E3F5;padding:0 28px;display:flex;gap:0">
   <button onclick="showTab('rapports')" id="tab-rapports" style="padding:12px 24px;border:none;background:none;cursor:pointer;font-weight:700;font-size:.85rem;color:#2D2660;border-bottom:3px solid #2D2660">📋 Rapports collectifs</button>
+  <button onclick="showTab('generation')" id="tab-generation" style="padding:12px 24px;border:none;background:none;cursor:pointer;font-weight:600;font-size:.85rem;color:#888;border-bottom:3px solid transparent">⚙️ Génération ODS</button>
   <button onclick="showTab('bilans')" id="tab-bilans" style="padding:12px 24px;border:none;background:none;cursor:pointer;font-weight:600;font-size:.85rem;color:#888;border-bottom:3px solid transparent">👤 Bilans individuels</button>
 </div>
 <div class="main">
@@ -712,9 +714,11 @@ async function confirmDelete(){
 function showTab(tab){
   document.getElementById('section-rapports').style.display = tab==='rapports' ? '' : 'none';
   document.getElementById('section-bilans').style.display   = tab==='bilans'   ? '' : 'none';
-  var tr=document.getElementById('tab-rapports'), tb=document.getElementById('tab-bilans');
+  document.getElementById('section-generation').style.display = tab==='generation' ? '' : 'none';
+  var tr=document.getElementById('tab-rapports'), tb=document.getElementById('tab-bilans'), tg=document.getElementById('tab-generation');
   tr.style.color=tab==='rapports'?'#2D2660':'#888'; tr.style.borderBottom=tab==='rapports'?'3px solid #2D2660':'3px solid transparent'; tr.style.fontWeight=tab==='rapports'?'700':'600';
   tb.style.color=tab==='bilans'?'#2D2660':'#888';   tb.style.borderBottom=tab==='bilans'?'3px solid #2D2660':'3px solid transparent';   tb.style.fontWeight=tab==='bilans'?'700':'600';
+  tg.style.color=tab==='generation'?'#2D2660':'#888'; tg.style.borderBottom=tab==='generation'?'3px solid #2D2660':'3px solid transparent'; tg.style.fontWeight=tab==='generation'?'700':'600';
   if(tab==='bilans') loadBilans();
 }
 document.addEventListener('DOMContentLoaded', function(){
@@ -945,6 +949,1781 @@ function askDeleteBilan(name,sha,joueur){
   document.getElementById('confirm-msg').textContent='Supprimer le bilan de '+joueur+' ? Cette action est irréversible.';
   document.getElementById('confirm-overlay').classList.add('active');
 }
+</script>
+<div id="section-generation" style="display:none;max-width:980px;margin:0 auto;padding:0 16px">
+
+  <div class="card" style="margin-bottom:16px">
+    <div class="card-title">⚙️ Import du fichier ODS</div>
+    <div style="font-size:.78rem;color:#666;margin-bottom:10px">Déposez <b>Suivi_CDF_FINAL.ods</b> (feuilles PROFIL_JOUEURS, SUIVI_J+1_J+25, ALERTES, MATCHS). Tout est calculé dans le navigateur — rien n'est publié avant votre validation.</div>
+    <div id="drop-ods" onclick="document.getElementById('file-input-ods').click()" style="border:2px dashed #C5C0E0;border-radius:12px;padding:28px;text-align:center;cursor:pointer;color:#6B5CA5;font-size:.85rem;font-weight:600;background:#FAFAFE">
+      📂 Glissez le fichier .ods ici ou cliquez pour parcourir
+    </div>
+    <input type="file" id="file-input-ods" accept=".ods" style="display:none" onchange="handleOdsFile(this.files[0])">
+    <div id="ods-status" class="publish-status" style="margin-top:10px"></div>
+    <div id="gen-analyse-row" style="display:none;margin-top:14px;align-items:center;gap:12px;flex-wrap:wrap">
+      <label style="font-size:.78rem;font-weight:600;color:#333">Date de référence :</label>
+      <input type="date" id="gen-date" style="padding:8px 12px;border:1.5px solid #DDD;border-radius:8px;font-size:.8rem">
+      <button onclick="analyserODS()" style="padding:9px 20px;border:none;border-radius:8px;background:#2D2660;color:white;font-weight:700;font-size:.8rem;cursor:pointer">Analyser</button>
+      <span style="font-size:.7rem;color:#999">Rapport et bilans utilisent cette même date</span>
+    </div>
+    <div id="gen-analyse-status" class="publish-status" style="margin-top:8px"></div>
+  </div>
+
+  <div class="card" id="gen-preview-card" style="display:none;margin-bottom:16px">
+    <div class="card-title">👥 Joueurs actifs — contrôle avant publication</div>
+    <div style="font-size:.75rem;color:#666;margin-bottom:10px">RRI calculé par le moteur unifié (progression matchs incluse · Soins+Prévention sur la fenêtre du protocole · pas de plafond courbatures). Vérifiez les statuts, ouvrez les aperçus, puis publiez.</div>
+    <div style="overflow-x:auto">
+    <table style="width:100%;border-collapse:collapse;font-size:.82rem">
+      <thead><tr style="border-bottom:2px solid #E5E3F5;text-align:left;color:#999;font-size:.68rem;text-transform:uppercase">
+        <th style="padding:8px 10px">Bilan</th><th style="padding:8px 10px">Joueur</th><th style="padding:8px 10px">Cat.</th>
+        <th style="padding:8px 10px">RRI</th><th style="padding:8px 10px">Statut</th><th style="padding:8px 10px">J+</th>
+        <th style="padding:8px 10px">Temps rec.</th><th style="padding:8px 10px">Matchs</th><th style="padding:8px 10px"></th>
+      </tr></thead>
+      <tbody id="gen-players-body"></tbody>
+    </table>
+    </div>
+    <div style="display:flex;align-items:center;gap:14px;margin-top:16px;flex-wrap:wrap">
+      <label style="display:flex;align-items:center;gap:6px;font-size:.82rem;font-weight:700;color:#2D2660">
+        <input type="checkbox" id="gen-cb-rapport" checked> Publier le rapport collectif
+      </label>
+      <button onclick="apercuRapport()" style="padding:8px 16px;border:1.5px solid #2D2660;border-radius:8px;background:white;color:#2D2660;font-weight:700;font-size:.78rem;cursor:pointer">Aperçu rapport</button>
+      <button id="gen-publish-btn" onclick="publierGeneration()" style="padding:10px 24px;border:none;border-radius:8px;background:#22C55E;color:white;font-weight:800;font-size:.82rem;cursor:pointer">🚀 Générer et publier la sélection</button>
+    </div>
+    <div id="gen-publish-status" class="publish-status" style="margin-top:10px"></div>
+  </div>
+
+</div>
+<script>
+/* ══ MOTEUR TFC EMBARQUÉ (validé contre les scripts Python d'origine) ══ */
+/* ═══════════════════════════════════════════════════════════════════
+   TFC — Moteur ODS unifié (port JavaScript des scripts Python)
+   Décisions validées :
+   - RRI : PAS de plafond courbatures lié au taux de remplissage
+   - Soins+Prévention : sommés sur la fenêtre protocole [date reprise → 1er match +25j],
+     repli sur l'historique complet si fenêtre indéfinie ou vide
+   - Bilans générés avec la même date de référence que le rapport
+   ═══════════════════════════════════════════════════════════════════ */
+
+// ── Arrondi Python (round half to even) ──────────────────────────────
+function pyRound(x){
+  var f = Math.floor(x), diff = x - f;
+  if (diff < 0.5) return f;
+  if (diff > 0.5) return f + 1;
+  return (f % 2 === 0) ? f : f + 1;
+}
+
+// Formatage décimal à la Python (f'{x:.nf}' — ties vers le pair)
+function pyFixed(x, nd){
+  var m = Math.pow(10, nd);
+  var y = x * m;
+  var f = Math.floor(y);
+  var diff = y - f;
+  var r;
+  if (Math.abs(diff - 0.5) < 1e-9) r = (f % 2 === 0) ? f : f + 1;
+  else r = Math.round(y);
+  return (r / m).toFixed(nd);
+}
+
+// ── Utilitaires ──────────────────────────────────────────────────────
+var MOIS_FR = ['janv.','févr.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.'];
+function dateFr(d){ return d.getUTCDate() + ' ' + MOIS_FR[d.getUTCMonth()] + ' ' + d.getUTCFullYear(); }
+function ddmmyyyy(d){
+  var p = function(n){ return String(n).padStart(2,'0'); };
+  return p(d.getUTCDate()) + '/' + p(d.getUTCMonth()+1) + '/' + d.getUTCFullYear();
+}
+function ddmm(d){
+  var p = function(n){ return String(n).padStart(2,'0'); };
+  return p(d.getUTCDate()) + '/' + p(d.getUTCMonth()+1);
+}
+function parseDDMMYYYY(s){
+  var m = String(s).match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+  if(!m) return null;
+  return new Date(Date.UTC(+m[3], +m[2]-1, +m[1]));
+}
+function addDays(d, n){ return new Date(d.getTime() + n*86400000); }
+function diffDays(a, b){ return Math.floor((a.getTime() - b.getTime()) / 86400000); }
+
+function safeVal(v, n){
+  var s = (v === null || v === undefined || String(v) === 'nan' || String(v) === 'None' || String(v) === '') ? '' : String(v).trim();
+  if (!s) return '—';
+  return (n && s.length > n) ? s.slice(0, n-1) + '…' : s;
+}
+function normName(s){
+  return String(s).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+         .split('').filter(function(c){ return /[a-z0-9]/.test(c); }).join('');
+}
+function isNum(v){ return typeof v === 'number' && !isNaN(v); }
+
+// ── Chargement du classeur (équivalent load_data) ────────────────────
+// wb : workbook SheetJS lu avec {cellDates:true}
+function loadWorkbook(wb, XLSX){
+  function sheetRows(name){
+    var ws = wb.Sheets[name];
+    if(!ws) throw new Error('Feuille manquante : ' + name);
+    var rows = XLSX.utils.sheet_to_json(ws, {defval: null});
+    // strip + remplacement espace insécable sur TOUS les en-têtes (fix \xa0 généralisé)
+    return rows.map(function(r){
+      var o = {};
+      Object.keys(r).forEach(function(k){
+        o[String(k).trim().replace(/\u00a0/g,' ')] = r[k];
+      });
+      return o;
+    });
+  }
+  function toDate(v){
+    if (v instanceof Date && !isNaN(v)) return new Date(Date.UTC(v.getUTCFullYear(), v.getUTCMonth(), v.getUTCDate()));
+    if (typeof v === 'string'){ var d = parseDDMMYYYY(v); if(d) return d; var d2 = new Date(v); if(!isNaN(d2)) return new Date(Date.UTC(d2.getUTCFullYear(), d2.getUTCMonth(), d2.getUTCDate())); }
+    return null;
+  }
+
+  var P = sheetRows('PROFIL_JOUEURS');
+  var Sraw = sheetRows('SUIVI_J+1_J+25');
+  var A = sheetRows('ALERTES');
+  var M = sheetRows('MATCHS');
+
+  // Renommage SUIVI par sous-chaîne (identique aux deux scripts Python)
+  var S = Sraw.map(function(r){
+    var o = {};
+    Object.keys(r).forEach(function(c){
+      var cl = c.toLowerCase(), key = null;
+      if (cl.indexOf('courbature') >= 0) key = 'Courbatures';
+      else if (cl.indexOf('douleur') >= 0) key = 'Douleur';
+      else if (cl.indexOf('fatigue') >= 0) key = 'Fatigue';
+      else if (cl.indexOf('soins') === 0) key = 'Soins';
+      else if (cl.indexOf('vention') >= 0) key = 'Prevention';
+      else if (cl.indexOf('physique') >= 0) key = 'ConfiancePhysique';
+      else if (cl.indexOf('mentale') >= 0) key = 'ConfianceMentale';
+      else if (cl.indexOf('commentaire') >= 0) key = 'Commentaire';
+      else key = c;
+      if (!(key in o)) o[key] = r[c];  // keep='first' en cas de doublon
+    });
+    o.Date = toDate(o.Date);
+    // Coercition numérique + fillna(0) — identique à Python
+    ['Soins','Prevention','Douleur','Fatigue','Courbatures'].forEach(function(col){
+      var v = o[col];
+      var n = (v === null || v === undefined || v === '') ? NaN : Number(v);
+      o[col] = isNaN(n) ? 0 : n;
+    });
+    ['ConfiancePhysique','ConfianceMentale'].forEach(function(col){
+      if (col in o){
+        var v = o[col];
+        var n = (v === null || v === undefined || v === '') ? null : Number(v);
+        o[col] = (n === null || isNaN(n)) ? null : n;
+      }
+    });
+    return o;
+  });
+
+  A = A.map(function(r){ r.Date = toDate(r.Date); return r; });
+  M = M.map(function(r){
+    r.Date = toDate(r.Date);
+    var t = r['Temps de jeu (min)'];
+    if (t === undefined) t = r['Temps'];
+    var tn = parseInt(String(t === null || t === undefined ? '' : t).replace(/'/g,'').trim(), 10);
+    r.Temps = isNaN(tn) ? 0 : tn;
+    return r;
+  });
+
+  // Index profils : nom exact (rapport) + repli normalisé (bilan)
+  var pidx = {}, pidxNorm = {};
+  P.forEach(function(r){
+    var j = String(r['Joueur'] === null || r['Joueur'] === undefined ? '' : r['Joueur']).trim();
+    if (j){ pidx[j] = r; pidxNorm[normName(j)] = r; }
+  });
+
+  // Détection des colonnes IPRRS (entre 'questionnaire' et 'total…60')
+  var pcols = Object.keys(P[0] || {});
+  var iStart = -1, iEnd = -1;
+  pcols.forEach(function(c, i){
+    if (iStart < 0 && c.toLowerCase().indexOf('questionnaire') >= 0) iStart = i;
+    if (iEnd < 0 && c.toLowerCase().indexOf('total') >= 0 && c.indexOf('60') >= 0) iEnd = i;
+  });
+  var IPRRS_COLS = (iStart >= 0 && iEnd > iStart) ? pcols.slice(iStart+1, iEnd)
+    : ['Pratiquer football','Pratiquer sans douleurs','Me donner à 100 %',
+       'Ne pas me concentrer sur la blessure','Confiance en la partie du corps blessée',
+       'Capacités techniques / physiques'];
+
+  return {P: P, S: S, A: A, M: M, pidx: pidx, pidxNorm: pidxNorm, IPRRS_COLS: IPRRS_COLS};
+}
+
+// ── Joueurs actifs (équivalent get_active) ───────────────────────────
+function getActive(S, rd){
+  var lastByPlayer = {};
+  S.forEach(function(r){
+    if (!r.Date || r.Date.getTime() > rd.getTime()) return;
+    var j = String(r.Joueur === null || r.Joueur === undefined ? '' : r.Joueur).trim();
+    if (!j || j === 'nan') return;
+    if (!(j in lastByPlayer) || r.Date.getTime() > lastByPlayer[j].getTime()) lastByPlayer[j] = r.Date;
+  });
+  var limit = addDays(rd, -5).getTime();
+  return Object.keys(lastByPlayer).filter(function(j){ return lastByPlayer[j].getTime() >= limit; });
+}
+
+// ── RRI unifié (SANS plafond courbatures) ────────────────────────────
+function computeRRI(cp, cm_, soinsPrev, doul, crb, fat, matchsList, alertes){
+  function n(v){ return (v === null || v === undefined || (typeof v === 'number' && isNaN(v))) ? null : v; }
+  var pts = 0, det = {}, p;
+
+  var cpv = n(cp);
+  p = cpv ? pyRound((cpv/10)*15) : 0; pts += p;
+  det.conf_physique = {pts: p, max: 15, val: cpv ? pyFixed(cpv,0)+'/10' : null};
+
+  var cmv = n(cm_);
+  p = cmv ? pyRound((cmv/10)*15) : 0; pts += p;
+  det.conf_mentale = {pts: p, max: 15, val: cmv ? pyFixed(cmv,0)+'/10' : null};
+
+  p = soinsPrev >= 20 ? 15 : soinsPrev >= 15 ? 10 : soinsPrev >= 10 ? 5 : 0; pts += p;
+  det.soins_prev = {pts: p, max: 15, val: soinsPrev + ' pts'};
+
+  var d = n(doul); if (d === null) d = 0.0;
+  p = d === 0 ? 20 : d <= 0.5 ? 17 : d <= 1 ? 12 : d <= 3 ? 6 : 0; pts += p;
+  det.douleur = {pts: p, max: 20, val: pyFixed(d,2) + '/10'};
+
+  var cv = n(crb); if (cv === null) cv = 0.0;
+  var pc = cv <= 1 ? 15 : cv <= 2 ? 10 : cv <= 4 ? 5 : 0; pts += pc;
+  det.courbatures = {pts: pc, max: 15, val: pyFixed(cv,2) + '/10'};
+
+  var fv = n(fat); fv = fv ? fv : 1.0;
+  p = fv <= 1 ? 10 : fv <= 1.5 ? 8 : fv <= 2.5 ? 4 : 0; pts += p;
+  det.fatigue = {pts: p, max: 10, val: pyFixed(fv,2) + '/5'};
+
+  if (matchsList.length >= 2){
+    var refs = matchsList.slice(Math.max(0, matchsList.length-3), matchsList.length-1).map(function(m){ return m.t; });
+    var mr = refs.length ? refs.reduce(function(a,b){return a+b;},0) / refs.length : 0;
+    p = matchsList[matchsList.length-1].t >= mr*0.9 ? 5 : 2;
+  } else if (matchsList.length === 1) p = 3;
+  else p = 0;
+  pts += p;
+  det.progression = {pts: p, max: 5,
+    val: matchsList.length ? matchsList.slice(-3).map(function(m){ return m.t + "'"; }).join('→') : null};
+
+  var nr = alertes.filter(function(a){ return a[0].toLowerCase() === 'rouge' && a[1].toLowerCase() === 'ouverte'; }).length;
+  p = nr === 0 ? 5 : nr === 1 ? 2 : 0; pts += p;
+  det.alertes = {pts: p, max: 5, val: nr + ' rouge(s)'};
+
+  return {rri: Math.min(100, Math.max(0, pts)), det: det};
+}
+
+var RECO = {'1f':'45 min','1m':'25 min','1e':'10 min',
+            '2f':'60 min','2m':'45 min','2e':'20 min',
+            '3f':'75-90 min','3m':'60 min','3e':'30-45 min',
+            '4f':'90 min','4m':'75 min','4e':'45 min'};
+
+// ── Construction des données joueur (fusion build_players + bilan) ───
+function buildPlayer(joueur, data, rd){
+  var S = data.S, A = data.A, M = data.M;
+  var pr = data.pidx[joueur] || data.pidxNorm[normName(joueur)] || null;
+
+  var df = S.filter(function(r){ return String(r.Joueur||'').trim() === joueur; })
+            .slice().sort(function(a,b){
+              var ta = a.Date ? a.Date.getTime() : -Infinity, tb = b.Date ? b.Date.getTime() : -Infinity;
+              return ta - tb;
+            });
+
+  var blessure = safeVal(pr ? pr['Blessure'] : null, 50);
+  var blessureFull = safeVal(pr ? pr['Blessure'] : null);
+  var cat = safeVal(pr ? pr['Catégorie'] : null);
+  var focus = safeVal(pr ? pr['Focus prévention'] : null);
+  var vig = safeVal(pr ? pr['Points de vigilance'] : null);
+  var etatRaw = pr ? (pr['Statut protocole'] !== null && pr['Statut protocole'] !== undefined ? pr['Statut protocole'] : pr['état de suivi']) : null;
+  var etat = safeVal(etatRaw, 14);
+  var etatFull = safeVal(etatRaw);
+
+  // Dernier commentaire non vide
+  var obs = '';
+  var commentaires = [];
+  df.forEach(function(r){
+    var c = String(r.Commentaire === null || r.Commentaire === undefined ? '' : r.Commentaire).trim();
+    if (c && c !== 'nan' && c !== '—'){
+      commentaires.push({date: r.Date ? ddmmyyyy(r.Date) : '', txt: c});
+    }
+  });
+  if (commentaires.length) obs = safeVal(commentaires[commentaires.length-1].txt, 600);
+
+  // Dates 1er match / reprise (recherche par sous-chaîne dans les colonnes profil)
+  var dm = null, dr = null;
+  if (pr){
+    var prCols = Object.keys(pr);
+    for (var i = 0; i < prCols.length; i++){
+      var c = prCols[i];
+      if (c.toLowerCase().indexOf('1er match') >= 0 && pr[c] !== null && pr[c] !== undefined && pr[c] !== ''){
+        var d1 = (pr[c] instanceof Date) ? new Date(Date.UTC(pr[c].getUTCFullYear(), pr[c].getUTCMonth(), pr[c].getUTCDate())) : parseDDMMYYYY(pr[c]);
+        if (d1){ dm = d1; break; }
+      }
+    }
+    for (var i2 = 0; i2 < prCols.length; i2++){
+      var c2 = prCols[i2];
+      if (c2.toLowerCase().indexOf('reprise') >= 0 && pr[c2] !== null && pr[c2] !== undefined && pr[c2] !== ''){
+        var d2 = (pr[c2] instanceof Date) ? new Date(Date.UTC(pr[c2].getUTCFullYear(), pr[c2].getUTCMonth(), pr[c2].getUTCDate())) : parseDDMMYYYY(pr[c2]);
+        if (d2){ dr = d2; break; }
+      }
+    }
+  }
+
+  var jp = dm ? Math.max(0, diffDays(rd, dm)) : null;
+  var pct = jp !== null ? Math.min(1.0, jp/25.0) : 0.0;
+
+  // Fenêtre protocole pour Soins+Prévention (décision : fenêtre, repli historique complet)
+  var dfr = df;
+  if (dr && dm){
+    var end = addDays(dm, 25);
+    var win = df.filter(function(r){ return r.Date && r.Date.getTime() >= dr.getTime() && r.Date.getTime() <= end.getTime(); });
+    if (win.length > 0) dfr = win;
+  }
+
+  var soins = Math.trunc(dfr.reduce(function(s,r){ return s + (r.Soins||0); }, 0));
+  var prev  = Math.trunc(dfr.reduce(function(s,r){ return s + (r.Prevention||0); }, 0));
+
+  function mean(arr){ return arr.length ? arr.reduce(function(a,b){return a+b;},0)/arr.length : 0.0; }
+  var doul = df.length ? mean(df.map(function(r){ return r.Douleur; })) : 0.0;
+  var crb  = df.length ? mean(df.map(function(r){ return r.Courbatures; })) : 0.0;
+  var fat  = df.length ? mean(df.map(function(r){ return r.Fatigue; })) : 0.0;
+
+  // Confiance : dernière valeur non nulle en remontant
+  var cp = null, cm_ = null;
+  for (var k = df.length-1; k >= 0; k--){
+    var row = df[k];
+    if (cp === null && isNum(row.ConfiancePhysique)) cp = row.ConfiancePhysique;
+    if (cm_ === null && isNum(row.ConfianceMentale)) cm_ = row.ConfianceMentale;
+    if (cp && cm_) break;
+  }
+
+  // Alertes
+  var alertes = [];
+  A.filter(function(r){ return String(r.Joueur||'').trim() === joueur; }).forEach(function(r){
+    var t = String(r['Alerte identifiée'] === null || r['Alerte identifiée'] === undefined ? '' : r['Alerte identifiée']).trim();
+    if (t === '' || t === 'nan' || t === '—') return;
+    function capz(s, def){
+      var x = String(s === null || s === undefined ? def : s);
+      x = x.charAt(0).toUpperCase() + x.slice(1).toLowerCase();
+      return (x === 'Nan' || x === '' || x === 'None') ? def : x;
+    }
+    alertes.push({
+      niv: capz(r['Niveau'], 'Orange'),
+      sta: capz(r['Statut'], 'Ouverte'),
+      txt: t,
+      date: r.Date ? ddmmyyyy(r.Date) : ''
+    });
+  });
+
+  // Matchs
+  var matchs = [];
+  M.filter(function(r){ return String(r.Joueur||'').trim() === joueur; })
+   .slice().sort(function(a,b){
+      var ta = a.Date ? a.Date.getTime() : -Infinity, tb = b.Date ? b.Date.getTime() : -Infinity;
+      return ta - tb;
+   })
+   .forEach(function(r){
+      matchs.push({adv: safeVal(r['Adversaire']), t: r.Temps || 0,
+                   date: r.Date ? ddmmyyyy(r.Date) : '',
+                   dateObj: r.Date || null,
+                   cat: safeVal(r['Catégorie'])});
+   });
+  var tempsTotal = matchs.reduce(function(s,m){ return s + m.t; }, 0);
+
+  var mlRri = matchs.map(function(m){ return {t: m.t}; });
+  var alRri = alertes.map(function(a){ return [a.niv, a.sta]; });
+  var R = computeRRI(cp, cm_, soins + prev, doul, crb, fat, mlRri, alRri);
+
+  // Niveau douleur 3 dernières séances
+  var last3 = df.slice(-3).map(function(r){ return r.Douleur; });
+  var d3 = last3.length ? last3.reduce(function(a,b){return a+b;},0)/last3.length : 0.0;
+  var nk = d3 < 1 ? 'f' : d3 <= 3 ? 'm' : 'e';
+  var nivLbl = nk === 'f' ? 'Faible' : nk === 'm' ? 'Modéré' : 'Élevé';
+
+  var palier = null, ph = 'Avant 1er match';
+  if (jp !== null){
+    if (jp <= 7){ palier = 1; ph = 'Phase 1  J+1→J+7'; }
+    else if (jp <= 14){ palier = 2; ph = 'Phase 2  J+8→J+14'; }
+    else if (jp <= 21){ palier = 3; ph = 'Phase 3  J+15→J+21'; }
+    else { palier = 4; ph = 'Phase 4  J+22→J+25'; }
+  }
+  var temps = palier ? (RECO[palier + nk] || '20 min') : '20 min';
+
+  // Données du jour (dernière ligne toutes dates confondues)
+  var dj = {doul:'—', fat:'—', crb:'—'};
+  if (df.length){
+    var maxT = Math.max.apply(null, df.map(function(r){ return r.Date ? r.Date.getTime() : -Infinity; }));
+    var today = df.filter(function(r){ return r.Date && r.Date.getTime() === maxT; })[0];
+    if (today){
+      dj = {doul: Math.trunc(today.Douleur), fat: Math.trunc(today.Fatigue), crb: Math.trunc(today.Courbatures)};
+    }
+  }
+
+  // Tendance douleur
+  var valsD = df.map(function(r){ return r.Douleur; });
+  var tend = '→ Stable';
+  if (valsD.length >= 4){
+    var m2 = (valsD[valsD.length-1] + valsD[valsD.length-2]) / 2;
+    var m4 = (valsD[valsD.length-3] + valsD[valsD.length-4]) / 2;
+    if (m2 > m4 + 0.3) tend = '↑ Hausse';
+    else if (m2 < m4 - 0.3) tend = '↓ Baisse';
+  }
+
+  var confSc = (cp || 0) + (cm_ || 0);
+  var confLbl = confSc >= 18 ? 'Prêt' : confSc >= 15 ? 'Solide' : confSc >= 12 ? 'Confiant' : 'Fragile';
+
+  // Points pour frises
+  var datesD = [], valsDF = [], datesC = [], valsCF = [], rowsD = [], rowsC = [];
+  df.forEach(function(r){
+    if (!r.Date) return;
+    datesD.push(ddmm(r.Date)); valsDF.push(r.Douleur);
+    rowsD.push({date: r.Date, v: r.Douleur});
+    if (r.Courbatures > 0){
+      datesC.push(ddmm(r.Date)); valsCF.push(r.Courbatures);
+      rowsC.push({date: r.Date, v: r.Courbatures});
+    }
+  });
+
+  // IPRRS
+  var iprrsVals = [], iprrsTotal = 0;
+  if (pr){
+    data.IPRRS_COLS.forEach(function(c){
+      var v = pr[c];
+      var vf = (v === null || v === undefined || String(v) === '' || String(v) === 'nan') ? 0 : Number(v);
+      if (isNaN(vf)) vf = 0;
+      iprrsVals.push(vf); iprrsTotal += vf;
+    });
+  }
+
+  // Comparaison début/fin (moyenne 3 premières / 3 dernières séances)
+  var doulDebut = null, doulFin = null;
+  if (df.length >= 2){
+    var f3 = df.slice(0,3).map(function(r){ return r.Douleur; });
+    var l3 = df.slice(-3).map(function(r){ return r.Douleur; });
+    doulDebut = f3.reduce(function(a,b){return a+b;},0)/f3.length;
+    doulFin = l3.reduce(function(a,b){return a+b;},0)/l3.length;
+  }
+
+  // Évolution du RRI séance par séance (moteur unifié, fenêtre appliquée)
+  var rriEvolution = [];
+  for (var idx = 1; idx <= df.length; idx++){
+    var part = df.slice(0, idx);
+    var datePt = part[part.length-1].Date;
+    if (!datePt) continue;
+    var partWin = part;
+    if (dr && dm){
+      var endW = addDays(dm, 25);
+      var w2 = part.filter(function(r){ return r.Date && r.Date.getTime() >= dr.getTime() && r.Date.getTime() <= endW.getTime(); });
+      if (w2.length > 0) partWin = w2;
+    }
+    var _soins = Math.trunc(partWin.reduce(function(s,r){ return s + (r.Soins||0); }, 0));
+    var _prev  = Math.trunc(partWin.reduce(function(s,r){ return s + (r.Prevention||0); }, 0));
+    var _doul = mean(part.map(function(r){ return r.Douleur; }));
+    var _crb  = mean(part.map(function(r){ return r.Courbatures; }));
+    var _fat  = mean(part.map(function(r){ return r.Fatigue; }));
+    var _cp = null, _cm = null;
+    for (var k2 = part.length-1; k2 >= 0; k2--){
+      if (_cp === null && isNum(part[k2].ConfiancePhysique)) _cp = part[k2].ConfiancePhysique;
+      if (_cm === null && isNum(part[k2].ConfianceMentale)) _cm = part[k2].ConfianceMentale;
+      if (_cp && _cm) break;
+    }
+    var mPt = matchs.filter(function(m){ return m.dateObj && m.dateObj.getTime() <= datePt.getTime(); })
+                    .map(function(m){ return {t: m.t}; });
+    var rPt = computeRRI(_cp, _cm, _soins + _prev, _doul, _crb, _fat, mPt, alRri);
+    var jpPt = dm ? diffDays(datePt, dm) : idx;
+    rriEvolution.push({jp: jpPt, rri: rPt.rri, date: ddmm(datePt)});
+  }
+
+  return {
+    id: normName(joueur), nom: joueur,
+    blessure: blessure, blessureFull: blessureFull, cat: cat, focus: focus, vig: vig,
+    etat: etat, etatFull: etatFull, obs: obs, commentaires: commentaires,
+    rri: R.rri, det: R.det, temps: temps, palier: palier, ph: ph,
+    jp: jp, pct: pct,
+    dm: dm, dr: dr,
+    dmStr: dm ? ddmmyyyy(dm) : null, drStr: dr ? ddmmyyyy(dr) : null,
+    d3: d3, nk: nk, nivLbl: nivLbl,
+    doul: doul, crb: crb, fat: fat, soins: soins, prev: prev,
+    cp: cp, cm_: cm_, confSc: confSc, confLbl: confLbl,
+    alertes: alertes, matchs: matchs, tempsTotal: tempsTotal, dj: dj, tend: tend,
+    datesD: datesD, valsD: valsDF, datesC: datesC, valsC: valsCF,
+    rowsD: rowsD, rowsC: rowsC,
+    iprrsVals: iprrsVals, iprrsTotal: iprrsTotal,
+    doulDebut: doulDebut, doulFin: doulFin,
+    rriEvolution: rriEvolution,
+    photo: null
+  };
+}
+
+function buildPlayers(active, data, rd){
+  var players = active.map(function(j){ return buildPlayer(j, data, rd); });
+  players.sort(function(a,b){ return a.rri - b.rri; });
+  return players;
+}
+
+var __TFC_EXPORTS = {
+  pyFixed: pyFixed,
+  pyRound: pyRound, loadWorkbook: loadWorkbook, getActive: getActive,
+  computeRRI: computeRRI, buildPlayer: buildPlayer, buildPlayers: buildPlayers,
+  dateFr: dateFr, ddmmyyyy: ddmmyyyy, addDays: addDays, diffDays: diffDays,
+  parseDDMMYYYY: parseDDMMYYYY, safeVal: safeVal, normName: normName, ddmm: ddmm
+};
+if (typeof module !== 'undefined') module.exports = __TFC_EXPORTS;
+if (typeof window !== 'undefined') window.TFCEngine = __TFC_EXPORTS;
+
+/* ═══ Template RAPPORT COLLECTIF — port fidèle de generate_html_report.py ═══ */
+(function(exports){
+var E = (typeof window !== 'undefined' && window.TFCEngine) ? window.TFCEngine : require('./tfc_engine_core.js');
+var pyFixed = E.pyFixed, dateFr = E.dateFr, addDays = E.addDays, parseDDMMYYYY = E.parseDDMMYYYY, ddmmyyyy = E.ddmmyyyy;
+
+var DARK='#2D2660', MID='#6B5CA5', GOLD='#C9A84C';
+var GREEN='#22C55E', ORANGE='#FB923C', RED='#EF4444';
+var GREEN_BG='#DCFCE7';
+
+function rc(r){ return r>=80 ? GREEN : r>=60 ? ORANGE : RED; }
+function rsShort(r){ return r>=80 ? 'PRÊT' : r>=60 ? 'SURV.' : 'VIGILANCE'; }
+function rsFull(r){ return r>=80 ? 'PRÊT' : r>=60 ? 'SURVEILLANCE' : 'VIGILANCE'; }
+function dc(v){ return v>3 ? RED : v>1 ? ORANGE : GREEN; }
+
+var CAT_COLORS={'N3':'#DC2626','N2':'#991B1B','N1':'#7F1D1D','U19':'#1D4ED8','U18':'#1E40AF','U17':'#1E3A8A','U16':'#1D3461','U23':'#6D28D9','U21':'#7C3AED','CDR':'#B45309','CDF':'#92400E','CDRJ':'#D97706','PRO':'#064E3B','L2':'#065F46'};
+function catColor(cat){
+  cat = String(cat||'').trim().toUpperCase();
+  for (var k in CAT_COLORS){ if (cat.indexOf(k) >= 0) return CAT_COLORS[k]; }
+  return '#374151';
+}
+
+// Hash de chaîne stable (remplace hash() Python non déterministe — cosmétique uniquement)
+function strHash(s){ var h=5381; for(var i=0;i<s.length;i++){ h=((h<<5)+h+s.charCodeAt(i))|0; } return Math.abs(h); }
+function teamSvgAvatar(adv){
+  if (!adv || adv === '—') return '';
+  var words = adv.trim().split(/\s+/).filter(Boolean);
+  var initials = words.slice(0,2).map(function(w){ return w[0].toUpperCase(); }).join('') || '?';
+  var hue = strHash(adv) % 360;
+  return '<svg width="36" height="36" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg">'
+    + '<circle cx="18" cy="18" r="18" fill="hsl('+hue+',60%,40%)"/>'
+    + '<text x="18" y="23" text-anchor="middle" font-size="13" font-weight="700" fill="white" font-family="system-ui">'+initials+'</text></svg>';
+}
+
+// ── Frise SVG (port de make_frise) ──────────────────────────────────
+function makeFrise(p, rd){
+  var W=900, H=220;
+  var dm = p.dmStr ? parseDDMMYYYY(p.dmStr) : null;
+  var dr = p.drStr ? parseDDMMYYYY(p.drStr) : null;
+  if (!dm) return '<div style="padding:20px;color:#aaa;font-style:italic;text-align:center">Frise non disponible — date du 1er match non renseignée</div>';
+
+  var t0 = dr ? dr : addDays(dm, -7);
+  var t1 = addDays(dm, 27);
+  var span = Math.floor((t1 - t0)/86400000) || 1;
+  var PL=45, PR=10, TL=H-32;
+  var WC = W-PL-PR;
+
+  function tx(d){ return PL + Math.max(0, Math.min(1, Math.floor((d - t0)/86400000)/span)) * WC; }
+  function txs(s){ var d = parseDDMMYYYY(s); return d ? tx(d) : PL; }
+  function f0(x){ return pyFixed(x, 0); }
+
+  var svg = ['<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block">'];
+  svg.push('<rect width="'+W+'" height="'+H+'" fill="#FAFAFE" rx="8"/>');
+
+  var PCOLS=['#EDE7F6','#E3F2FD','#E8F5E9','#FFF3E0'];
+  var PLBLS=[['Phase 1','J+1→J+7'],['Phase 2','J+8→J+14'],['Phase 3','J+15→J+21'],['Phase 4','J+22→J+25']];
+  for (var i=0;i<4;i++){
+    var ps = addDays(dm, i*7), pe = addDays(dm, (i+1)*7);
+    var x1 = tx(ps), x2 = Math.min(tx(pe), PL+WC);
+    svg.push('<rect x="'+f0(x1)+'" y="16" width="'+f0(x2-x1)+'" height="'+(TL-16)+'" fill="'+PCOLS[i]+'" rx="3" opacity="0.8"/>');
+    var xc = (x1+x2)/2;
+    PLBLS[i].forEach(function(line, li){
+      svg.push('<text x="'+f0(xc)+'" y="'+(26+li*10)+'" text-anchor="middle" font-size="8" fill="'+MID+'" font-family="system-ui,sans-serif" font-weight="700">'+line+'</text>');
+    });
+  }
+
+  [2,4,6,8,10].forEach(function(yv){
+    var yp = TL-(yv/10)*(TL-46);
+    svg.push('<line x1="'+PL+'" y1="'+f0(yp)+'" x2="'+(PL+WC)+'" y2="'+f0(yp)+'" stroke="#DDD" stroke-width="0.5"/>');
+    svg.push('<text x="'+(PL-5)+'" y="'+f0(yp+3)+'" text-anchor="end" font-size="8" fill="#BBB" font-family="system-ui">'+yv+'</text>');
+  });
+  svg.push('<line x1="'+PL+'" y1="'+TL+'" x2="'+(PL+WC)+'" y2="'+TL+'" stroke="#CCC" stroke-width="1"/>');
+
+  var xm = tx(dm);
+  svg.push('<line x1="'+f0(xm)+'" y1="12" x2="'+f0(xm)+'" y2="'+(TL+5)+'" stroke="'+DARK+'" stroke-width="1.5" stroke-dasharray="5,3"/>');
+  svg.push('<text x="'+f0(xm)+'" y="'+(TL+16)+'" text-anchor="middle" font-size="8" fill="'+DARK+'" font-family="system-ui" font-weight="700">1er match '+p.dmStr+'</text>');
+
+  var xt = tx(rd);
+  var lblAuj = p.jp !== null ? 'Auj. J+'+p.jp : 'Auj.';
+  var bw = lblAuj.length*5.5+8;
+  svg.push('<line x1="'+f0(xt)+'" y1="8" x2="'+f0(xt)+'" y2="'+(TL+5)+'" stroke="#E91E63" stroke-width="1.5" stroke-dasharray="3,3"/>');
+  svg.push('<rect x="'+f0(xt-bw/2)+'" y="0" width="'+f0(bw)+'" height="13" rx="6" fill="#E91E63"/>');
+  svg.push('<text x="'+f0(xt)+'" y="9" text-anchor="middle" font-size="7.5" fill="white" font-family="system-ui" font-weight="700">'+lblAuj+'</text>');
+
+  p.matchs.forEach(function(m){
+    if (!m.date) return;
+    var xmt = txs(m.date);
+    svg.push('<polygon points="'+f0(xmt)+','+(TL-5)+' '+f0(xmt-5)+','+(TL+4)+' '+f0(xmt)+','+(TL+12)+' '+f0(xmt+5)+','+(TL+4)+'" fill="'+DARK+'"/>');
+    svg.push('<text x="'+f0(xmt)+'" y="'+(TL+24)+'" text-anchor="middle" font-size="7" fill="'+DARK+'" font-family="system-ui">'+m.adv.slice(0,7)+' '+m.t+"'"+'</text>');
+  });
+
+  // Courbe douleur — réplication de la logique d'inférence d'année du script Python
+  function guessDate(ds_){
+    var d = parseDDMMYYYY(ds_ + '/' + rd.getUTCFullYear());
+    if (d && (d < t0 || d > t1)){
+      var y2 = rd.getUTCMonth()+1 < 6 ? rd.getUTCFullYear()-1 : rd.getUTCFullYear();
+      d = parseDDMMYYYY(ds_ + '/' + y2);
+    }
+    return d;
+  }
+  var ptsD = [];
+  p.datesD.forEach(function(ds_, i){
+    var dt = guessDate(ds_);
+    if (!dt) return;
+    var xp = tx(dt), yp = TL-(p.valsD[i]/10)*(TL-46);
+    ptsD.push([xp, yp, p.valsD[i]]);
+  });
+  if (ptsD.length >= 2){
+    var path = 'M ' + ptsD.map(function(pt){ return f0(pt[0])+','+f0(pt[1]); }).join(' L ');
+    svg.push('<path d="'+path+'" fill="none" stroke="'+GREEN+'" stroke-width="2.5"/>');
+  }
+  ptsD.forEach(function(pt){
+    svg.push('<circle cx="'+f0(pt[0])+'" cy="'+f0(pt[1])+'" r="4" fill="'+GREEN+'" stroke="white" stroke-width="1.5"/>');
+    if (pt[2] > 0) svg.push('<text x="'+f0(pt[0])+'" y="'+f0(pt[1]-8)+'" text-anchor="middle" font-size="8" fill="'+GREEN+'" font-family="system-ui" font-weight="700">'+pyFixed(pt[2],0)+'</text>');
+  });
+
+  var ptsC = [];
+  p.datesC.forEach(function(ds_, i){
+    var dt = parseDDMMYYYY(ds_ + '/' + rd.getUTCFullYear());
+    if (!dt) return;
+    var xp = tx(dt), yp = TL-(p.valsC[i]/10)*(TL-46);
+    ptsC.push([xp, yp, p.valsC[i]]);
+  });
+  if (ptsC.length >= 2){
+    var path2 = 'M ' + ptsC.map(function(pt){ return f0(pt[0])+','+f0(pt[1]); }).join(' L ');
+    svg.push('<path d="'+path2+'" fill="none" stroke="'+ORANGE+'" stroke-width="2.5" stroke-dasharray="7,4"/>');
+  }
+  ptsC.forEach(function(pt){
+    svg.push('<polygon points="'+f0(pt[0])+','+f0(pt[1]-5)+' '+f0(pt[0]-5)+','+f0(pt[1]+4)+' '+f0(pt[0]+5)+','+f0(pt[1]+4)+'" fill="'+ORANGE+'" stroke="white" stroke-width="1"/>');
+    svg.push('<text x="'+f0(pt[0])+'" y="'+f0(pt[1]-9)+'" text-anchor="middle" font-size="8" fill="'+ORANGE+'" font-family="system-ui" font-weight="700">'+pyFixed(pt[2],0)+'</text>');
+  });
+
+  var ly = H-8;
+  svg.push('<circle cx="'+PL+'" cy="'+ly+'" r="5" fill="'+GREEN+'"/>');
+  svg.push('<text x="'+(PL+8)+'" y="'+(ly+4)+'" font-size="9" fill="'+GREEN+'" font-family="system-ui">Douleur (/10)</text>');
+  svg.push('<polygon points="'+(PL+110)+','+(ly-4)+' '+(PL+105)+','+(ly+4)+' '+(PL+115)+','+(ly+4)+'" fill="'+ORANGE+'"/>');
+  svg.push('<text x="'+(PL+118)+'" y="'+(ly+4)+'" font-size="9" fill="'+ORANGE+'" font-family="system-ui">Courbatures (/10)</text>');
+  svg.push('<line x1="'+(PL+240)+'" y1="'+ly+'" x2="'+(PL+256)+'" y2="'+ly+'" stroke="#E91E63" stroke-dasharray="4,2" stroke-width="2"/>');
+  svg.push("<text x=\""+(PL+260)+"\" y=\""+(ly+4)+"\" font-size=\"9\" fill=\"#E91E63\" font-family=\"system-ui\">Aujourd'hui</text>");
+  svg.push('</svg>');
+  return svg.join('\n');
+}
+
+// ── CSS du rapport (transcription littérale) ─────────────────────────
+function reportCSS(){
+  return "\n:root{--dark:"+DARK+";--mid:"+MID+";--gold:"+GOLD+";--green:"+GREEN+";--orange:"+ORANGE+";--red:"+RED+";--bg:#EEEAF6}\n*{box-sizing:border-box;margin:0;padding:0}\nbody{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:#1a1a2e;min-height:100vh}\n.layout{display:flex;min-height:100vh}\n.sidebar{width:190px;background:var(--dark);position:sticky;top:0;height:100vh;overflow-y:auto;flex-shrink:0;display:flex;flex-direction:column}\n.sidebar-logo{padding:16px;text-align:center;border-bottom:1px solid rgba(255,255,255,.1)}\n.sidebar-logo img,.sidebar-logo>div{margin:0 auto 8px}\n.sidebar-club{color:white;font-weight:800;font-size:.85rem;letter-spacing:.05em}\n.sidebar-date{color:var(--gold);font-size:.68rem;margin-top:2px}\n.sidebar-section{padding:12px 14px 4px;color:rgba(255,255,255,.4);font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase}\n.nav-link{display:flex;align-items:center;gap:8px;padding:7px 14px;color:rgba(255,255,255,.7);text-decoration:none;font-size:.73rem;transition:.15s;cursor:pointer;border:none;background:none;width:100%;text-align:left}\n.nav-link:hover{background:rgba(255,255,255,.08);color:white}\n.nav-rri{font-weight:800;font-size:.82rem;min-width:26px}\nhr.nav-sep{margin:6px 14px;border:none;border-top:1px solid rgba(255,255,255,.1)}\n.main{flex:1;min-width:0;padding:24px 28px;overflow-x:hidden}\n.report-header{background:var(--dark);border-radius:12px;padding:18px 24px;display:flex;align-items:center;gap:16px;margin-bottom:28px;border-bottom:3px solid var(--gold)}\n.rh-text h1{color:white;font-size:1.15rem;font-weight:800;letter-spacing:.04em}\n.rh-text p{color:var(--gold);font-size:.73rem;margin-top:3px}\n.rh-stats{margin-left:auto;display:flex;gap:10px}\n.stat-chip{background:rgba(255,255,255,.1);border-radius:8px;padding:6px 14px;text-align:center}\n.stat-chip .v{font-size:1.3rem;font-weight:800;color:white}\n.stat-chip .l{font-size:.58rem;color:rgba(255,255,255,.6);text-transform:uppercase}\n.page-section{margin-bottom:36px}\n.section-title-bar{display:flex;align-items:baseline;gap:12px;margin-bottom:14px}\n.section-title-bar h2{font-size:.92rem;font-weight:800;color:var(--dark);letter-spacing:.08em;text-transform:uppercase}\n.section-title-bar span{font-size:.72rem;color:var(--mid)}\n.pano-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}\n.pano-card{background:#FAFAFE;border-radius:10px;border:2px solid #ccc;cursor:pointer;transition:transform .18s,box-shadow .18s;overflow:hidden;display:block;padding:0;-webkit-tap-highlight-color:transparent}\n.pano-card:hover{transform:translateY(-4px);box-shadow:0 10px 30px rgba(45,38,96,.2)}\n.pano-head{background:var(--dark);padding:9px 12px;display:flex;align-items:flex-start;justify-content:space-between;gap:6px}\n.pano-name{display:block;color:white;font-weight:700;font-size:.85rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}\n.pano-sub{display:block;color:rgba(255,255,255,.55);font-size:.63rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}\n.pano-photo{height:110px;overflow:hidden;background:#EEE}\n.pano-photo img{width:100%;height:100%;object-fit:cover;object-position:top}\n.pano-photo-placeholder{height:110px;display:flex;align-items:center;justify-content:center;font-size:1.8rem;font-weight:800;color:white}\n.pano-kpis{display:flex;border-bottom:1px solid #EEE;padding:7px 10px}\n.pano-kpi{flex:1;text-align:center}\n.pano-kv{display:block;font-size:1.25rem;font-weight:800}\n.pano-kl{display:block;font-size:.55rem;color:#aaa;text-transform:uppercase;margin-top:1px}\n.pano-rri{padding:8px 10px}\n.pano-rri-row{display:flex;align-items:center;gap:6px}\n.pano-rri-score{font-size:1.25rem;font-weight:800}\n.pano-rri-max{font-size:.65rem;color:#aaa}\n.pano-tap{text-align:right;font-size:.6rem;color:var(--mid);font-weight:600;margin-top:4px}\n.badge{font-size:.6rem;font-weight:700;color:white;padding:2px 7px;border-radius:20px;white-space:nowrap;flex-shrink:0}\n.rri-badge{font-size:.65rem;font-weight:700;border:1.5px solid;border-radius:20px;padding:1px 7px;display:inline-block}\n.bar{background:#E5E3F5;border-radius:4px;height:5px;overflow:hidden;margin-top:5px}\n.bar-fill{height:100%;border-radius:4px}\n.bar.lg{height:8px}\n.bar.sm{height:4px}\n.card-section{background:#FAFAFE;border-radius:10px;padding:18px 20px;margin-bottom:14px}\n.section-bar{background:var(--mid);color:white;padding:6px 14px;border-radius:6px;font-size:.73rem;font-weight:700;margin-bottom:12px}\n.synth-table{width:100%;border-collapse:collapse;font-size:.77rem}\n.synth-table th{color:#999;font-size:.63rem;font-weight:600;padding:0 8px 6px;text-align:left;border-bottom:1px solid #EEE}\n.synth-table td{padding:6px 8px;border-bottom:1px solid #F5F5F5}\n.synth-table tr:nth-child(even) td{background:#F8F7FF}\n.s-name{font-weight:700}\n.proto-mini{background:#EEE;border-radius:3px;height:6px;width:110px;overflow:hidden;display:inline-block;vertical-align:middle;margin-right:6px}\n.proto-mini-fill{height:100%;border-radius:3px}\n.sbar-wrap{display:flex;align-items:center;gap:8px}\n.sbar-wrap .bar{flex:1;max-width:120px;height:8px}\n.sbar-val{font-size:.7rem;font-weight:700;min-width:28px}\n.ds-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}\n.ds-card{background:#FAFAFE;border-radius:10px;border:2px solid #ccc;cursor:pointer;transition:transform .18s,box-shadow .18s;overflow:hidden;display:block;padding:0;-webkit-tap-highlight-color:transparent}\n.ds-card:hover{transform:translateY(-4px);box-shadow:0 10px 30px rgba(45,38,96,.2)}\n.ds-head{background:var(--dark);padding:9px 12px;display:flex;align-items:flex-start;justify-content:space-between;gap:6px}\n.ds-body{display:flex;padding:10px 12px 8px;gap:0}\n.ds-left{flex:0 0 80px}\n.ds-score{font-size:1.8rem;font-weight:800;line-height:1;display:block}\n.ds-max{font-size:.7rem;color:#aaa;font-weight:400}\n.ds-div{width:1px;background:#EEE;margin:0 8px;align-self:stretch}\n.ds-right{flex:1;min-width:0}\n.ds-label{font-size:.57rem;font-weight:700;color:var(--mid);letter-spacing:.06em;text-transform:uppercase}\n.ds-temps{font-size:1.1rem;font-weight:800;margin:1px 0 4px}\n.ds-tap{text-align:right;padding:0 10px 6px;font-size:.6rem;color:var(--mid);font-weight:600}\n.modal-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;-webkit-overflow-scrolling:touch;background:rgba(20,15,50,.75);z-index:9999;align-items:center;justify-content:center;padding:16px}\n.modal-overlay:target{display:flex;animation:fadeIn .2s ease}\n@keyframes fadeIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}\n.modal-close-btn{background:rgba(255,255,255,.15);border:none;color:white;width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-left:auto}\n.modal-close-btn:hover{background:rgba(255,255,255,.3)}\n.fiche-modal-box{background:white;border-radius:14px;width:100%;max-width:1100px;max-height:94vh;overflow-y:auto;-webkit-overflow-scrolling:touch;box-shadow:0 32px 80px rgba(20,15,50,.5)}\n.fm-header{background:var(--dark);padding:16px 24px;border-radius:14px 14px 0 0;display:flex;align-items:center;gap:16px;border-bottom:3px solid var(--gold)}\n.fm-title{font-size:1.3rem;font-weight:800;color:white;letter-spacing:.04em}\n.fm-sub{color:rgba(255,255,255,.55);font-size:.77rem;margin-top:2px}\n.fm-tend{font-size:.78rem;font-weight:700;padding:3px 10px;border-radius:12px;border:1.5px solid}\n.fm-content{padding:20px 24px}\n.fm-kpi-row{display:flex;gap:8px;margin-bottom:14px}\n.fm-kpi{flex:1;background:#F8F7FF;border:1px solid #E5E3F5;border-radius:10px;padding:10px 14px;text-align:center}\n.fm-kpi-val{font-size:1.5rem;font-weight:800}\n.fm-kpi-lbl{font-size:.62rem;color:#888;margin-top:2px;text-transform:uppercase}\n.fm-proto{display:flex;align-items:center;gap:12px;padding:10px 16px;border-radius:8px;margin-bottom:14px;font-size:.83rem}\n.fm-body{display:grid;grid-template-columns:1.3fr .75fr 1.5fr 1fr;gap:16px;margin-bottom:14px}\n.info-lbl{font-weight:700;color:var(--dark);font-size:.75rem}\n.info-val{color:#444;font-size:.75rem;margin-left:4px}\n.info-row{display:flex;align-items:baseline;gap:4px;margin-bottom:6px}\n.match-grid{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}\n.match-chip{background:var(--dark);color:white;border-radius:7px;padding:4px 8px;text-align:center}\n.match-chip .m-adv{font-size:.58rem;opacity:.7}\n.match-chip .m-t{font-size:.8rem;font-weight:700}\n.al-row{display:flex;align-items:center;gap:6px;padding:4px 8px;background:#FAFAFA;border-radius:4px;margin-top:4px;font-size:.72rem}\n.obs-title{font-weight:700;color:var(--dark);font-size:.78rem;margin-bottom:6px}\n.obs-text{font-style:italic;font-size:.76rem;color:#444;line-height:1.55}\n.today-lbl{font-size:.72rem;color:#666;margin-bottom:2px}\n.today-val{font-size:1.2rem;font-weight:800}\n.today-max{font-size:.62rem;color:#aaa;font-weight:400}\n.fm-conf{background:#F8F7FF;border-radius:10px;padding:12px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px;border:1px solid #E5E3F5}\n.fm-conf-title{font-size:.65rem;font-weight:800;color:var(--mid);letter-spacing:.07em;text-transform:uppercase;white-space:nowrap}\n.conf-bar{flex:1;min-width:120px;background:#EEE;border-radius:6px;height:12px;overflow:hidden}\n.conf-bar-fill{height:100%;border-radius:6px}\n.conf-score{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:.82rem;font-weight:800;flex-shrink:0}\n.fm-frise{background:#F8F7FF;border-radius:10px;padding:16px;border:1px solid #E5E3F5}\n.fm-frise-title{font-size:.73rem;font-weight:700;color:var(--dark);margin-bottom:12px;letter-spacing:.04em}\n.rri-modal-box{background:white;border-radius:14px;width:100%;max-width:860px;max-height:90vh;overflow-y:auto;-webkit-overflow-scrolling:touch;box-shadow:0 24px 60px rgba(20,15,50,.4)}\n.rri-modal-body{display:grid;grid-template-columns:1fr 1fr;gap:0}\n.rri-left{padding:18px 20px;border-right:1px solid #EEE}\n.rri-right{padding:18px 20px}\n.comp-table{width:100%;border-collapse:collapse;font-size:.77rem}\n.comp-table th{color:#999;font-size:.62rem;font-weight:600;padding:0 6px 6px;text-align:left}\n.comp-table td{padding:4px 6px}\n.comp-table tr:nth-child(even) td{background:#F8F7FF}\n.dot{display:inline-block;width:10px;height:10px;border-radius:50%;flex-shrink:0}\n.comp-bar{background:#EEE;border-radius:3px;height:5px;overflow:hidden;width:70px}\n.comp-bar-fill{height:100%;border-radius:3px}\n.info-box{background:#F8F7FF;border-radius:8px;padding:10px 14px;margin-bottom:8px;border:1px solid #E5E3F5}\n.info-box .lbl{font-size:.6rem;font-weight:700;color:var(--mid);letter-spacing:.06em;margin-bottom:3px}\n.info-box .val{font-size:1rem;font-weight:700;color:var(--dark)}\n.result-box{border-radius:10px;padding:14px 18px;text-align:center;margin-bottom:10px}\n.result-box .lbl{font-size:.65rem;font-weight:700;color:rgba(255,255,255,.8);letter-spacing:.08em}\n.result-box .val{font-size:2.2rem;font-weight:800;color:white}\n.dec-table{width:100%;border-collapse:collapse;font-size:.74rem;text-align:center}\n.dec-table th{background:var(--dark);color:white;padding:5px 8px;font-size:.63rem}\n.dec-table td{padding:4px 8px;border:1px solid #EEE}\n.dec-niv{text-align:left;font-size:.67rem;color:#666;font-style:italic}\n.sec-title{font-size:.67rem;font-weight:800;color:var(--mid);letter-spacing:.08em;margin-bottom:10px;text-transform:uppercase}\n@media(max-width:900px){\n  .sidebar{display:none}\n  .pano-grid,.ds-grid{grid-template-columns:repeat(2,1fr)}\n  .fm-body{grid-template-columns:1fr 1fr}\n  .rri-modal-body{grid-template-columns:1fr}\n}\n";
+}
+
+var RECO_TABLE = [
+  ['< 1/10 — Faible', ['45 min','60 min','75-90 min','90 min']],
+  ['1-3/10 — Modéré', ['25 min','45 min','60 min','75 min']],
+  ['> 3/10 — Élevé', ['10 min','20 min','30-45 min','45 min']]
+];
+var COMP_INFO = [
+  ['conf_physique','Confiance Physique','#6B5CA5'],
+  ['conf_mentale','Confiance Mentale','#8B5CF6'],
+  ['soins_prev','Soins + Prévention','#0EA5E9'],
+  ['douleur','Douleur moyenne',GREEN],
+  ['courbatures','Courbatures',ORANGE],
+  ['fatigue','Fatigue','#14B8A6'],
+  ['progression','Progression matchs','#3B82F6'],
+  ['alertes','Alertes rouges',RED]
+];
+var DEFAULT_VAL = {conf_physique:'Non renseignée', conf_mentale:'Non renseignée', progression:'Aucun'};
+function detVal(p, key){ var d = p.det[key]; return d.val !== null ? d.val : (DEFAULT_VAL[key] || '—'); }
+
+function initials(nom){ return nom.split(/\s+/).slice(0,2).map(function(w){ return w[0]; }).join(''); }
+function etatColor(etat){
+  var e = etat.toLowerCase();
+  return e.indexOf('termin') >= 0 ? GREEN : e.indexOf('arr') >= 0 ? RED : ORANGE;
+}
+function pctColor(pct){ return pct>=0.75 ? GREEN : pct>=0.5 ? '#3B82F6' : pct>=0.25 ? ORANGE : RED; }
+
+// ── Cartes panorama ──────────────────────────────────────────────────
+function panoCard(p){
+  var col = rc(p.rri), st = rsShort(p.rri), ec = etatColor(p.etat);
+  var pct = Math.trunc(p.pct*100);
+  var photo = p.photo
+    ? '<div class="pano-photo"><img src="'+p.photo+'" alt=""/></div>'
+    : '<div class="pano-photo-placeholder" style="background:'+MID+'">'+initials(p.nom)+'</div>';
+  var dj = p.dj;
+  var doulNum = typeof dj.doul === 'number' ? dj.doul : 0;
+  return '<a class="pano-card" href="#fiche-'+p.id+'" style="border-color:'+col+';text-decoration:none;display:block">\n'
+    + '  <div class="pano-head">\n'
+    + '    <div style="min-width:0"><span class="pano-name">'+p.nom+'</span><span class="pano-sub">'+p.blessure+'</span></div>\n'
+    + '    <span class="badge" style="background:'+ec+'">'+p.etat+'</span>\n'
+    + '  </div>\n  '+photo+'\n'
+    + '  <div class="pano-kpis">\n'
+    + '    <div class="pano-kpi"><span class="pano-kv" style="color:'+dc(doulNum)+'">'+dj.doul+'</span><span class="pano-kl">Douleur</span></div>\n'
+    + '    <div class="pano-kpi"><span class="pano-kv" style="color:'+MID+'">'+dj.fat+'</span><span class="pano-kl">Fatigue</span></div>\n'
+    + '    <div class="pano-kpi"><span class="pano-kv" style="color:'+(String(dj.crb)!=='0'&&String(dj.crb)!=='—'?ORANGE:GREEN)+'">'+dj.crb+'</span><span class="pano-kl">Courb.</span></div>\n'
+    + '  </div>\n'
+    + '  <div class="pano-rri">\n'
+    + '    <div class="pano-rri-row">\n'
+    + '      <span class="pano-rri-score" style="color:'+col+'">'+p.rri+'<span class="pano-rri-max">/100</span></span>\n'
+    + '      <span class="rri-badge" style="color:'+col+';border-color:'+col+'">'+st+'</span>\n'
+    + '    </div>\n'
+    + '    <div class="bar"><div class="bar-fill" style="width:'+p.rri+'%;background:'+col+'"></div></div>\n'
+    + '    <div class="pano-tap">Voir la fiche individuelle →</div>\n'
+    + '  </div>\n</a>';
+}
+
+// ── Fiche modale ─────────────────────────────────────────────────────
+function ficheModal(p, rd){
+  var col = rc(p.rri), ec = etatColor(p.etat);
+  var pct = Math.trunc(p.pct*100);
+  var bc = pctColor(p.pct);
+  var protoLbl = p.jp !== null
+    ? 'J+'+p.jp+' depuis 1er match — '+pct+'% du protocole ('+p.jp+'/25 jours)'
+    : 'En attente du premier match — protocole non démarré';
+  var protoCol = p.jp ? DARK : MID;
+  var tendCol = p.tend.indexOf('Hausse') >= 0 ? RED : p.tend.indexOf('Baisse') >= 0 ? '#3B82F6' : DARK;
+
+  var photoHtml = p.photo
+    ? '<img src="'+p.photo+'" style="width:100%;height:100%;object-fit:cover;object-position:top;border-radius:10px"/>'
+    : '<div style="height:100%;background:'+MID+';border-radius:10px;display:flex;align-items:center;justify-content:center;color:white;font-size:2.8rem;font-weight:800">'+initials(p.nom)+'</div>';
+
+  function matchCard(m){
+    var img = teamSvgAvatar(m.adv);
+    var cc = catColor(m.cat);
+    var catBadge = (m.cat && m.cat !== '—')
+      ? '<span style="background:'+cc+';color:white;font-size:.52rem;font-weight:700;padding:1px 5px;border-radius:8px;margin-top:2px;display:block;text-align:center">'+m.cat.slice(0,4)+'</span>' : '';
+    return '<div class="match-chip"><div style="display:flex;justify-content:center">'+img+'</div><div class="m-t">'+m.t+"'"+'</div>'+catBadge+'</div>';
+  }
+  var matchHtml = p.matchs.length ? p.matchs.map(matchCard).join('')
+    : '<span style="color:#aaa;font-style:italic;font-size:.75rem">Aucun match enregistré</span>';
+
+  var acols = {rouge: RED, orange: ORANGE, jaune: '#EAB308'};
+  var alHtml = p.alertes.map(function(a){
+    var ac = acols[a.niv.toLowerCase()] || ORANGE;
+    return '<div class="al-row" style="border-left:3px solid '+ac+'"><span class="badge" style="background:'+ac+';font-size:.55rem">'+a.niv+'</span><span style="flex:1">'+a.txt+'</span><span style="font-size:.65rem;color:#aaa">'+a.date+'</span></div>';
+  }).join('');
+
+  var dj = p.dj;
+  var doulD = typeof dj.doul === 'number' ? dj.doul : 0;
+  var fatD = typeof dj.fat === 'number' ? dj.fat : 0;
+  var crbD = typeof dj.crb === 'number' ? dj.crb : 0;
+
+  var confPct = Math.trunc((p.confSc/20)*100);
+  var confCol = p.confSc >= 18 ? GREEN : p.confSc >= 15 ? '#3B82F6' : p.confSc >= 12 ? ORANGE : RED;
+
+  var frise = makeFrise(p, rd);
+
+  var crbKpi = p.crb > 0
+    ? '<div class="fm-kpi" style="border-color:'+ORANGE+'"><div class="fm-kpi-val" style="color:'+ORANGE+'">'+pyFixed(p.crb,1)+'</div><div class="fm-kpi-lbl">Courbatures moy.</div></div>' : '';
+
+  return '<div class="modal-overlay" id="fiche-'+p.id+'">\n'
+    + ' <a href="#_" style="position:absolute;top:0;left:0;right:0;bottom:0;z-index:0"></a>\n'
+    + ' <div class="fiche-modal-box" style="position:relative;z-index:1">\n'
+    + '  <div class="fm-header">\n'
+    + '   <div>\n    <div class="fm-title">'+p.nom.toUpperCase()+'</div>\n    <div class="fm-sub">'+p.cat+' · '+p.blessure+'</div>\n   </div>\n'
+    + '   <span class="badge" style="background:'+ec+';font-size:.7rem">'+p.etat+'</span>\n'
+    + '   <span class="fm-tend" style="color:'+tendCol+';border-color:'+tendCol+'">'+p.tend+'</span>\n'
+    + '   <a href="#_" class="modal-close-btn" style="text-decoration:none;display:flex">✕</a>\n'
+    + '  </div>\n  <div class="fm-content">\n'
+    + '   <div class="fm-kpi-row">\n'
+    + '    <div class="fm-kpi" style="background:'+GREEN_BG+';border-color:'+GREEN+'"><div class="fm-kpi-val" style="color:'+dc(p.doul)+'">'+pyFixed(p.doul,1)+'</div><div class="fm-kpi-lbl">Douleur moy.</div></div>\n'
+    + '    '+crbKpi+'\n'
+    + '    <div class="fm-kpi"><div class="fm-kpi-val" style="color:'+MID+'">'+pyFixed(p.fat,1)+'</div><div class="fm-kpi-lbl">Fatigue moy.</div></div>\n'
+    + '    <div class="fm-kpi"><div class="fm-kpi-val" style="color:'+DARK+'">'+p.soins+'</div><div class="fm-kpi-lbl">Entretiens soins</div></div>\n'
+    + '    <div class="fm-kpi"><div class="fm-kpi-val" style="color:'+DARK+'">'+p.prev+'</div><div class="fm-kpi-lbl">Entretiens prév.</div></div>\n'
+    + '    <div class="fm-kpi" style="background:#F3F0FC"><div class="fm-kpi-val" style="color:'+col+'">'+p.rri+'</div><div class="fm-kpi-lbl">RRI /100</div></div>\n'
+    + '   </div>\n'
+    + '   <div style="background:#F8F7FF;border-radius:10px;padding:12px 16px;margin-bottom:14px;border:1px solid #E5E3F5">\n'
+    + '    <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px">\n'
+    + '     <span style="font-weight:700;color:'+protoCol+';font-size:.83rem">'+protoLbl+'</span>\n'
+    + '     '+(p.dmStr ? '<span style="font-size:.7rem;color:#888">1er match : '+p.dmStr+'</span>' : '')+'\n'
+    + '    </div>\n'
+    + '    <div style="position:relative;height:20px;border-radius:10px;overflow:hidden;background:#EEE">\n'
+    + '     <div style="position:absolute;left:0;top:0;width:25%;height:100%;background:#EDE7F6"></div>\n'
+    + '     <div style="position:absolute;left:25%;top:0;width:25%;height:100%;background:#E3F2FD"></div>\n'
+    + '     <div style="position:absolute;left:50%;top:0;width:25%;height:100%;background:#E8F5E9"></div>\n'
+    + '     <div style="position:absolute;left:75%;top:0;width:25%;height:100%;background:#FFF3E0"></div>\n'
+    + '     <div style="position:absolute;left:0;top:0;width:'+pct+'%;height:100%;background:'+bc+';opacity:.85;border-radius:10px;transition:width .5s"></div>\n'
+    + '     <div style="position:absolute;left:'+pct+'%;top:50%;transform:translate(-50%,-50%);width:14px;height:14px;background:white;border:3px solid '+bc+';border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,.2)"></div>\n'
+    + '    </div>\n'
+    + '    <div style="display:flex;justify-content:space-between;margin-top:5px">\n'
+    + '     <span style="font-size:.6rem;color:'+MID+';font-weight:600">J+1</span>\n'
+    + '     <span style="font-size:.6rem;color:'+MID+';font-weight:600">Phase 1 · J+7</span>\n'
+    + '     <span style="font-size:.6rem;color:'+MID+';font-weight:600">Phase 2 · J+14</span>\n'
+    + '     <span style="font-size:.6rem;color:'+MID+';font-weight:600">Phase 3 · J+21</span>\n'
+    + '     <span style="font-size:.6rem;color:'+MID+';font-weight:600">J+25 ✓</span>\n'
+    + '    </div>\n   </div>\n'
+    + '   <div class="fm-body">\n    <div>\n'
+    + '     <div class="info-row"><span class="info-lbl">Catégorie :</span><span class="info-val">'+p.cat+'</span></div>\n'
+    + '     <div class="info-row"><span class="info-lbl">Focus prévent. :</span><span class="info-val">'+p.focus+'</span></div>\n'
+    + '     <div class="info-row"><span class="info-lbl">Vigilance :</span><span class="info-val">'+p.vig+'</span></div>\n'
+    + '     <div style="margin-top:8px"><span class="info-lbl">Matchs joués :</span></div>\n'
+    + '     <div class="match-grid">'+matchHtml+'</div>\n'
+    + '     '+(p.alertes.length ? '<div style="margin-top:10px">'+alHtml+'</div>' : '')+'\n'
+    + '    </div>\n'
+    + '    <div style="min-height:180px">'+photoHtml+'</div>\n'
+    + '    <div>\n     <div class="obs-title">Observations</div>\n     <div class="obs-text">'+(p.obs || '—')+'</div>\n    </div>\n'
+    + '    <div>\n'
+    + '     <div style="font-weight:700;color:'+DARK+';font-size:.75rem;margin-bottom:10px">Données du jour <span style="color:#aaa;font-weight:400;font-size:.65rem">'+ddmmyyyy(rd)+'</span></div>\n'
+    + '     <div class="today-lbl">Douleur</div>\n'
+    + '     <div style="display:flex;align-items:baseline;gap:4px"><span class="today-val" style="color:'+dc(doulD)+'">'+dj.doul+'</span><span class="today-max">/10</span></div>\n'
+    + '     <div class="bar sm" style="margin-bottom:8px"><div class="bar-fill" style="width:'+Math.min(100,Math.trunc(doulD*10))+'%;background:'+dc(doulD)+'"></div></div>\n'
+    + '     <div class="today-lbl">Fatigue</div>\n'
+    + '     <div style="display:flex;align-items:baseline;gap:4px"><span class="today-val" style="color:'+MID+'">'+dj.fat+'</span><span class="today-max">/5</span></div>\n'
+    + '     <div class="bar sm" style="margin-bottom:8px"><div class="bar-fill" style="width:'+Math.min(100,Math.trunc(fatD*20))+'%;background:'+MID+'"></div></div>\n'
+    + '     <div class="today-lbl">Courbatures</div>\n'
+    + '     <div style="display:flex;align-items:baseline;gap:4px"><span class="today-val" style="color:'+ORANGE+'">'+dj.crb+'</span><span class="today-max">/10</span></div>\n'
+    + '     <div class="bar sm"><div class="bar-fill" style="width:'+Math.min(100,Math.trunc(crbD*10))+'%;background:'+ORANGE+'"></div></div>\n'
+    + '    </div>\n   </div>\n'
+    + '   <div class="fm-conf">\n'
+    + '    <span class="fm-conf-title">Indice de confiance</span>\n'
+    + '    <span style="font-size:.72rem;color:#555">Physique : '+(p.cp || '—')+'/10</span>\n'
+    + '    <span style="font-size:.72rem;color:#555">Mental : '+(p.cm_ || '—')+'/10</span>\n'
+    + '    <div class="conf-bar"><div class="conf-bar-fill" style="width:'+confPct+'%;background:linear-gradient(90deg,'+RED+','+ORANGE+','+GREEN+')"></div></div>\n'
+    + '    <div class="conf-score" style="background:'+confCol+'">'+p.confSc+'</div>\n'
+    + '    <span style="font-size:.85rem;font-weight:700;color:'+confCol+'">'+p.confLbl+'</span>\n'
+    + '    <span style="font-size:.65rem;color:#aaa">Score : '+p.confSc+'/20</span>\n'
+    + '   </div>\n'
+    + '   <div class="fm-frise">\n'
+    + '    <div class="fm-frise-title">■ Frise chronologique — Phases · Entretiens · Matchs</div>\n'
+    + '    '+frise+'\n   </div>\n  </div>\n </div>\n</div>';
+}
+
+// ── Cartes DS + modales RRI ─────────────────────────────────────────
+function dsCard(p){
+  var col = rc(p.rri), st = rsShort(p.rri), ec = etatColor(p.etat);
+  var pct = Math.trunc(p.pct*100), bc = pctColor(p.pct);
+  var proto = p.jp !== null ? 'J+'+p.jp+'/25 · '+pct+'%' : 'En attente';
+  return '<a class="ds-card" href="#rri-'+p.id+'" style="border-color:'+col+';text-decoration:none;display:block">\n'
+    + ' <div class="ds-head">\n'
+    + '  <div style="min-width:0"><span class="pano-name">'+p.nom+'</span><span class="pano-sub">'+p.cat+' · '+p.blessure+'</span></div>\n'
+    + '  <span class="badge" style="background:'+ec+'">'+p.etat+'</span>\n'
+    + ' </div>\n <div class="ds-body">\n  <div class="ds-left">\n'
+    + '   <span class="ds-score" style="color:'+col+'">'+p.rri+'<span class="ds-max">/100</span></span>\n'
+    + '   <span class="rri-badge" style="color:'+col+';border-color:'+col+';margin-top:4px;display:inline-block">'+st+'</span>\n'
+    + '   <div class="bar" style="margin-top:6px;width:72px"><div class="bar-fill" style="width:'+p.rri+'%;background:'+col+'"></div></div>\n'
+    + '  </div>\n  <div class="ds-div"></div>\n  <div class="ds-right">\n'
+    + '   <div class="ds-label">Temps de jeu rec.</div>\n'
+    + '   <div class="ds-temps" style="color:'+col+'">'+p.temps+'</div>\n'
+    + '   <div class="ds-label" style="margin-top:6px">Avancement</div>\n'
+    + '   <div class="bar sm"><div class="bar-fill" style="width:'+pct+'%;background:'+bc+'"></div></div>\n'
+    + '   <div style="font-size:.63rem;color:#888;margin-top:2px">'+proto+'</div>\n'
+    + '  </div>\n </div>\n <div class="ds-tap">Détail RRI →</div>\n</a>';
+}
+
+function rriModal(p){
+  var col = rc(p.rri), st = rsShort(p.rri);
+  var rows = COMP_INFO.map(function(ci){
+    var key = ci[0], lbl = ci[1], c_ = ci[2];
+    var d = p.det[key] || {pts:0, max:5, val:null};
+    var pct_ = d.max ? Math.trunc((d.pts/d.max)*100) : 0;
+    return '<tr><td><span class="dot" style="background:'+c_+'"></span></td><td style="font-weight:500">'+lbl+'</td><td style="color:#666;font-style:italic">'+detVal(p,key)+'</td><td style="font-weight:700;color:'+c_+'">'+d.pts+'/'+d.max+'</td><td><div class="comp-bar"><div class="comp-bar-fill" style="width:'+pct_+'%;background:'+c_+'"></div></div></td></tr>';
+  }).join('');
+
+  var nk2 = {f:0, m:1, e:2}[p.nk];
+  var dec = RECO_TABLE.map(function(row, ni){
+    var tr = '<td class="dec-niv">'+row[0]+'</td>';
+    row[1].forEach(function(v, pi){
+      var act = (pi+1 === p.palier && ni === nk2);
+      var s = act ? 'background:'+col+';color:white;font-weight:700' : '';
+      tr += '<td style="'+s+'">'+v+'</td>';
+    });
+    return '<tr>'+tr+'</tr>';
+  }).join('');
+
+  return '<div class="modal-overlay" id="rri-'+p.id+'">\n'
+    + ' <a href="#_" style="position:absolute;top:0;left:0;right:0;bottom:0;z-index:0"></a>\n'
+    + ' <div class="rri-modal-box" style="position:relative;z-index:1">\n'
+    + '  <div class="fm-header" style="border-radius:14px 14px 0 0">\n'
+    + '   <div><div class="fm-title">'+p.nom.toUpperCase()+'</div><div class="fm-sub">Détail du score RRI</div></div>\n'
+    + '   <div style="display:flex;align-items:center;gap:8px;margin-left:auto">\n'
+    + '    <span style="font-size:2rem;font-weight:800;color:'+col+'">'+p.rri+'</span>\n'
+    + '    <span style="color:#aaa">/100</span>\n'
+    + '    <span class="rri-badge" style="color:'+col+';border-color:'+col+'">'+st+'</span>\n'
+    + '   </div>\n'
+    + '   <a href="#_" class="modal-close-btn" style="text-decoration:none;display:flex">✕</a>\n'
+    + '  </div>\n  <div class="rri-modal-body">\n   <div class="rri-left">\n'
+    + '    <div class="sec-title">Les 8 composantes</div>\n'
+    + '    <table class="comp-table"><thead><tr><th></th><th>Composante</th><th>Valeur</th><th>Score</th><th></th></tr></thead><tbody>'+rows+'</tbody></table>\n'
+    + '   </div>\n   <div class="rri-right">\n'
+    + '    <div class="sec-title">Justification temps de jeu</div>\n'
+    + '    <div class="info-box"><div class="lbl">Palier protocole</div><div class="val">Palier '+p.palier+' · '+p.ph+'</div></div>\n'
+    + '    <div class="info-box"><div class="lbl">J+ depuis 1er match</div><div class="val">'+p.jp+' jours</div></div>\n'
+    + '    <div class="info-box"><div class="lbl">Douleur moy. 3 dern. séances</div><div class="val" style="color:'+(p.nk==='f'?GREEN:p.nk==='m'?ORANGE:RED)+'">'+pyFixed(p.d3,2)+'/10 → '+p.nivLbl+'</div></div>\n'
+    + '    <div class="result-box" style="background:'+col+'"><div class="lbl">Temps de jeu recommandé</div><div class="val">'+p.temps+'</div></div>\n'
+    + '    <div class="sec-title">Table de décision</div>\n'
+    + '    <table class="dec-table"><thead><tr><th>Douleur</th><th>P1</th><th>P2</th><th>P3</th><th>P4</th></tr></thead><tbody>'+dec+'</tbody></table>\n'
+    + '   </div>\n  </div>\n </div>\n</div>';
+}
+
+function sbar(val, mx, col){
+  var pct = mx > 0 ? Math.min(100, (val/mx)*100) : 0;
+  return '<div class="sbar-wrap"><div class="bar lg" style="max-width:130px;flex:1"><div class="bar-fill" style="width:'+pyFixed(pct,0)+'%;background:'+col+'"></div></div><span class="sbar-val" style="color:'+col+'">'+pyFixed(val,2)+'</span></div>';
+}
+
+// ── Génération HTML complète du rapport ──────────────────────────────
+function generateReportHTML(players, rd, logoDataUrl){
+  var ds = dateFr(rd);
+  var np_ = players.length;
+  var npPret = players.filter(function(p){ return p.rri >= 80; }).length;
+  var npSurv = players.filter(function(p){ return p.rri >= 60 && p.rri < 80; }).length;
+  var npVig = players.filter(function(p){ return p.rri < 60; }).length;
+
+  var logoTag = logoDataUrl
+    ? '<img src="'+logoDataUrl+'" style="width:48px;height:48px;object-fit:contain;border-radius:50%"/>'
+    : '<div style="width:48px;height:48px;border-radius:50%;background:'+MID+';display:flex;align-items:center;justify-content:center;border:2px solid '+GOLD+'"><span style="color:white;font-size:.65rem;font-weight:800;text-align:center;line-height:1.1">TFC<br>PERF</span></div>';
+
+  var synthRows = players.map(function(p){
+    var protoCell;
+    if (p.jp !== null){
+      var pct = Math.trunc(p.pct*100), bc = pctColor(p.pct);
+      protoCell = "<div class='proto-mini'><div class='proto-mini-fill' style='width:"+pct+"%;background:"+bc+"'></div></div><span style='font-size:.72rem;color:#555'>J+"+p.jp+"/25 ("+pct+"%)</span>";
+    } else {
+      protoCell = "<span style='font-size:.72rem;color:#aaa;font-style:italic'>En attente 1er match</span>";
+    }
+    var tendCol = p.tend.indexOf('Hausse') >= 0 ? RED : p.tend.indexOf('Baisse') >= 0 ? '#3B82F6' : DARK;
+    var confBg = p.confSc >= 18 ? GREEN : p.confSc >= 15 ? '#3B82F6' : ORANGE;
+    return '<tr>\n<td class="s-name" style="color:'+rc(p.rri)+'">'+p.nom+'</td>\n<td>'+protoCell+'</td>\n'
+      + '<td style="color:'+tendCol+';font-weight:600">'+p.tend+'</td>\n'
+      + '<td><span class="badge" style="background:'+confBg+'">'+p.confLbl+'</span>&nbsp;'+p.confSc+'/20</td>\n</tr>';
+  }).join('');
+
+  var compRows = players.map(function(p){
+    return '<tr>\n<td class="s-name" style="color:'+rc(p.rri)+'">'+p.nom+'</td>\n'
+      + '<td>'+sbar(p.doul, 10, dc(p.doul))+'</td>\n'
+      + '<td>'+sbar(p.crb, 10, p.crb > 0 ? ORANGE : GREEN)+'</td>\n'
+      + '<td>'+sbar(p.fat, 5, MID)+'</td>\n</tr>';
+  }).join('');
+
+  var navFiches = players.map(function(p){
+    return '<button class="nav-link" onclick="openFiche(\''+p.id+'\')">'
+      + '<span class="nav-rri" style="color:'+rc(p.rri)+'">'+p.rri+'</span>'
+      + p.nom.split(/\s+/).pop() + '</button>';
+  }).join('');
+
+  var allPano = players.map(panoCard).join('');
+  var allFiches = players.map(function(p){ return ficheModal(p, rd); }).join('');
+  var allDs = players.map(dsCard).join('');
+  var allRri = players.map(rriModal).join('');
+
+  var cats = [];
+  players.forEach(function(p){ if (p.cat && p.cat !== '—' && cats.indexOf(p.cat) < 0) cats.push(p.cat); });
+  cats.sort();
+  var dateStrMeta = ddmmyyyy(rd);
+
+  var JS = '\nfunction openFiche(id){\n  var m=document.getElementById(\'fiche-\'+id);\n  if(m){m.classList.add(\'active\');}\n}\nfunction handleTouch(fn,id){return function(e){e.preventDefault();fn(null,id);};}\nfunction closeFiche(e,id){\n  if(e===null||e.target===document.getElementById(\'fiche-\'+id)){\n    document.getElementById(\'fiche-\'+id).classList.remove(\'active\');\n    document.body.style.overflow=\'\';\n  }\n}\nfunction openRRI(id){\n  var m=document.getElementById(\'rri-\'+id);\n  if(m){m.classList.add(\'active\');}\n}\nfunction closeRRI(e,id){\n  if(e===null||e.target===document.getElementById(\'rri-\'+id)){\n    document.getElementById(\'rri-\'+id).classList.remove(\'active\');\n    document.body.style.overflow=\'\';\n  }\n}\ndocument.addEventListener(\'keydown\',function(e){\n  if(e.key===\'Escape\'){\n    document.querySelectorAll(\'.modal-overlay.active\').forEach(function(m){\n      m.classList.remove(\'active\');\n    });\n  }\n});\n';
+
+  return '<!DOCTYPE html>\n<html lang="fr">\n<head>\n<meta charset="UTF-8">\n'
+    + '<meta name="tfc-date" content="'+dateStrMeta+'">\n'
+    + '<meta name="tfc-categories" content="'+cats.join(',')+'">\n'
+    + '<meta name="tfc-players" content="'+np_+'">\n'
+    + '<meta name="viewport" content="width=device-width,initial-scale=1">\n'
+    + '<title>TFC · Rapport Suivi · '+ds+'</title>\n'
+    + '<style>'+reportCSS()+'</style>\n</head>\n<body ontouchstart="">\n<div class="layout">\n\n'
+    + '<!-- SIDEBAR -->\n<nav class="sidebar">\n  <div class="sidebar-logo">\n    '+logoTag+'\n'
+    + '    <div class="sidebar-club">TOULOUSE FC</div>\n    <div class="sidebar-date">'+ds+'</div>\n  </div>\n'
+    + '  <div class="sidebar-section">Sections</div>\n'
+    + '  <a class="nav-link" href="#panorama">📋 Panorama</a>\n'
+    + '  <a class="nav-link" href="#synthese">📊 Synthèse</a>\n'
+    + '  <a class="nav-link" href="#ds">🎯 Directeur sportif</a>\n'
+    + '  <hr class="nav-sep">\n  <div class="sidebar-section">Fiches joueurs</div>\n  '+navFiches+'\n</nav>\n\n'
+    + '<!-- CONTENU -->\n<main class="main">\n\n  <div class="report-header">\n    '+logoTag+'\n'
+    + '    <div class="rh-text">\n      <h1>TOULOUSE FOOTBALL CLUB</h1>\n'
+    + '      <p>Cellule Performance &amp; Réathlétisation · Rapport de suivi · '+ds+'</p>\n    </div>\n'
+    + '    <div class="rh-stats">\n'
+    + '      <div class="stat-chip"><div class="v">'+np_+'</div><div class="l">Joueurs</div></div>\n'
+    + '      <div class="stat-chip"><div class="v" style="color:'+GREEN+'">'+npPret+'</div><div class="l">Prêts</div></div>\n'
+    + '      <div class="stat-chip"><div class="v" style="color:'+ORANGE+'">'+npSurv+'</div><div class="l">Surv.</div></div>\n'
+    + '      <div class="stat-chip"><div class="v" style="color:'+RED+'">'+npVig+'</div><div class="l">Vigilance</div></div>\n'
+    + '    </div>\n  </div>\n\n'
+    + '  <!-- PANORAMA -->\n  <div class="page-section" id="panorama">\n'
+    + '    <div class="section-title-bar"><h2>Panorama joueurs</h2><span>Triés par RRI · Cliquez sur une carte pour la fiche individuelle complète</span></div>\n'
+    + '    <div class="pano-grid">'+allPano+'</div>\n  </div>\n\n'
+    + '  <!-- SYNTHESE -->\n  <div class="page-section" id="synthese">\n'
+    + '    <div class="section-title-bar"><h2>Synthèse du groupe</h2></div>\n'
+    + '    <div class="card-section">\n      <div class="section-bar">■ Avancement · Tendance · Confiance</div>\n'
+    + '      <table class="synth-table">\n        <thead><tr><th>Joueur</th><th>Avancement J+25</th><th>Tendance douleur</th><th>Indice confiance</th></tr></thead>\n'
+    + '        <tbody>'+synthRows+'</tbody>\n      </table>\n    </div>\n'
+    + '    <div class="card-section">\n      <div class="section-bar">■ Comparatif douleur · courbatures · fatigue</div>\n'
+    + '      <table class="synth-table">\n        <thead><tr><th>Joueur</th><th>Douleur moy. /10</th><th>Courbatures moy. /10</th><th>Fatigue moy. /5</th></tr></thead>\n'
+    + '        <tbody>'+compRows+'</tbody>\n      </table>\n    </div>\n  </div>\n\n'
+    + '  <!-- VUE DIRECTEUR SPORTIF -->\n  <div class="page-section" id="ds">\n'
+    + '    <div class="section-title-bar"><h2>Vue Directeur Sportif</h2><span>Cliquez sur une carte pour le détail RRI et la justification temps de jeu</span></div>\n'
+    + '    <div class="ds-grid">'+allDs+'</div>\n  </div>\n\n</main>\n</div>\n\n'
+    + '<!-- MODALES FICHES (cachées) -->\n'+allFiches+'\n\n'
+    + '<!-- MODALES RRI (cachées) -->\n'+allRri+'\n\n'
+    + '<script>\n/* Navigation via :target CSS — aucun JS requis pour les modales */\n<\/script>\n</body>\n</html>';
+}
+
+exports.generateReportHTML = generateReportHTML;
+exports.rsFull = rsFull;
+exports.rsShort = rsShort;
+exports.makeFrise = makeFrise;
+exports.teamSvgAvatar = teamSvgAvatar;
+exports.catColor = catColor;
+})(typeof window !== 'undefined' ? (window.TFCReport = {}) : module.exports);
+
+/* ═══ Template BILAN INDIVIDUEL — port fidèle de generate_bilan_html.py ═══ */
+(function(exports){
+var E = (typeof window !== 'undefined' && window.TFCEngine) ? window.TFCEngine : require('./tfc_engine_core.js');
+var pyFixed = E.pyFixed, addDays = E.addDays, parseDDMMYYYY = E.parseDDMMYYYY, ddmmyyyy = E.ddmmyyyy;
+
+var DARK='#F4F2FA', PANEL='#261C5E', MID='#2D2660';
+var GREEN='#4ADE80', GREEN2='#22C55E', ORANGE='#FB923C', RED='#EF4444';
+var GOLD='#D4AF37', LABEL='#EAE7FC';
+
+function rc(r){ return r>=80 ? GREEN2 : r>=60 ? ORANGE : RED; }
+function rsFull(r){ return r>=80 ? 'PRÊT' : r>=60 ? 'SURVEILLANCE' : 'VIGILANCE'; }
+function initials(nom){ return nom.split(/\s+/).slice(0,2).map(function(w){ return (w[0]||'').toUpperCase(); }).join(''); }
+function f0(x){ return pyFixed(x, 0); }
+function f1(x){ return pyFixed(x, 1); }
+
+var IPRRS_LABELS = ['Foot','Sans douleur','100%','Pas penser','Confiance','Technique'];
+var IPRRS_LABELS_COURTS = ['Football','Sans douleur','Donner 100%','Pas penser blessure','Confiance corps','Capacités tech/phys'];
+
+// ── Timeline SVG (port de make_timeline_svg) ─────────────────────────
+function makeTimelineSvg(p){
+  var W=860, H=240;
+  var dm = p.dm, dr = p.dr;
+  if (!dm) return '<div style="color:#E8E4F8;font-style:italic;text-align:center;padding:20px">Date du 1er match non renseignée</div>';
+  var t0 = dr ? dr : addDays(dm, -7);
+  var t1 = addDays(dm, 27);
+  var span = Math.max(Math.floor((t1 - t0)/86400000), 1);
+  var PL=35, PR=10, TL=H-45;
+  function tx(d){ return PL + Math.max(0, Math.min(1, Math.floor((d - t0)/86400000)/span)) * (W-PL-PR); }
+
+  var lines = ['<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block">'];
+  lines.push('<rect width="'+W+'" height="'+H+'" fill="#1E1A50" rx="8"/>');
+
+  var phaseCols = ['rgba(100,80,160,0.3)','rgba(80,100,180,0.3)','rgba(60,140,100,0.3)','rgba(180,120,60,0.3)'];
+  var phaseLbls = [['Phase 1','J+1→J+7'],['Phase 2','J+8→J+14'],['Phase 3','J+15→J+21'],['Phase 4','J+22→J+25']];
+  for (var i=0;i<4;i++){
+    var ps = addDays(dm, i*7), pe = addDays(dm, (i+1)*7);
+    var x1 = tx(ps), x2 = Math.min(tx(pe), PL+(W-PL-PR));
+    lines.push('<rect x="'+f0(x1)+'" y="16" width="'+f0(x2-x1)+'" height="'+(TL-16)+'" fill="'+phaseCols[i]+'" rx="3"/>');
+    var xc = (x1+x2)/2;
+    phaseLbls[i].forEach(function(line, li){
+      lines.push('<text x="'+f0(xc)+'" y="'+(25+li*10)+'" text-anchor="middle" font-size="8" fill="rgba(200,196,232,0.8)" font-family="system-ui" font-weight="700">'+line+'</text>');
+    });
+  }
+
+  [2,4,6,8,10].forEach(function(yv){
+    var yp = TL-(yv/10)*(TL-46);
+    lines.push('<line x1="'+PL+'" y1="'+f0(yp)+'" x2="'+(PL+(W-PL-PR))+'" y2="'+f0(yp)+'" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/>');
+    lines.push('<text x="'+(PL-4)+'" y="'+f0(yp+3)+'" text-anchor="end" font-size="8" fill="rgba(255,255,255,0.4)" font-family="system-ui">'+yv+'</text>');
+  });
+  lines.push('<line x1="'+PL+'" y1="'+TL+'" x2="'+(PL+(W-PL-PR))+'" y2="'+TL+'" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>');
+
+  var xm = tx(dm);
+  var p2 = function(n){ return String(n).padStart(2,'0'); };
+  var dmShort = p2(dm.getUTCDate())+'/'+p2(dm.getUTCMonth()+1);
+  lines.push('<line x1="'+f0(xm)+'" y1="12" x2="'+f0(xm)+'" y2="'+(TL+5)+'" stroke="'+GOLD+'" stroke-width="1.5" stroke-dasharray="5,3"/>');
+  lines.push('<text x="'+f0(xm)+'" y="'+(TL+16)+'" text-anchor="middle" font-size="8" fill="'+GOLD+'" font-family="system-ui" font-weight="700">1er match '+dmShort+'</text>');
+
+  var acols = {rouge: RED, orange: ORANGE, jaune: '#EAB308'};
+  p.alertes.forEach(function(al){
+    if (!al.date) return;
+    var dAl = parseDDMMYYYY(al.date);
+    if (!dAl) return;
+    var xal = tx(dAl);
+    var ac = acols[al.niv.toLowerCase()] || ORANGE;
+    var msg = ('Alerte ' + al.niv.toUpperCase() + ' — ' + al.date + ' : ' + al.txt.slice(0,50)).replace(/'/g,'&#39;').replace(/"/g,'&quot;');
+    lines.push('<g onclick="showPopup(event,\''+msg+'\')" style="cursor:pointer">');
+    lines.push('<line x1="'+f0(xal)+'" y1="16" x2="'+f0(xal)+'" y2="'+TL+'" stroke="'+ac+'" stroke-width="1" stroke-dasharray="3,2" opacity="0.7"/>');
+    lines.push('<circle cx="'+f0(xal)+'" cy="13" r="6" fill="'+ac+'"/>');
+    lines.push('<text x="'+f0(xal)+'" y="17" text-anchor="middle" font-size="8" fill="white" font-family="system-ui" font-weight="700">!</text>');
+    lines.push('</g>');
+  });
+
+  // Courbe douleur (toutes les valeurs, dates réelles)
+  var ptsD = p.rowsD.map(function(r){
+    return [tx(r.date), TL-(r.v/10)*(TL-46), r.v, p2(r.date.getUTCDate())+'/'+p2(r.date.getUTCMonth()+1)];
+  });
+  if (ptsD.length >= 2){
+    lines.push('<path d="M '+ptsD.map(function(pt){ return f0(pt[0])+','+f0(pt[1]); }).join(' L ')+'" fill="none" stroke="'+GREEN+'" stroke-width="2.5"/>');
+  }
+  ptsD.forEach(function(pt){
+    var col = pt[2] <= 1 ? GREEN2 : pt[2] <= 4 ? ORANGE : RED;
+    var msg = pt[3] + ' — Douleur : ' + Math.trunc(pt[2]) + '/10';
+    lines.push('<g onclick="showPopup(event,\''+msg+'\')" style="cursor:pointer"><circle cx="'+f0(pt[0])+'" cy="'+f0(pt[1])+'" r="7" fill="'+col+'" stroke="'+DARK+'" stroke-width="1.5" opacity="0.9"/></g>');
+    if (pt[2] > 0) lines.push('<text x="'+f0(pt[0])+'" y="'+f0(pt[1]-9)+'" text-anchor="middle" font-size="8" fill="'+col+'" font-family="system-ui" font-weight="700">'+f0(pt[2])+'</text>');
+  });
+
+  var ptsC = p.rowsC.map(function(r){
+    return [tx(r.date), TL-(r.v/10)*(TL-46), r.v, p2(r.date.getUTCDate())+'/'+p2(r.date.getUTCMonth()+1)];
+  });
+  if (ptsC.length >= 2){
+    lines.push('<path d="M '+ptsC.map(function(pt){ return f0(pt[0])+','+f0(pt[1]); }).join(' L ')+'" fill="none" stroke="'+ORANGE+'" stroke-width="2" stroke-dasharray="7,4"/>');
+  }
+  ptsC.forEach(function(pt){
+    var msg = pt[3] + ' — Courbatures : ' + Math.trunc(pt[2]) + '/10';
+    lines.push('<g onclick="showPopup(event,\''+msg+'\')" style="cursor:pointer"><polygon points="'+f0(pt[0])+','+f0(pt[1]-6)+' '+f0(pt[0]-5)+','+f0(pt[1]+4)+' '+f0(pt[0]+5)+','+f0(pt[1]+4)+'" fill="'+ORANGE+'" stroke="'+DARK+'" stroke-width="1"/></g>');
+  });
+
+  p.matchs.forEach(function(m){
+    if (!m.dateObj) return;
+    var xmt = tx(m.dateObj);
+    var msg = ('Match ' + m.date + ' — ' + m.adv + ' — ' + m.t + "'").replace(/'/g,'&#39;');
+    lines.push('<g onclick="showPopup(event,\''+msg+'\')" style="cursor:pointer"><polygon points="'+f0(xmt)+','+f0(TL-6)+' '+f0(xmt-7)+','+f0(TL+5)+' '+f0(xmt)+','+f0(TL+15)+' '+f0(xmt+7)+','+f0(TL+5)+'" fill="'+GOLD+'" stroke="'+DARK+'" stroke-width="1"/></g>');
+    lines.push('<text x="'+f0(xmt)+'" y="'+(TL+26)+'" text-anchor="middle" font-size="7" fill="'+GOLD+'" font-family="system-ui">'+m.adv.slice(0,8)+' '+m.t+"'"+'</text>');
+  });
+
+  var ly = H-8;
+  lines.push('<circle cx="'+PL+'" cy="'+ly+'" r="5" fill="'+GREEN+'"/>');
+  lines.push('<text x="'+(PL+9)+'" y="'+(ly+4)+'" font-size="9" fill="'+GREEN+'" font-family="system-ui">Douleur</text>');
+  lines.push('<polygon points="'+(PL+75)+','+(ly-4)+' '+(PL+71)+','+(ly+3)+' '+(PL+79)+','+(ly+3)+'" fill="'+ORANGE+'"/>');
+  lines.push('<text x="'+(PL+84)+'" y="'+(ly+4)+'" font-size="9" fill="'+ORANGE+'" font-family="system-ui">Courbatures</text>');
+  lines.push('<polygon points="'+(PL+175)+','+(ly-4)+' '+(PL+169)+','+(ly+4)+' '+(PL+175)+','+(ly+12)+' '+(PL+181)+','+(ly+4)+'" fill="'+GOLD+'"/>');
+  lines.push('<text x="'+(PL+187)+'" y="'+(ly+4)+'" font-size="9" fill="'+GOLD+'" font-family="system-ui">Match</text>');
+  lines.push('<circle cx="'+(PL+235)+'" cy="'+ly+'" r="5" fill="'+RED+'"/>');
+  lines.push('<text x="'+(PL+244)+'" y="'+(ly+4)+'" font-size="9" fill="'+RED+'" font-family="system-ui">Alerte</text>');
+  lines.push('</svg>');
+  return lines.join('\n');
+}
+
+// ── Radar IPRRS ──────────────────────────────────────────────────────
+function radarSvg(vals){
+  if (!vals.length || vals.every(function(v){ return v === 0; })) return '';
+  var W=180, H=180;
+  var cx=W/2, cy=H/2, r=Math.min(W,H)/2-20;
+  var n = vals.length, maxV = 10;
+  var angles = [];
+  for (var i=0;i<n;i++) angles.push(Math.PI/2 + 2*Math.PI*i/n);
+  function fx(v){ return v.toFixed(1); }
+  var lines = ['<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg">'];
+  lines.push('<rect width="'+W+'" height="'+H+'" fill="transparent"/>');
+  [0.25,0.5,0.75,1.0].forEach(function(pr){
+    var pts = angles.map(function(a){ return fx(cx+r*pr*Math.cos(a))+','+fx(cy-r*pr*Math.sin(a)); }).join(' ');
+    lines.push('<polygon points="'+pts+'" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>');
+  });
+  angles.forEach(function(a){
+    lines.push('<line x1="'+f0(cx)+'" y1="'+f0(cy)+'" x2="'+f0(cx+r*Math.cos(a))+'" y2="'+f0(cy-r*Math.sin(a))+'" stroke="rgba(255,255,255,0.2)" stroke-width="0.8"/>');
+  });
+  var ptsD = vals.map(function(v, i){
+    var a = angles[i];
+    return fx(cx+r*(v/maxV)*Math.cos(a))+','+fx(cy-r*(v/maxV)*Math.sin(a));
+  }).join(' ');
+  lines.push('<polygon points="'+ptsD+'" fill="rgba(74,222,128,0.3)" stroke="'+GREEN+'" stroke-width="2"/>');
+  vals.forEach(function(v, i){
+    var a = angles[i];
+    lines.push('<circle cx="'+fx(cx+r*(v/maxV)*Math.cos(a))+'" cy="'+fx(cy-r*(v/maxV)*Math.sin(a))+'" r="3" fill="'+GREEN+'"/>');
+  });
+  IPRRS_LABELS.forEach(function(lbl, i){
+    var a = angles[i];
+    var lx = cx+(r+14)*Math.cos(a), lyy = cy-(r+14)*Math.sin(a);
+    lines.push('<text x="'+f0(lx)+'" y="'+f0(lyy+4)+'" text-anchor="middle" font-size="8" fill="#EAE7FC" font-family="system-ui">'+lbl+'</text>');
+  });
+  lines.push('</svg>');
+  return lines.join('\n');
+}
+
+// ── Barres temps de jeu ──────────────────────────────────────────────
+function matchBars(p){
+  if (!p.matchs.length) return '<div style="color:#E8E4F8;font-style:italic">Aucun match enregistré</div>';
+  var maxT = Math.max.apply(null, p.matchs.map(function(m){ return m.t; })) || 1;
+  var html = '<div style="display:flex;flex-direction:column;gap:6px">';
+  p.matchs.forEach(function(m){
+    var pctB = Math.trunc(m.t/maxT*100);
+    var logoHtml = '<div style="width:22px;height:22px;border-radius:50%;background:'+MID+';display:flex;align-items:center;justify-content:center;font-size:7px;color:white;font-weight:700;flex-shrink:0">'+initials(m.adv)+'</div>';
+    html += '<div style="display:flex;align-items:center;gap:8px">'
+      + logoHtml
+      + '<div style="font-size:.72rem;color:'+LABEL+';min-width:80px;white-space:nowrap">'+m.adv.slice(0,12)+'</div>'
+      + '<div style="flex:1;background:rgba(255,255,255,0.1);border-radius:4px;height:8px;overflow:hidden">'
+      + '<div style="width:'+pctB+'%;height:100%;background:'+GREEN+';border-radius:4px;transition:width .5s"></div>'
+      + '</div>'
+      + '<div style="font-size:.78rem;font-weight:700;color:'+GREEN+';min-width:30px;text-align:right">'+m.t+"'"+'</div>'
+      + '<div style="font-size:.72rem;color:'+GOLD+';min-width:30px">'+(m.cat!=='—'?m.cat:'')+'</div>'
+      + '</div>';
+  });
+  html += '</div>';
+  return html;
+}
+
+// ── Génération HTML complète du bilan ────────────────────────────────
+function generateBilanHTML(p, rd, photoDataUrl, tfcLogoDataUrl){
+  var col = rc(p.rri), stat = rsFull(p.rri);
+  var etat = p.etatFull;
+  var ec = etat.toLowerCase().indexOf('termin') >= 0 ? GREEN2 : etat.toLowerCase().indexOf('arr') >= 0 ? RED : ORANGE;
+  var todayStr = ddmmyyyy(rd);
+  var jp = p.jp;
+  var cat = (p.cat === '—') ? '' : p.cat;
+
+  var logoHtml = tfcLogoDataUrl ? '<img src="'+tfcLogoDataUrl+'" style="width:52px;height:52px;object-fit:contain;border-radius:50%"/>' : '';
+  var photoHtml = photoDataUrl
+    ? '<img src="'+photoDataUrl+'" style="width:100%;height:auto;object-fit:contain;border-radius:10px;display:block"/>'
+    : '<div style="width:100%;height:100%;border-radius:10px;background:'+MID+';display:flex;align-items:center;justify-content:center;color:white;font-size:2.5rem;font-weight:800">'+initials(p.nom)+'</div>';
+
+  // Table détail RRI
+  var COMP_INFO = [
+    ['conf_physique','Confiance Physique'],['conf_mentale','Confiance Mentale'],
+    ['soins_prev','Soins + Prévention'],['douleur','Douleur moyenne'],
+    ['courbatures','Courbatures'],['fatigue','Fatigue'],
+    ['progression','Progression matchs'],['alertes','Alertes rouges']
+  ];
+  var rriRows = COMP_INFO.map(function(ci){
+    var d = p.det[ci[0]] || {pts:0, max:5, val:null};
+    var val = d.val !== null ? d.val : '—';
+    var pctC = d.max ? Math.trunc(d.pts/d.max*100) : 0;
+    return '<tr>'
+      + '<td style="padding:5px 8px;font-size:.78rem;font-weight:600;color:'+LABEL+'">'+ci[1]+'</td>'
+      + '<td style="padding:5px 8px;font-style:italic;font-size:.72rem;color:#E8E4F8">'+val+'</td>'
+      + '<td style="padding:5px 8px"><div style="background:rgba(255,255,255,0.1);border-radius:3px;height:6px;width:80px;overflow:hidden"><div style="width:'+pctC+'%;height:100%;background:'+GREEN+';border-radius:3px"></div></div></td>'
+      + '<td style="padding:5px 8px;font-weight:700;font-size:.82rem;color:'+GREEN+'">'+d.pts+'/'+d.max+'</td>'
+      + '</tr>';
+  }).join('');
+
+  // Alertes
+  var acols = {rouge: RED, orange: ORANGE, jaune: '#EAB308'};
+  var alHtml;
+  if (p.alertes.length){
+    alHtml = p.alertes.map(function(a){
+      var ac = acols[a.niv.toLowerCase()] || ORANGE;
+      return '<div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:rgba(255,255,255,0.05);border-radius:6px;border-left:3px solid '+ac+';margin-bottom:5px"><span style="font-size:.72rem;font-weight:700;color:white;background:'+ac+';padding:1px 6px;border-radius:10px;flex-shrink:0">'+a.niv.toUpperCase()+'</span><span style="flex:1;font-size:.75rem;color:'+LABEL+'">'+a.txt+'</span><span style="font-size:.72rem;color:#E8E4F8">'+a.date+'</span></div>';
+    }).join('');
+  } else {
+    alHtml = '<div style="color:'+GREEN+';font-size:.78rem;font-style:italic">Aucune alerte identifiée</div>';
+  }
+
+  // Commentaires (ordre inverse)
+  var comHtml;
+  if (p.commentaires.length){
+    comHtml = p.commentaires.slice().reverse().map(function(cm){
+      return '<div style="padding:8px 10px;border-bottom:1px solid rgba(255,255,255,0.07)"><div style="font-size:.72rem;color:'+GOLD+';font-weight:700;margin-bottom:3px">'+cm.date+'</div><div style="font-size:.78rem;color:'+LABEL+';line-height:1.5">'+cm.txt+'</div></div>';
+    }).join('');
+  } else {
+    comHtml = '<div style="color:#E8E4F8;font-style:italic;padding:10px;font-size:.78rem">Aucun commentaire saisi</div>';
+  }
+
+  // Comparaison début/fin
+  var compHtml;
+  if (p.doulDebut !== null && p.doulFin !== null){
+    var diff = p.doulDebut - p.doulFin;
+    var diffCol = diff > 0 ? GREEN2 : diff < 0 ? RED : ORANGE;
+    var diffTxt = diff > 0 ? '↓ '+f1(diff)+'/10 de douleur en moins'
+                : diff < 0 ? '↑ '+f1(Math.abs(diff))+'/10 de douleur en plus'
+                : '→ Stable';
+    function dcol(v){ return v > 3 ? RED : v > 1 ? ORANGE : GREEN; }
+    compHtml = '<div style="display:flex;gap:10px">'
+      + '<div style="flex:1;background:rgba(255,255,255,0.06);border-radius:8px;padding:10px;text-align:center">'
+      + '<div style="font-size:.72rem;color:'+LABEL+';margin-bottom:4px">Début (moy. 3 premiers j.)</div>'
+      + '<div style="font-size:1.4rem;font-weight:800;color:'+dcol(p.doulDebut)+'">'+f1(p.doulDebut)+'<span style="font-size:.75rem;color:#E8E4F8">/10</span></div>'
+      + '</div>'
+      + '<div style="display:flex;align-items:center;font-size:1.2rem;color:'+diffCol+'">→</div>'
+      + '<div style="flex:1;background:rgba(255,255,255,0.06);border-radius:8px;padding:10px;text-align:center">'
+      + '<div style="font-size:.72rem;color:'+LABEL+';margin-bottom:4px">Fin (moy. 3 derniers j.)</div>'
+      + '<div style="font-size:1.4rem;font-weight:800;color:'+dcol(p.doulFin)+'">'+f1(p.doulFin)+'<span style="font-size:.75rem;color:#E8E4F8">/10</span></div>'
+      + '</div></div>'
+      + '<div style="text-align:center;margin-top:8px;font-size:.82rem;font-weight:700;color:'+diffCol+'">'+diffTxt+'</div>';
+  } else {
+    compHtml = '<div style="color:#E8E4F8;font-style:italic;font-size:.78rem">Données insuffisantes</div>';
+  }
+
+  var timelineSvg = makeTimelineSvg(p);
+
+  // Charge match cumulée
+  var cibleMinutes = 270;
+  var tempsTotal = p.tempsTotal;
+  var pctCharge = cibleMinutes > 0 ? Math.min(100, Math.trunc(tempsTotal/cibleMinutes*100)) : 0;
+  var chargeCol = pctCharge >= 75 ? GREEN2 : pctCharge >= 40 ? ORANGE : RED;
+  var chargeSvg = '';
+  if (p.matchs.length){
+    var Wch = 500, Hch = 60;
+    var cumul = 0, pts = [];
+    p.matchs.forEach(function(m, i){
+      cumul += m.t;
+      var xM = Math.trunc((i / Math.max(p.matchs.length-1, 1)) * Wch);
+      var yM = Math.trunc(Hch - (cumul / Math.max(cibleMinutes, tempsTotal || 1)) * Hch);
+      yM = Math.max(5, Math.min(Hch-5, yM));
+      pts.push([xM, yM, cumul]);
+    });
+    chargeSvg = '<polyline points="'+pts.map(function(pt){ return pt[0]+','+pt[1]; }).join(' ')+'" fill="none" stroke="'+chargeCol+'" stroke-width="2.5" stroke-linejoin="round"/>';
+    pts.forEach(function(pt){
+      chargeSvg += '<circle cx="'+pt[0]+'" cy="'+pt[1]+'" r="4" fill="'+chargeCol+'" stroke="white" stroke-width="1.5"/>';
+      chargeSvg += '<text x="'+pt[0]+'" y="'+(pt[1]-8)+'" text-anchor="middle" font-size="9" fill="'+chargeCol+'" font-family="system-ui" font-weight="700">'+pt[2]+"'"+'</text>';
+    });
+  }
+
+  // SVG évolution RRI
+  var rriEvolSvg = '';
+  if (p.rriEvolution.length >= 2){
+    var Wr = 700, Hr = 120;
+    var rris = p.rriEvolution.map(function(r){ return r.rri; });
+    var jps = p.rriEvolution.map(function(r){ return r.jp; });
+    var minRri = Math.min.apply(null, rris);
+    var maxRri = Math.max(Math.max.apply(null, rris), minRri+1);
+    var minJp = Math.min.apply(null, jps);
+    var maxJp = Math.max.apply(null, jps);
+    var spanJp = Math.max(maxJp-minJp, 1);
+    function rx(jp_){ return Math.trunc((jp_-minJp)/spanJp*(Wr-40))+20; }
+    function ry(rv){ return Math.trunc(Hr-10-(rv-minRri+5)/(maxRri-minRri+10)*(Hr-25)); }
+    var y80 = ry(80), y60 = ry(60);
+    rriEvolSvg  = '<rect x="20" y="'+y80+'" width="'+(Wr-40)+'" height="'+(Hr-10-y80)+'" fill="rgba(34,197,94,0.08)" rx="2"/>';
+    rriEvolSvg += '<rect x="20" y="'+y60+'" width="'+(Wr-40)+'" height="'+(y80-y60)+'" fill="rgba(251,146,60,0.08)" rx="2"/>';
+    rriEvolSvg += '<line x1="20" y1="'+y80+'" x2="'+(Wr-20)+'" y2="'+y80+'" stroke="rgba(34,197,94,0.4)" stroke-width="1" stroke-dasharray="4,3"/>';
+    rriEvolSvg += '<text x="22" y="'+(y80-3)+'" font-size="8" fill="rgba(34,197,94,0.8)" font-family="system-ui">80</text>';
+    rriEvolSvg += '<line x1="20" y1="'+y60+'" x2="'+(Wr-20)+'" y2="'+y60+'" stroke="rgba(251,146,60,0.4)" stroke-width="1" stroke-dasharray="4,3"/>';
+    rriEvolSvg += '<text x="22" y="'+(y60-3)+'" font-size="8" fill="rgba(251,146,60,0.8)" font-family="system-ui">60</text>';
+    rriEvolSvg += '<polyline points="'+p.rriEvolution.map(function(r){ return rx(r.jp)+','+ry(r.rri); }).join(' ')+'" fill="none" stroke="#6B5CA5" stroke-width="2.5" stroke-linejoin="round"/>';
+    p.rriEvolution.forEach(function(r){
+      var colV = r.rri >= 80 ? GREEN2 : r.rri >= 60 ? ORANGE : RED;
+      var pxV = rx(r.jp), pyV = ry(r.rri);
+      rriEvolSvg += '<circle cx="'+pxV+'" cy="'+pyV+'" r="5" fill="'+colV+'" stroke="white" stroke-width="1.5"/>';
+      rriEvolSvg += '<text x="'+pxV+'" y="'+(pyV-8)+'" text-anchor="middle" font-size="8" fill="'+colV+'" font-family="system-ui" font-weight="700">'+r.rri+'</text>';
+      rriEvolSvg += '<text x="'+pxV+'" y="'+(Hr+4)+'" text-anchor="middle" font-size="7" fill="rgba(200,196,232,0.7)" font-family="system-ui">'+r.date+'</text>';
+    });
+  }
+
+  var lastObsTxt = p.commentaires.length ? p.commentaires[p.commentaires.length-1].txt : '—';
+  var lastObsHtml = '<div style="font-size:.8rem;color:'+LABEL+';font-style:italic;line-height:1.6">'+lastObsTxt+'</div>';
+  var btnHist = p.commentaires.length > 1
+    ? '<button class="toggle-btn" onclick="toggle(\'all-comments\')">&#9660; Voir tout l&#39;historique des commentaires</button>' : '';
+
+  // Détail IPRRS
+  var iprrsDetailHtml = IPRRS_LABELS_COURTS.map(function(lbl, i){
+    var val = p.iprrsVals[i] !== undefined ? p.iprrsVals[i] : 0;
+    var c = val >= 10 ? GREEN : val >= 7 ? ORANGE : val > 0 ? RED : '#555';
+    var pctI = Math.trunc(val/10*100);
+    return '<div style="display:flex;align-items:center;gap:10px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.07)">'
+      + '<span style="font-size:.75rem;color:'+LABEL+';flex:1">'+lbl+'</span>'
+      + '<div style="background:rgba(255,255,255,0.1);border-radius:4px;height:6px;width:80px;overflow:hidden">'
+      + '<div style="width:'+pctI+'%;height:100%;background:'+c+';border-radius:4px"></div>'
+      + '</div>'
+      + '<span style="font-size:.78rem;font-weight:700;color:'+c+';min-width:32px;text-align:right">'+f0(val)+'/10</span>'
+      + '</div>';
+  }).join('');
+
+  var doulCol = p.doul > 3 ? RED : p.doul > 1 ? ORANGE : GREEN;
+  var crbCol = p.crb > 2 ? ORANGE : GREEN;
+  var fatCol = p.fat > 2.5 ? ORANGE : GREEN;
+
+  return '<!DOCTYPE html>\n<html lang="fr">\n<head>\n<meta charset="UTF-8">\n'
+    + '<meta name="viewport" content="width=device-width,initial-scale=1">\n'
+    + '<meta name="tfc-joueur" content="'+p.nom+'">\n'
+    + '<meta name="tfc-categorie" content="'+cat+'">\n'
+    + '<meta name="tfc-statut" content="'+stat+'">\n'
+    + '<meta name="tfc-rri" content="'+p.rri+'">\n'
+    + '<meta name="tfc-date" content="'+todayStr+'">\n'
+    + '<meta name="tfc-jp" content="'+(jp !== null ? jp : '')+'">\n'
+    + '<meta name="tfc-date-fin-proto" content="'+(p.dm ? ddmmyyyy(addDays(p.dm,25)) : '')+'">\n'
+    + '<title>Bilan — '+p.nom+' — TFC</title>\n<style>\n'
+    + '*{box-sizing:border-box;margin:0;padding:0}\n'
+    + "body{font-family:'Segoe UI',system-ui,sans-serif;background:"+DARK+";color:#1E1A50;min-height:100vh}\n"
+    + '.header{background:'+PANEL+';padding:16px 24px;display:flex;align-items:center;gap:16px;border-bottom:3px solid '+GOLD+'}\n'
+    + '.h-title{font-size:1.25rem;font-weight:800;letter-spacing:.04em;color:white}\n'
+    + '.h-sub{font-size:.75rem;color:'+LABEL+';margin-top:3px}\n'
+    + '.badge{font-size:.72rem;font-weight:700;color:white;padding:3px 10px;border-radius:20px;flex-shrink:0}\n'
+    + '.main{max-width:1100px;margin:0 auto;padding:20px 20px}\n'
+    + '.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}\n'
+    + '.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px}\n'
+    + '.grid-4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:16px;margin-bottom:16px}\n'
+    + '.card{background:'+PANEL+';border-radius:12px;padding:16px;border:1px solid rgba(255,255,255,0.08)}\n'
+    + '.card-title{font-size:.7rem;font-weight:800;color:'+LABEL+';letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px}\n'
+    + '.kpi-val{font-size:1.8rem;font-weight:800}\n'
+    + '.kpi-lbl{font-size:.72rem;color:'+LABEL+';margin-top:3px;text-transform:uppercase}\n'
+    + '.bar{background:rgba(255,255,255,0.1);border-radius:4px;height:6px;overflow:hidden;margin-top:5px}\n'
+    + '.bar-fill{height:100%;border-radius:4px}\n'
+    + '.section-full{margin-bottom:16px}\n'
+    + '.toggle-btn{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:'+LABEL+';padding:6px 14px;border-radius:20px;cursor:pointer;font-size:.75rem;font-weight:600;margin-top:10px;display:inline-block}\n'
+    + '.toggle-btn:hover{background:rgba(255,255,255,0.15)}\n'
+    + '.collapsible{max-height:0;overflow:hidden;transition:max-height .4s ease}\n'
+    + '.collapsible.open{max-height:2000px}\n'
+    + '.rri-score{font-size:3rem;font-weight:800;line-height:1}\n'
+    + '.footer{background:'+PANEL+';border-top:1px solid rgba(255,255,255,0.1);padding:12px 24px;display:flex;justify-content:space-between;font-size:.75rem;color:#E8E4F8;margin-top:24px}\n'
+    + 'table{width:100%;border-collapse:collapse}\n'
+    + 'tr:nth-child(even) td{background:rgba(255,255,255,0.03)}\n'
+    + '@media(max-width:700px){.grid-2,.grid-3,.grid-4{grid-template-columns:1fr}}\n'
+    + '</style>\n</head>\n<body>\n\n'
+    + '<!-- HEADER -->\n<div class="header">\n  '+logoHtml+'\n  <div style="flex:1">\n'
+    + '    <div class="h-title">25 JOURS DE REPRISE COMPÉTITION / '+p.nom.toUpperCase()+'</div>\n'
+    + '    <div class="h-sub">'+cat+' · '+p.blessureFull+' · TFC Cellule Performance & Réathlétisation</div>\n'
+    + '  </div>\n  <span class="badge" style="background:'+ec+'">'+etat+'</span>\n</div>\n\n<div class="main">\n\n'
+    + '  <!-- ROW 0 : COMMENTAIRE DU JOUR -->\n'
+    + '  <div class="card section-full" style="margin-bottom:16px;border-left:3px solid '+GOLD+';border-radius:0 12px 12px 0">\n'
+    + '    <div class="card-title" style="color:'+GOLD+'">Observations</div>\n'
+    + '    '+lastObsHtml+'\n    '+btnHist+'\n'
+    + '    <div class="collapsible" id="all-comments">\n'
+    + '      <div style="margin-top:10px;max-height:250px;overflow-y:auto;border-radius:8px;border:1px solid rgba(255,255,255,0.08)">'+comHtml+'</div>\n'
+    + '    </div>\n  </div>\n\n'
+    + '  <!-- ROW 1 : INFOS + RRI + PHOTO -->\n'
+    + '  <div style="display:grid;grid-template-columns:1.2fr 1.2fr .8fr;gap:16px;margin-bottom:16px">\n\n'
+    + '    <div class="card">\n      <div class="card-title">Informations protocole</div>\n'
+    + '      <div style="display:flex;flex-direction:column;gap:8px">\n'
+    + '        <div><span style="font-size:.75rem;color:'+LABEL+'">Blessure</span><div style="font-weight:700;font-size:.9rem;color:'+GOLD+';margin-top:2px">'+p.blessureFull+'</div></div>\n'
+    + '        <div><span style="font-size:.75rem;color:'+LABEL+'">Date reprise</span><div style="font-weight:600;font-size:.85rem;margin-top:2px;color:white">'+(p.drStr || '—')+'</div></div>\n'
+    + '        <div><span style="font-size:.75rem;color:'+LABEL+'">Date 1er match</span><div style="font-weight:600;font-size:.85rem;margin-top:2px;color:white">'+(p.dmStr || '—')+'</div></div>\n'
+    + '        <div><span style="font-size:.75rem;color:'+LABEL+'">Jours entraînement → 1er match</span>\n'
+    + '          <div style="font-size:1.5rem;font-weight:800;color:'+GOLD+';margin-top:2px">'+(p.dm && p.dr ? Math.floor((p.dm-p.dr)/86400000) : '—')+' jours</div></div>\n'
+    + '        <div><span style="font-size:.75rem;color:'+LABEL+'">Soins · Prévention</span>\n'
+    + '          <div style="font-weight:600;margin-top:2px;color:white">'+p.soins+' · '+p.prev+' <span style="font-size:.72rem;color:#E8E4F8">entretiens</span></div></div>\n'
+    + '        <div><span style="font-size:.75rem;color:'+LABEL+'">Focus prévention</span>\n'
+    + '          <div style="font-size:.8rem;margin-top:2px;color:white">'+p.focus+'</div></div>\n'
+    + '      </div>\n    </div>\n\n'
+    + '    <div class="card" style="text-align:center">\n'
+    + '      <div class="card-title" style="text-align:left">RRI — Indice de Retour Compétition /100</div>\n'
+    + '      <div style="font-size:.72rem;color:'+LABEL+';text-align:left;margin-bottom:10px">Score composite : Psychologie · Condition physique · Alertes médicales</div>\n'
+    + '      <div class="rri-score" style="color:'+col+'">'+p.rri+'<span style="font-size:1.2rem;color:#E8E4F8;font-weight:400">/100</span></div>\n'
+    + '      <div style="margin:8px auto;max-width:200px">\n'
+    + '        <div class="bar" style="height:10px"><div class="bar-fill" style="width:'+p.rri+'%;background:'+col+'"></div></div>\n'
+    + '      </div>\n'
+    + '      <span style="font-size:.8rem;font-weight:700;color:'+col+';border:2px solid '+col+';padding:3px 14px;border-radius:20px">'+stat+'</span>\n'
+    + '      <div style="margin-top:12px">\n'
+    + '        <button class="toggle-btn" onclick="toggle(\'rri-detail\')">▶ Détail des 8 composantes</button>\n'
+    + '      </div>\n'
+    + '      <div class="collapsible" id="rri-detail" style="margin-top:10px">\n'
+    + '        <table><thead><tr>\n'
+    + '          <th style="text-align:left;font-size:.72rem;color:#E8E4F8;padding:4px 8px">Composante</th>\n'
+    + '          <th style="font-size:.72rem;color:#E8E4F8;padding:4px 8px">Valeur</th>\n'
+    + '          <th style="font-size:.72rem;color:#E8E4F8;padding:4px 8px">Progression</th>\n'
+    + '          <th style="font-size:.72rem;color:#E8E4F8;padding:4px 8px">Score</th>\n'
+    + '        </tr></thead><tbody>'+rriRows+'</tbody></table>\n'
+    + '      </div>\n'
+    + '      <div style="display:flex;justify-content:center;gap:12px;margin-top:14px;font-size:.7rem">\n'
+    + '        <span style="color:'+GREEN2+'">● ≥80 PRÊT</span>\n'
+    + '        <span style="color:'+ORANGE+'">● 60-79 SURV.</span>\n'
+    + '        <span style="color:'+RED+'">● &lt;60 VIGIL.</span>\n'
+    + '      </div>\n    </div>\n\n'
+    + '    <div class="card" style="padding:8px">\n      <div style="min-height:180px">'+photoHtml+'</div>\n    </div>\n\n  </div>\n\n'
+    + '  <!-- ROW 2 : MOYENNES + IPRRS + COMPARAISON -->\n  <div class="grid-3">\n'
+    + '    <div class="card">\n      <div class="card-title">Moyennes sur 25 jours</div>\n'
+    + '      <div style="margin-bottom:10px">\n'
+    + '        <div style="display:flex;justify-content:space-between;align-items:baseline">\n'
+    + '          <span style="font-size:.75rem;color:'+LABEL+'">Douleur moyenne</span>\n'
+    + '          <span style="font-size:1rem;font-weight:800;color:'+doulCol+'">'+f1(p.doul)+'/10</span>\n'
+    + '        </div>\n'
+    + '        <div class="bar"><div class="bar-fill" style="width:'+Math.min(100,Math.trunc(p.doul*10))+'%;background:'+doulCol+'"></div></div>\n'
+    + '      </div>\n      <div style="margin-bottom:10px">\n'
+    + '        <div style="display:flex;justify-content:space-between;align-items:baseline">\n'
+    + '          <span style="font-size:.75rem;color:'+LABEL+'">Courbatures moyenne</span>\n'
+    + '          <span style="font-size:1rem;font-weight:800;color:'+crbCol+'">'+f1(p.crb)+'/10</span>\n'
+    + '        </div>\n'
+    + '        <div class="bar"><div class="bar-fill" style="width:'+Math.min(100,Math.trunc(p.crb*10))+'%;background:'+crbCol+'"></div></div>\n'
+    + '      </div>\n      <div>\n'
+    + '        <div style="display:flex;justify-content:space-between;align-items:baseline">\n'
+    + '          <span style="font-size:.75rem;color:'+LABEL+'">Fatigue moyenne</span>\n'
+    + '          <span style="font-size:1rem;font-weight:800;color:'+fatCol+'">'+f1(p.fat)+'/5</span>\n'
+    + '        </div>\n'
+    + '        <div class="bar"><div class="bar-fill" style="width:'+Math.min(100,Math.trunc(p.fat*20))+'%;background:'+fatCol+'"></div></div>\n'
+    + '      </div>\n    </div>\n\n'
+    + '    <div class="card">\n      <div class="card-title">IPRRS — Readiness retour compétition</div>\n'
+    + '      <div style="display:flex;align-items:center;gap:8px">\n'
+    + '        '+radarSvg(p.iprrsVals)+'\n'
+    + '        <div style="text-align:center">\n'
+    + '          <div style="font-size:2rem;font-weight:800;color:'+GREEN+'">'+f0(p.iprrsTotal)+'<span style="font-size:.9rem;color:#E8E4F8">/60</span></div>\n'
+    + '          <div style="font-size:.72rem;color:'+LABEL+'">Readiness compét.</div>\n'
+    + '          <button class="toggle-btn" onclick="toggle(\'iprrs-detail\')" style="margin-top:8px;font-size:.72rem">▶ Détail des 6 questions</button>\n'
+    + '        </div>\n      </div>\n'
+    + '      <div class="collapsible" id="iprrs-detail" style="margin-top:10px">\n'
+    + '        '+iprrsDetailHtml+'\n      </div>\n    </div>\n\n'
+    + '    <div class="card">\n      <div class="card-title">Évolution J+1 → J+25</div>\n      '+compHtml+'\n    </div>\n  </div>\n\n'
+    + '  <!-- ROW 3 : ALERTES -->\n  <div class="card section-full" style="margin-bottom:16px">\n'
+    + '      <div class="card-title">Alertes identifiées</div>\n      '+alHtml+'\n  </div>\n\n'
+    + '  <!-- ROW 3b : ÉVOLUTION RRI -->\n  <div class="card section-full" style="margin-bottom:16px">\n'
+    + '    <div class="card-title">■ Évolution du RRI séance par séance</div>\n'
+    + '    '+(rriEvolSvg
+        ? '<svg viewBox="0 0 700 130" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block"><rect width="700" height="130" fill="rgba(255,255,255,0.03)" rx="8"/>'+rriEvolSvg+'</svg>'
+        : '<div style="color:#E8E4F8;font-style:italic;font-size:.78rem;padding:12px">Données insuffisantes pour tracer la courbe (minimum 2 séances requises).</div>')+'\n'
+    + '    <div style="display:flex;gap:16px;margin-top:8px;font-size:.75rem">\n'
+    + '      <span style="color:'+GREEN2+'">● Zone PRÊT (≥80)</span>\n'
+    + '      <span style="color:'+ORANGE+'">● Zone SURVEILLANCE (60-79)</span>\n'
+    + '      <span style="color:'+RED+'">● Zone VIGILANCE (&lt;60)</span>\n'
+    + '    </div>\n  </div>\n\n'
+    + '  <!-- ROW 4 : TIMELINE -->\n  <div class="card section-full">\n'
+    + '    <div class="card-title">■ Frise chronologique — cliquez sur un point pour le détail</div>\n'
+    + '    '+timelineSvg+'\n'
+    + '    <div id="frise-info-box" style="display:none;margin-top:10px;padding:10px 14px;background:#2D2660;color:white;border-radius:8px;font-size:.82rem;font-weight:600;border:2px solid #C9A84C;line-height:1.5"></div>\n'
+    + '  </div>\n\n'
+    + '  <!-- ROW 4b : CHARGE MATCH CUMULÉE -->\n  <div class="card section-full" style="margin-bottom:16px">\n'
+    + '    <div class="card-title">■ Charge match cumulée — progression vers la cible saison</div>\n'
+    + '    <div style="display:flex;gap:20px;align-items:center;flex-wrap:wrap">\n'
+    + '      <div style="flex:1;min-width:200px">\n'
+    + '        <div style="display:flex;justify-content:space-between;margin-bottom:6px">\n'
+    + '          <span style="font-size:.75rem;color:'+LABEL+'">Minutes jouées</span>\n'
+    + '          <span style="font-size:.75rem;font-weight:700;color:'+chargeCol+'">'+tempsTotal+"' / "+cibleMinutes+"'"+'</span>\n'
+    + '        </div>\n'
+    + '        <div style="background:rgba(255,255,255,0.1);border-radius:8px;height:14px;overflow:hidden">\n'
+    + '          <div style="width:'+pctCharge+'%;height:100%;background:'+chargeCol+';border-radius:8px;transition:width .6s"></div>\n'
+    + '        </div>\n'
+    + '        <div style="display:flex;justify-content:space-between;margin-top:4px">\n'
+    + '          <span style="font-size:.72rem;color:#E8E4F8">0\'</span>\n'
+    + '          <span style="font-size:.75rem;font-weight:700;color:'+chargeCol+'">'+pctCharge+'% de la cible</span>\n'
+    + '          <span style="font-size:.72rem;color:#E8E4F8">'+cibleMinutes+"'"+'</span>\n'
+    + '        </div>\n      </div>\n'
+    + '      <div style="flex:1;min-width:200px">\n'
+    + '        <div style="font-size:.72rem;color:'+LABEL+';margin-bottom:6px;font-weight:600">Progression match par match</div>\n'
+    + '        <svg viewBox="0 0 500 70" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;overflow:visible">\n'
+    + '          <rect width="500" height="70" fill="rgba(255,255,255,0.05)" rx="4"/>\n'
+    + '          <line x1="0" y1="60" x2="500" y2="60" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>\n'
+    + '          '+chargeSvg+'\n        </svg>\n      </div>\n'
+    + '      <div style="background:rgba(255,255,255,0.06);border-radius:10px;padding:14px 18px;text-align:center;flex-shrink:0">\n'
+    + '        <div style="font-size:.72rem;color:'+LABEL+';margin-bottom:4px">Total cumulé</div>\n'
+    + '        <div style="font-size:2rem;font-weight:800;color:'+chargeCol+'">'+tempsTotal+"'"+'</div>\n'
+    + '        <div style="font-size:.72rem;color:'+LABEL+';margin-top:2px">'+p.matchs.length+' match'+(p.matchs.length !== 1 ? 's' : '')+'</div>\n'
+    + '      </div>\n    </div>\n  </div>\n\n'
+    + '  <!-- ROW 5 : TEMPS DE JEU -->\n  <div class="card section-full">\n'
+    + '    <div class="card-title">Temps de jeu — progression par match</div>\n'
+    + '    <div style="display:flex;gap:20px;align-items:flex-start">\n'
+    + '      <div style="flex:1">'+matchBars(p)+'</div>\n'
+    + '      <div style="background:rgba(255,255,255,0.06);border-radius:10px;padding:16px;text-align:center;min-width:120px">\n'
+    + '        <div style="font-size:.72rem;color:'+LABEL+';margin-bottom:6px">Total minutes jouées</div>\n'
+    + '        <div style="font-size:2.5rem;font-weight:800;color:'+GREEN+'">'+tempsTotal+"'"+'</div>\n'
+    + '        <div style="font-size:.72rem;color:'+LABEL+';margin-top:4px">'+p.matchs.length+' match'+(p.matchs.length !== 1 ? 's' : '')+'</div>\n'
+    + '      </div>\n    </div>\n  </div>\n\n</div>\n\n'
+    + '<!-- FOOTER -->\n<div class="footer">\n'
+    + '  <span>Bilan individuel — '+p.nom+' — TFC Cellule Performance & Réathlétisation — '+todayStr+'</span>\n'
+    + '  <span>PIERRICK BRIEND</span>\n</div>\n\n'
+    + '<script>\nfunction toggle(id){\n  var el=document.getElementById(id);\n  if(!el) return;\n'
+    + "  el.classList.toggle('open');\n  var btn=el.previousElementSibling;\n"
+    + "  if(btn && btn.classList.contains('toggle-btn'))\n"
+    + "    btn.textContent = el.classList.contains('open')\n"
+    + "      ? btn.textContent.replace('▶','▼')\n      : btn.textContent.replace('▼','▶');\n}\n"
+    + 'function showPopup(e, msg){\n  e.stopPropagation();\n'
+    + "  var box = document.getElementById('frise-info-box');\n  if(!box) return;\n"
+    + "  box.textContent = msg;\n  box.style.display = 'block';\n  box.style.opacity = '1';\n}\n"
+    + '<\/script>\n</body>\n</html>';
+}
+
+exports.generateBilanHTML = generateBilanHTML;
+exports.rsFullBilan = rsFull;
+})(typeof window !== 'undefined' ? (window.TFCBilan = {}) : module.exports);
+
+/* ═══════════════════════════════════════════════════════════════════
+   ONGLET GÉNÉRATION ODS — orchestration
+   (s'appuie sur TFCEngine / TFCReport / TFCBilan embarqués ci-dessus,
+    et sur ghGet/ghPut/manifest/seasonOf déjà présents dans admin.html)
+   ═══════════════════════════════════════════════════════════════════ */
+var odsData = null;          // données parsées du classeur
+var odsFileName = '';
+var genPlayers = [];         // joueurs construits pour la date de référence
+var genRd = null;            // date de référence (Date UTC)
+var repoImgCache = {};       // cache des images du dépôt (photos + logo)
+var tfcLogoCache = undefined; // undefined = pas encore cherché, null = introuvable
+
+function setupDropOds(){
+  var dz = document.getElementById('drop-ods');
+  if(!dz) return;
+  ['dragenter','dragover'].forEach(function(ev){ dz.addEventListener(ev, function(e){ e.preventDefault(); dz.classList.add('drag'); }); });
+  ['dragleave','drop'].forEach(function(ev){ dz.addEventListener(ev, function(e){ e.preventDefault(); dz.classList.remove('drag'); }); });
+  dz.addEventListener('drop', function(e){ if(e.dataTransfer.files.length) handleOdsFile(e.dataTransfer.files[0]); });
+}
+
+async function handleOdsFile(file){
+  if(!file) return;
+  var st = document.getElementById('ods-status');
+  if(!/\.ods$/i.test(file.name)){
+    st.className='publish-status err'; st.textContent='✗ Le fichier doit être un .ods'; return;
+  }
+  st.className='publish-status loading'; st.textContent='Lecture du fichier...';
+  try{
+    var buf = await file.arrayBuffer();
+    var wb = XLSX.read(buf, {type:'array', cellDates:true});
+    odsData = TFCEngine.loadWorkbook(wb, XLSX);
+    odsFileName = file.name;
+    var nS = odsData.S.length, nP = odsData.P.length, nA = odsData.A.length, nM = odsData.M.length;
+    st.className='publish-status ok';
+    st.textContent = '✓ ' + file.name + ' — ' + nP + ' profils · ' + nS + ' lignes de suivi · ' + nA + ' alertes · ' + nM + ' matchs';
+    document.getElementById('gen-analyse-row').style.display='';
+    document.getElementById('gen-preview-card').style.display='none';
+  } catch(e){
+    odsData = null;
+    st.className='publish-status err';
+    st.textContent = '✗ Lecture impossible : ' + e.message + ' — vérifiez que les 4 feuilles (PROFIL_JOUEURS, SUIVI_J+1_J+25, ALERTES, MATCHS) sont présentes.';
+  }
+}
+
+function genRefDate(){
+  var v = document.getElementById('gen-date').value;
+  if(!v) return null;
+  return new Date(v + 'T00:00:00Z');
+}
+
+function analyserODS(){
+  if(!odsData) return;
+  var rd = genRefDate();
+  var st = document.getElementById('gen-analyse-status');
+  if(!rd){ st.className='publish-status err'; st.textContent='✗ Choisissez une date de référence.'; return; }
+  genRd = rd;
+  var active = TFCEngine.getActive(odsData.S, rd);
+  genPlayers = TFCEngine.buildPlayers(active, odsData, rd);
+  var card = document.getElementById('gen-preview-card');
+  var tbody = document.getElementById('gen-players-body');
+  if(!genPlayers.length){
+    st.className='publish-status err';
+    st.textContent = '✗ Aucun joueur actif au ' + TFCEngine.ddmmyyyy(rd) + ' (aucune saisie de suivi dans les 5 jours précédents).';
+    card.style.display='none';
+    return;
+  }
+  st.className='publish-status ok';
+  st.textContent = '✓ ' + genPlayers.length + ' joueur(s) actif(s) au ' + TFCEngine.ddmmyyyy(rd);
+  var cols = {PRET:'#22C55E', SURVEILLANCE:'#FB923C', VIGILANCE:'#EF4444'};
+  tbody.innerHTML = genPlayers.map(function(p, i){
+    var statut = TFCReport.rsFull(p.rri);
+    var c = cols[statut.replace('Ê','E')] || '#888';
+    return '<tr style="border-bottom:1px solid #F0F0F0">'
+      + '<td style="padding:8px 10px"><input type="checkbox" class="gen-bilan-cb" data-idx="'+i+'" checked></td>'
+      + '<td style="padding:8px 10px;font-weight:700;color:#2D2660">'+p.nom+'</td>'
+      + '<td style="padding:8px 10px;font-size:.78rem;color:#666">'+p.cat+'</td>'
+      + '<td style="padding:8px 10px;font-weight:800;color:'+c+'">'+p.rri+'/100</td>'
+      + '<td style="padding:8px 10px"><span class="cat-badge" style="background:'+c+'">'+statut+'</span></td>'
+      + '<td style="padding:8px 10px;font-size:.78rem">'+(p.jp !== null ? 'J+'+p.jp : '—')+'</td>'
+      + '<td style="padding:8px 10px;font-size:.78rem;font-weight:600">'+p.temps+'</td>'
+      + '<td style="padding:8px 10px;font-size:.78rem">'+p.matchs.length+'</td>'
+      + '<td style="padding:8px 10px"><button onclick="apercuBilan('+i+')" style="padding:4px 10px;border:1.5px solid #2D2660;border-radius:6px;background:white;color:#2D2660;cursor:pointer;font-size:.72rem;font-weight:600">Aperçu bilan</button></td>'
+      + '</tr>';
+  }).join('');
+  card.style.display='block';
+  document.getElementById('gen-publish-status').textContent='';
+}
+
+// ── Images du dépôt (photos joueurs + logo TFC) ─────────────────────
+async function fetchRepoImage(path){
+  if(path in repoImgCache) return repoImgCache[path];
+  var out = null;
+  if(getToken()){
+    try{
+      var f = await ghGet(path);
+      if(f && f.content){
+        var ext = path.toLowerCase().split('.').pop();
+        var mime = ext==='png' ? 'image/png' : ext==='svg' ? 'image/svg+xml' : 'image/jpeg';
+        out = 'data:'+mime+';base64,' + f.content.replace(/\n/g,'');
+      }
+    } catch(e){}
+  }
+  repoImgCache[path] = out;
+  return out;
+}
+
+async function fetchTfcLogo(){
+  if(tfcLogoCache !== undefined) return tfcLogoCache;
+  var candidates = ['tfc_logo_transparent.png','logo.png','Logo.png','tfc.png'];
+  for(var i=0;i<candidates.length;i++){
+    var img = await fetchRepoImage(candidates[i]);
+    if(img){ tfcLogoCache = img; return img; }
+  }
+  tfcLogoCache = null;
+  return null;
+}
+
+async function attachPhotos(players){
+  for(var i=0;i<players.length;i++){
+    var p = players[i];
+    p.photo = await fetchRepoImage('photos/' + p.nom.replace(/ /g,'_') + '.jpg');
+  }
+}
+
+// ── Aperçus (ouverture locale, rien n'est publié) ───────────────────
+function openHtmlPreview(html){
+  var blob = new Blob([html], {type:'text/html'});
+  window.open(URL.createObjectURL(blob), '_blank');
+}
+
+async function apercuRapport(){
+  if(!genPlayers.length) return;
+  var st = document.getElementById('gen-publish-status');
+  st.className='publish-status loading'; st.textContent='Préparation de l\'aperçu (photos + logo)...';
+  var logo = await fetchTfcLogo();
+  await attachPhotos(genPlayers);
+  openHtmlPreview(TFCReport.generateReportHTML(genPlayers, genRd, logo));
+  st.className='publish-status ok'; st.textContent='✓ Aperçu du rapport ouvert dans un nouvel onglet (non publié).';
+}
+
+async function apercuBilan(idx){
+  var p = genPlayers[idx];
+  if(!p) return;
+  var st = document.getElementById('gen-publish-status');
+  st.className='publish-status loading'; st.textContent='Préparation de l\'aperçu bilan...';
+  var logo = await fetchTfcLogo();
+  var photo = await fetchRepoImage('photos/' + p.nom.replace(/ /g,'_') + '.jpg');
+  openHtmlPreview(TFCBilan.generateBilanHTML(p, genRd, photo, logo));
+  st.className='publish-status ok'; st.textContent='✓ Aperçu du bilan de '+p.nom+' ouvert (non publié).';
+}
+
+// ── Publication ─────────────────────────────────────────────────────
+async function publierGeneration(){
+  if(!genPlayers.length || !genRd) return;
+  if(!getToken()){ alert('Configurez d\'abord votre token GitHub.'); return; }
+  var doRapport = document.getElementById('gen-cb-rapport').checked;
+  var bilanIdx = Array.prototype.slice.call(document.querySelectorAll('.gen-bilan-cb'))
+    .filter(function(cb){ return cb.checked; })
+    .map(function(cb){ return parseInt(cb.dataset.idx, 10); });
+  if(!doRapport && !bilanIdx.length){ alert('Sélectionnez au moins le rapport ou un bilan.'); return; }
+
+  var st = document.getElementById('gen-publish-status');
+  var btn = document.getElementById('gen-publish-btn');
+  btn.disabled = true;
+
+  var dateStr = TFCEngine.ddmmyyyy(genRd);
+  var d = dateStr.replace(/\//g,'');
+
+  // Détection doublon rapport (même comportement que l'upload manuel)
+  if(doRapport && manifest['rapport_'+d+'.html']){
+    var ok = window.confirm('Un rapport du '+dateStr+' existe déjà en ligne.\n\nÉcraser ce rapport ?');
+    if(!ok){ btn.disabled=false; st.textContent=''; return; }
+  }
+
+  try{
+    st.className='publish-status loading';
+    st.textContent='Récupération des photos et du logo depuis le dépôt...';
+    var logo = await fetchTfcLogo();
+    await attachPhotos(genPlayers);
+
+    var publies = [];
+
+    if(doRapport){
+      st.textContent='Génération et publication du rapport...';
+      var html = TFCReport.generateReportHTML(genPlayers, genRd, logo);
+      var filename = 'rapports/rapport_'+d+'.html';
+      var existing = await ghGet(filename);
+      var okPut = await ghPut(filename, html, existing ? existing.sha : null);
+      if(!okPut) throw new Error('Échec upload rapport');
+      var statuts = {'PRÊT':0,'SURVEILLANCE':0,'VIGILANCE':0};
+      var joueurs = genPlayers.map(function(p){
+        var s = TFCReport.rsFull(p.rri);
+        statuts[s]++;
+        return {nom: p.nom, statut: s};
+      });
+      var cats = [];
+      genPlayers.forEach(function(p){ if(p.cat && p.cat !== '—' && cats.indexOf(p.cat) < 0) cats.push(p.cat); });
+      cats.sort();
+      manifest['rapport_'+d+'.html'] = {
+        date: dateStr, categories: cats, players: genPlayers.length,
+        statuts: statuts, joueurs: joueurs, saison: seasonOf(dateStr)
+      };
+      publies.push('rapport du '+dateStr);
+    }
+
+    for(var k=0;k<bilanIdx.length;k++){
+      var p = genPlayers[bilanIdx[k]];
+      st.textContent='Publication bilan '+(k+1)+'/'+bilanIdx.length+' — '+p.nom+'...';
+      var bhtml = TFCBilan.generateBilanHTML(p, genRd, p.photo, logo);
+      var nomFichier = 'Bilan_'+p.nom.replace(/ /g,'_')+'.html';
+      var bfile = 'bilans/'+nomFichier;
+      var bex = await ghGet(bfile);
+      var okB = await ghPut(bfile, bhtml, bex ? bex.sha : null);
+      if(!okB) throw new Error('Échec upload bilan '+p.nom);
+      manifest['bilan_'+nomFichier] = {
+        joueur: p.nom,
+        cat: p.cat === '—' ? '' : p.cat,
+        statut: TFCReport.rsFull(p.rri),
+        rri: String(p.rri),
+        date: dateStr,
+        jp: p.jp !== null ? String(p.jp) : '',
+        dateFinProto: p.dm ? TFCEngine.ddmmyyyy(TFCEngine.addDays(p.dm, 25)) : '',
+        fichier: nomFichier, type: 'bilan', saison: seasonOf(dateStr)
+      };
+      publies.push('bilan '+p.nom);
+    }
+
+    st.textContent='Mise à jour du manifest...';
+    await saveManifest();
+    await loadManifest();
+    await loadBilans();
+
+    st.className='publish-status ok';
+    st.textContent='✓ Publié : '+publies.join(' · ')+' — déploiement GitHub Pages en cours (1-2 min).';
+    showToast('✓ '+publies.length+' document(s) publié(s)');
+  } catch(e){
+    st.className='publish-status err';
+    st.textContent='✗ Erreur : '+e.message;
+  }
+  btn.disabled = false;
+}
+
+document.addEventListener('DOMContentLoaded', function(){
+  setupDropOds();
+  var gd = document.getElementById('gen-date');
+  if(gd && !gd.value){ var t=new Date(); gd.value = t.toISOString().slice(0,10); }
+});
 </script>
 <div class="toast" id="toast"></div>
 </body>
