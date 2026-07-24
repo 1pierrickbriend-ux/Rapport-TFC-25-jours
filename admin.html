@@ -186,6 +186,38 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);min-height
       </div>
     </div>
   </div>
+  <!-- PHOTOS JOUEURS -->
+  <div class="card">
+    <div class="card-title">📸 Photos joueurs</div>
+    <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+      <select id="photo-player-select" onchange="onPhotoPlayerChange()" style="flex:1;min-width:180px;padding:10px 14px;border:1.5px solid #DDD;border-radius:8px;font-size:.82rem;background:white;color:#333">
+        <option value="">— Choisir un joueur —</option>
+        <option value="__custom__">Autre (saisir un nom)</option>
+      </select>
+      <input type="text" id="photo-player-custom" placeholder="Prénom Nom" style="display:none;flex:1;min-width:180px;padding:10px 14px;border:1.5px solid #DDD;border-radius:8px;font-size:.82rem">
+    </div>
+    <div class="drop-zone" id="drop-zone-photo" onclick="document.getElementById('file-input-photo').click()">
+      <input type="file" id="file-input-photo" accept="image/*" onchange="handlePhotoFile(this.files[0])">
+      <div class="drop-zone-icon">🖼️</div>
+      <div class="drop-zone-text">Glissez une photo ici ou cliquez pour choisir</div>
+      <div class="drop-zone-sub">JPG ou PNG — redimensionnée et compressée automatiquement</div>
+    </div>
+    <div class="preview-card" id="photo-preview-card" style="display:none">
+      <div class="preview-row">
+        <img id="photo-preview-img" style="width:56px;height:68px;object-fit:cover;border-radius:8px;flex-shrink:0;background:#EEE"/>
+        <div class="preview-info">
+          <div class="preview-date">Aperçu</div>
+          <div class="preview-meta" id="photo-preview-name">Vérifiez le joueur sélectionné avant publication</div>
+        </div>
+      </div>
+      <div class="publish-row">
+        <button class="btn btn-primary" id="photo-upload-btn" onclick="uploadPhoto()">✓ Publier la photo</button>
+        <span class="publish-status" id="photo-upload-status"></span>
+      </div>
+    </div>
+    <div id="photo-gallery" style="display:flex;flex-wrap:wrap;gap:12px;margin-top:16px"></div>
+  </div>
+
   <div id="alerte-fin-proto" style="display:none;background:#FFF7ED;border:1.5px solid #FB923C;border-radius:10px;padding:12px 16px;margin-bottom:12px">
     <div style="font-size:.75rem;font-weight:800;color:#C2410C;margin-bottom:6px">&#9888;&#65039; Protocole d&eacute;pass&eacute; &mdash; bilan &agrave; reg&eacute;n&eacute;rer</div>
     <div id="alerte-fin-proto-list" style="display:flex;flex-direction:column;gap:4px"></div>
@@ -390,6 +422,8 @@ async function loadManifest(){
     manifest = r.ok ? await r.json() : {};
   } catch{ manifest = {}; }
   loadReports();
+  populatePhotoSelect();
+  buildPhotoGallery();
 }
 
 async function saveManifest(){
@@ -620,6 +654,12 @@ document.addEventListener('DOMContentLoaded', function(){
   dz.addEventListener('dragover',function(e){e.preventDefault();dz.classList.add('drag-over');});
   dz.addEventListener('dragleave',function(){dz.classList.remove('drag-over');});
   dz.addEventListener('drop',function(e){e.preventDefault();dz.classList.remove('drag-over');var f=e.dataTransfer.files[0];if(f&&f.name.endsWith('.html'))handleBilan(f);});
+  var dzp=document.getElementById('drop-zone-photo');
+  if(dzp){
+    dzp.addEventListener('dragover',function(e){e.preventDefault();dzp.classList.add('drag-over');});
+    dzp.addEventListener('dragleave',function(){dzp.classList.remove('drag-over');});
+    dzp.addEventListener('drop',function(e){e.preventDefault();dzp.classList.remove('drag-over');var f=e.dataTransfer.files[0];if(f&&f.type.indexOf('image/')===0)handlePhotoFile(f);});
+  }
 });
 
 var currentBilanFile=null, currentBilanMeta=null;
@@ -710,6 +750,118 @@ async function loadBilans(){
       alerteBox.style.display='none';
     }
   } catch(e){ list.innerHTML='<div class="empty-list">Erreur : '+e.message+'</div>'; }
+}
+
+// ── PHOTOS JOUEURS ───────────────────────────────────────────────────────────
+var currentPhotoFile = null;
+
+function populatePhotoSelect(){
+  var sel = document.getElementById('photo-player-select');
+  if(!sel) return;
+  var current = sel.value;
+  var joueurs = Object.keys(manifest)
+    .filter(function(k){ return manifest[k].type==='bilan'; })
+    .map(function(k){ return manifest[k].joueur; })
+    .filter(Boolean);
+  var unique = [...new Set(joueurs)].sort();
+  sel.innerHTML = '<option value="">— Choisir un joueur —</option>'
+    + unique.map(function(j){ return '<option value="'+j+'">'+j+'</option>'; }).join('')
+    + '<option value="__custom__">Autre (saisir un nom)</option>';
+  if(current) sel.value = current;
+}
+
+function onPhotoPlayerChange(){
+  var sel = document.getElementById('photo-player-select');
+  var custom = document.getElementById('photo-player-custom');
+  custom.style.display = sel.value==='__custom__' ? '' : 'none';
+}
+
+function handlePhotoFile(file){
+  if(!file) return;
+  currentPhotoFile = file;
+  var reader = new FileReader();
+  reader.onload = function(e){
+    document.getElementById('photo-preview-img').src = e.target.result;
+    document.getElementById('photo-preview-card').style.display = 'block';
+    document.getElementById('photo-upload-status').textContent = '';
+  };
+  reader.readAsDataURL(file);
+}
+
+function loadImageFromFile(file){
+  return new Promise(function(resolve, reject){
+    var img = new Image();
+    img.onload = function(){ resolve(img); };
+    img.onerror = reject;
+    img.src = URL.createObjectURL(file);
+  });
+}
+
+async function fileToJpegArrayBuffer(file, maxDim, quality){
+  maxDim = maxDim || 500; quality = quality || .85;
+  var img = await loadImageFromFile(file);
+  var w = img.naturalWidth, h = img.naturalHeight;
+  if(w >= h && w > maxDim){ h = Math.round(h*maxDim/w); w = maxDim; }
+  else if(h > w && h > maxDim){ w = Math.round(w*maxDim/h); h = maxDim; }
+  var canvas = document.createElement('canvas');
+  canvas.width = w; canvas.height = h;
+  canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+  var blob = await new Promise(function(res){ canvas.toBlob(res, 'image/jpeg', quality); });
+  return blob.arrayBuffer();
+}
+
+async function uploadPhoto(){
+  if(!getToken()){ alert('Configurez d\'abord votre token GitHub.'); return; }
+  var sel = document.getElementById('photo-player-select').value;
+  var custom = document.getElementById('photo-player-custom').value.trim();
+  var joueur = sel==='__custom__' ? custom : sel;
+  if(!joueur){ alert('Choisissez ou saisissez le nom du joueur.'); return; }
+  if(!currentPhotoFile){ alert('Choisissez une photo.'); return; }
+  var st = document.getElementById('photo-upload-status');
+  var btn = document.getElementById('photo-upload-btn');
+  btn.disabled = true;
+  st.className = 'publish-status loading';
+  st.textContent = "Traitement de l'image...";
+  try{
+    var arrayBuffer = await fileToJpegArrayBuffer(currentPhotoFile);
+    var filename = 'photos/' + joueur.replace(/ /g,'_') + '.jpg';
+    st.textContent = 'Envoi vers GitHub...';
+    var existing = await ghGet(filename);
+    var sha = existing ? existing.sha : null;
+    var ok = await ghPutBinary(filename, arrayBuffer, sha);
+    if(!ok) throw new Error("Échec de l'envoi vers GitHub");
+    st.className = 'publish-status ok';
+    st.textContent = '✓ Photo publiée pour ' + joueur;
+    showToast('✓ Photo mise à jour');
+    currentPhotoFile = null;
+    document.getElementById('file-input-photo').value = '';
+    buildPhotoGallery();
+  } catch(e){
+    st.className = 'publish-status err';
+    st.textContent = '✗ Erreur : ' + e.message;
+  }
+  btn.disabled = false;
+}
+
+function buildPhotoGallery(){
+  var gallery = document.getElementById('photo-gallery');
+  if(!gallery) return;
+  var joueurs = [...new Set(Object.keys(manifest)
+    .filter(function(k){ return manifest[k].type==='bilan'; })
+    .map(function(k){ return manifest[k].joueur; })
+    .filter(Boolean))].sort();
+  if(!joueurs.length){ gallery.innerHTML = '<div class="empty-list">Aucun joueur dans les bilans pour le moment.</div>'; return; }
+  gallery.innerHTML = joueurs.map(function(j){
+    var photoName = j.replace(/ /g,'_');
+    var initiales = j.split(' ').map(function(w){ return w[0]||''; }).join('').slice(0,2).toUpperCase();
+    return '<div style="width:76px;text-align:center">'
+      + '<div style="width:60px;height:72px;border-radius:8px;overflow:hidden;background:var(--mid);display:flex;align-items:center;justify-content:center;margin:0 auto 4px">'
+      + '<img src="'+RAW+'/photos/'+photoName+'.jpg?t='+Date.now()+'" alt="'+j+'" style="width:100%;height:100%;object-fit:cover" '
+      + 'onerror="this.style.display=\'none\';this.parentNode.innerHTML=\'<span style=&quot;font-size:14px;font-weight:700;color:white&quot;>'+initiales+'</span>\'">'
+      + '</div>'
+      + '<div style="font-size:.62rem;color:#555;line-height:1.2">'+j+'</div>'
+      + '</div>';
+  }).join('');
 }
 
 function askDeleteBilan(name,sha,joueur){
