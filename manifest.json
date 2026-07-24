@@ -381,5 +381,17 @@
       }
     ],
     "saison": "2025-2026"
+  },
+  "rapport_24072026.html": {
+    "date": "24/07/2026",
+    "categories": [],
+    "players": 0,
+    "statuts": {
+      "PRÊT": 0,
+      "SURVEILLANCE": 0,
+      "VIGILANCE": 0
+    },
+    "joueurs": [],
+    "saison": "2026-2027"
   }
 }
