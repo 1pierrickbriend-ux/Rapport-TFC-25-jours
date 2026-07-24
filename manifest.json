@@ -103,10 +103,12 @@
   },
   "bilan_Bilan_Wassim_Dardake.html": {
     "joueur": "Wassim Dardake",
-    "cat": "U19",
-    "statut": "PRÊT",
-    "rri": "80",
-    "date": "09/06/2026",
+    "cat": "",
+    "statut": "",
+    "rri": "",
+    "date": "",
+    "jp": "",
+    "dateFinProto": "",
     "fichier": "Bilan_Wassim_Dardake.html",
     "type": "bilan"
   },
