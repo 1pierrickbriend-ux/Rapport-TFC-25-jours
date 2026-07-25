@@ -977,8 +977,10 @@ function askDeleteBilan(name,sha,joueur){
         <select id="q-joueur" onchange="buildQuotidienForm()" style="flex:1;min-width:220px;padding:10px 12px;border:1.5px solid #DDD;border-radius:10px;font-size:.85rem;font-weight:600"></select>
         <input type="date" id="q-date" onchange="buildQuotidienForm()" style="padding:10px 12px;border:1.5px solid #DDD;border-radius:10px;font-size:.82rem">
       </div>
+      <div id="q-dayboard" style="margin-bottom:14px"></div>
       <div id="q-existing" style="font-size:.78rem;margin-bottom:12px"></div>
       <div id="q-form" style="display:none"></div>
+      <div id="q-actions" style="margin-top:14px"></div>
     </div>
   </div>
 
@@ -1104,7 +1106,7 @@ function askDeleteBilan(name,sha,joueur){
 
   <div class="card" style="margin-bottom:16px">
     <div class="card-title">📡 Source des données</div>
-    <div style="font-size:.78rem;color:#666;margin-bottom:10px">Génère directement depuis vos saisies en ligne (suivi_data.json) — plus besoin d'importer quoi que ce soit.</div>
+    <div style="font-size:.78rem;color:#666;margin-bottom:10px">Le rapport et les bilans se génèrent ici à partir de vos saisies en ligne, puis se publient : ils deviennent alors visibles par le staff sur le portail (index.html) et dans les onglets Rapports / Bilans.</div>
     <button onclick="chargerDepuisStore()" style="padding:11px 22px;border:none;border-radius:10px;background:#2D2660;color:white;font-weight:800;font-size:.82rem;cursor:pointer">📡 Charger les données en ligne</button>
   </div>
 
@@ -3223,6 +3225,9 @@ function findSuivi(joueur, dateIso){
 }
 
 function buildQuotidienForm(){
+  renderDayBoard();
+  var qa = document.getElementById('q-actions');
+  if(qa) qa.innerHTML = '';
   var wrap = document.getElementById('q-form');
   var joueur = qSelectedPlayer();
   wrap.style.display = '';
@@ -3303,7 +3308,70 @@ async function saveQuotidien(){
       commentaire:com});
   }
   var ok = await storeSave('Saisie '+joueur+' — '+frOfIso(dateIso));
-  if(ok) buildQuotidienForm();
+  if(ok){
+    buildQuotidienForm();
+    var profils = storeData.profils;
+    var faits = profils.filter(function(p){ return findSuivi(p.joueur, dateIso); }).length;
+    var manquants = profils.map(function(p){ return p.joueur; }).filter(function(j){ return !findSuivi(j, dateIso); });
+    var qa = document.getElementById('q-actions');
+    var html = '<div style="background:#F0FDF4;border:1.5px solid #22C55E;border-radius:12px;padding:14px 16px">'
+      + '<div style="font-size:.82rem;font-weight:800;color:#15803D;margin-bottom:6px">\u2713 Saisie de '+joueur+' enregistr\u00E9e sur GitHub</div>'
+      + '<div style="font-size:.75rem;color:#333;margin-bottom:10px">'+faits+'/'+profils.length+' joueur(s) saisi(s) pour le '+frOfIso(dateIso)+'.'
+      + (manquants.length ? ' Manquant(s) : '+manquants.map(function(j){ return j.split(' ').pop(); }).join(', ')+'.' : ' Journ\u00E9e compl\u00E8te \u2713')+'</div>'
+      + '<div style="display:flex;gap:10px;flex-wrap:wrap">';
+    if(manquants.length){
+      html += '<button onclick="qPickPlayer(\''+manquants[0].replace(/'/g,"\\'")+'\')" style="padding:10px 18px;border:none;border-radius:10px;background:#2D2660;color:white;font-weight:800;font-size:.78rem;cursor:pointer">\u27A1\uFE0F Joueur suivant : '+manquants[0].split(' ').pop()+'</button>';
+    }
+    html += '<button onclick="genererRapportDuJour(\''+dateIso+'\')" style="padding:10px 18px;border:1.5px solid #2D2660;border-radius:10px;background:white;color:#2D2660;font-weight:800;font-size:.78rem;cursor:pointer">\u2699\uFE0F G\u00E9n\u00E9rer le rapport du '+frOfIso(dateIso)+'</button>'
+      + '</div></div>';
+    qa.innerHTML = html;
+    qa.scrollIntoView({behavior:'smooth', block:'nearest'});
+  }
+}
+
+
+// ── Tableau de bord du jour : qui est saisi, qui manque ─────────────
+function renderDayBoard(){
+  var box = document.getElementById('q-dayboard');
+  if(!box || !storeData) return;
+  var dateIso = qDate();
+  var cur = qSelectedPlayer();
+  var profils = storeData.profils.slice().sort(function(a,b){ return a.joueur.localeCompare(b.joueur); });
+  if(!profils.length){ box.innerHTML=''; return; }
+  var faits = 0;
+  var chips = profils.map(function(p){
+    var e = findSuivi(p.joueur, dateIso);
+    if(e) faits++;
+    var sel = p.joueur === cur;
+    var bg = e ? (sel ? '#15803D' : '#DCFCE7') : (sel ? '#2D2660' : '#F3F0FC');
+    var fg = e ? (sel ? 'white' : '#15803D') : (sel ? 'white' : '#6B5CA5');
+    var bd = sel ? (e ? '#15803D' : '#2D2660') : 'transparent';
+    return '<button onclick="qPickPlayer(\''+p.joueur.replace(/'/g,"\\'")+'\')" '
+      + 'style="padding:7px 12px;border-radius:18px;border:2px solid '+bd+';background:'+bg+';color:'+fg+';cursor:pointer;font-size:.74rem;font-weight:700;display:inline-flex;align-items:center;gap:5px">'
+      + (e ? '\u2713' : '\u25CB') + ' ' + p.joueur.split(' ').pop()
+      + (e ? ' <span style="font-weight:400;opacity:.8">D'+e.douleur+'</span>' : '')
+      + '</button>';
+  }).join(' ');
+  box.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px">'
+    + '<span style="font-size:.72rem;font-weight:800;color:#6B5CA5;text-transform:uppercase;letter-spacing:.05em">Saisies du '+frOfIso(dateIso)+'</span>'
+    + '<span style="font-size:.74rem;font-weight:700;color:'+(faits===profils.length?'#15803D':'#B45309')+'">'+faits+'/'+profils.length+' joueur(s) saisi(s)</span></div>'
+    + '<div style="display:flex;flex-wrap:wrap;gap:6px">'+chips+'</div>';
+}
+
+function qPickPlayer(nom){
+  var sel = document.getElementById('q-joueur');
+  if(sel){ sel.value = nom; }
+  buildQuotidienForm();
+}
+
+// ── Raccourci : générer le rapport de la date saisie en un clic ─────
+async function genererRapportDuJour(dateIso){
+  showTab('generation');
+  await chargerDepuisStore();
+  var gd = document.getElementById('gen-date');
+  if(gd && dateIso) gd.value = dateIso;
+  analyserODS();
+  window.scrollTo({top:0, behavior:'smooth'});
 }
 
 // ═══ 2. JOUEURS ═════════════════════════════════════════════════════
