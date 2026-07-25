@@ -1499,12 +1499,13 @@ function buildPlayer(joueur, data, rd){
   var temps = palier ? (RECO[palier + nk] || '20 min') : '20 min';
 
   // Données du jour (dernière ligne toutes dates confondues)
-  var dj = {doul:'—', fat:'—', crb:'—'};
+  var dj = {doul:'—', fat:'—', crb:'—', doulZone:'', crbZone:'', crbLat:''};
   if (df.length){
     var maxT = Math.max.apply(null, df.map(function(r){ return r.Date ? r.Date.getTime() : -Infinity; }));
     var today = df.filter(function(r){ return r.Date && r.Date.getTime() === maxT; })[0];
     if (today){
-      dj = {doul: Math.trunc(today.Douleur), fat: Math.trunc(today.Fatigue), crb: Math.trunc(today.Courbatures)};
+      dj = {doul: Math.trunc(today.Douleur), fat: Math.trunc(today.Fatigue), crb: Math.trunc(today.Courbatures),
+            doulZone: today.DouleurZone || '', crbZone: today.CourbaturesZone || '', crbLat: today.CourbaturesLateralite || ''};
     }
   }
 
@@ -1917,12 +1918,14 @@ function ficheModal(p, rd){
     + '     <div class="today-lbl">Douleur</div>\n'
     + '     <div style="display:flex;align-items:baseline;gap:4px"><span class="today-val" style="color:'+dc(doulD)+'">'+dj.doul+'</span><span class="today-max">/10</span></div>\n'
     + '     <div class="bar sm" style="margin-bottom:8px"><div class="bar-fill" style="width:'+Math.min(100,Math.trunc(doulD*10))+'%;background:'+dc(doulD)+'"></div></div>\n'
+    + (dj.doulZone ? '     <div style="font-size:.64rem;color:#888;margin:-5px 0 8px">\uD83D\uDCCD '+dj.doulZone+'</div>\n' : '')
     + '     <div class="today-lbl">Fatigue</div>\n'
     + '     <div style="display:flex;align-items:baseline;gap:4px"><span class="today-val" style="color:'+MID+'">'+dj.fat+'</span><span class="today-max">/10</span></div>\n'
     + '     <div class="bar sm" style="margin-bottom:8px"><div class="bar-fill" style="width:'+Math.min(100,Math.trunc(fatD*10))+'%;background:'+MID+'"></div></div>\n'
     + '     <div class="today-lbl">Courbatures</div>\n'
     + '     <div style="display:flex;align-items:baseline;gap:4px"><span class="today-val" style="color:'+ORANGE+'">'+dj.crb+'</span><span class="today-max">/10</span></div>\n'
     + '     <div class="bar sm"><div class="bar-fill" style="width:'+Math.min(100,Math.trunc(crbD*10))+'%;background:'+ORANGE+'"></div></div>\n'
+    + ((dj.crbZone || dj.crbLat) ? '     <div style="font-size:.64rem;color:'+(String(dj.crbLat).indexOf('Unilat')===0 ? ORANGE : '#888')+';margin-top:3px;font-weight:'+(String(dj.crbLat).indexOf('Unilat')===0 ? '700' : '400')+'">\uD83D\uDCCD '+[dj.crbZone, dj.crbLat].filter(Boolean).join(' \u00B7 ')+'</div>\n' : '')
     + '    </div>\n   </div>\n'
     + '   <div class="fm-conf">\n'
     + '    <span class="fm-conf-title">Indice de confiance</span>\n'
@@ -2809,7 +2812,10 @@ function jsonToEngine(json){
       Prevention: num0(s.prevention),
       ConfiancePhysique: numOrNull(s.confiancePhysique),
       ConfianceMentale: numOrNull(s.confianceMentale),
-      Commentaire: s.commentaire || null
+      Commentaire: s.commentaire || null,
+      DouleurZone: s.douleurZone || '',
+      CourbaturesZone: s.courbaturesZone || '',
+      CourbaturesLateralite: s.courbaturesLateralite || ''
     };
   });
 
