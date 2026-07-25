@@ -1,5 +1,5 @@
 {
- "version": 2,
+ "version": 3,
  "profils": [
   {
    "joueur": "Frederique Efuele",
@@ -17,7 +17,8 @@
     0,
     0,
     0
-   ]
+   ],
+   "etatSuivi": "en_cours"
   }
  ],
  "suivi": [
@@ -32,7 +33,10 @@
    "prevention": 2,
    "confiancePhysique": 5,
    "confianceMentale": 4,
-   "commentaire": ""
+   "commentaire": "",
+   "douleurZone": "",
+   "courbaturesZone": "",
+   "courbaturesLateralite": ""
   }
  ],
  "alertes": [],
