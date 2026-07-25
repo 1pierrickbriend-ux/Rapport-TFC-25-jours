@@ -75,14 +75,5 @@
   }
  ],
  "alertes": [],
- "matchs": [
-  {
-   "id": "m_ms06765g_1ao",
-   "date": "2026-07-25",
-   "joueur": "Darren Bique",
-   "adversaire": "Blagnac",
-   "temps": 45,
-   "categorie": "N2"
-  }
- ]
+ "matchs": []
 }
