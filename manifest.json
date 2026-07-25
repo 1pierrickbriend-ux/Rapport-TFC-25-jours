@@ -393,5 +393,52 @@
     },
     "joueurs": [],
     "saison": "2026-2027"
+  },
+  "rapport_25072026.html": {
+    "date": "25/07/2026",
+    "categories": [
+      "N2"
+    ],
+    "players": 2,
+    "statuts": {
+      "PRÊT": 0,
+      "SURVEILLANCE": 1,
+      "VIGILANCE": 1
+    },
+    "joueurs": [
+      {
+        "nom": "Frederique Efuele",
+        "statut": "VIGILANCE"
+      },
+      {
+        "nom": "Darren Bique",
+        "statut": "SURVEILLANCE"
+      }
+    ],
+    "saison": "2026-2027"
+  },
+  "bilan_Bilan_Frederique_Efuele.html": {
+    "joueur": "Frederique Efuele",
+    "cat": "N2",
+    "statut": "VIGILANCE",
+    "rri": "24",
+    "date": "25/07/2026",
+    "jp": "",
+    "dateFinProto": "",
+    "fichier": "Bilan_Frederique_Efuele.html",
+    "type": "bilan",
+    "saison": "2026-2027"
+  },
+  "bilan_Bilan_Darren_Bique.html": {
+    "joueur": "Darren Bique",
+    "cat": "N2",
+    "statut": "SURVEILLANCE",
+    "rri": "79",
+    "date": "25/07/2026",
+    "jp": "",
+    "dateFinProto": "",
+    "fichier": "Bilan_Darren_Bique.html",
+    "type": "bilan",
+    "saison": "2026-2027"
   }
 }
