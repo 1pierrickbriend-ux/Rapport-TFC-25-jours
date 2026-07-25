@@ -1152,7 +1152,7 @@ function askDeleteBilan(name,sha,joueur){
 
 </div>
 <script>
-/* ══ MOTEUR TFC EMBARQUÉ (validé contre les scripts Python d'origine ; fatigue /10 depuis v2) ══ */
+/* ══ MOTEUR TFC EMBARQUÉ (validé contre les scripts Python d'origine ; schéma v3) ══ */
 /* ═══════════════════════════════════════════════════════════════════
    TFC — Moteur ODS unifié (port JavaScript des scripts Python)
    Décisions validées :
@@ -2685,9 +2685,14 @@ function numOrNull(v){
 }
 function genId(prefix, i){ return prefix + '_' + Date.now().toString(36) + '_' + i; }
 
+function deriveEtatSuivi(statut){
+  var t = String(statut || '').toLowerCase();
+  return (t.indexOf('termin') >= 0 || t.indexOf('arret') >= 0 || t.indexOf('arrêt') >= 0) ? 'termine' : 'en_cours';
+}
+
 // ── ODS (déjà parsé par loadWorkbook) → JSON de stockage ─────────────
 function odsToJson(data){
-  var out = {version: 2, profils: [], suivi: [], alertes: [], matchs: []};  // v2 : fatigue sur /10
+  var out = {version: 3, profils: [], suivi: [], alertes: [], matchs: []};  // v2 : fatigue /10 ; v3 : etatSuivi + zones
 
   // Profils : un par joueur, la DERNIÈRE ligne gagne (comportement identique au moteur/pidx)
   var byPlayer = {};
@@ -2720,7 +2725,8 @@ function odsToJson(data){
       pointsVigilance: cleanStr(r['Points de vigilance']),
       dateReprise: isoOf(dr),
       datePremierMatch: isoOf(dm),
-      iprrs: iprrs.slice(0,6)
+      iprrs: iprrs.slice(0,6),
+      etatSuivi: deriveEtatSuivi(etat)
     });
   });
 
@@ -2738,7 +2744,8 @@ function odsToJson(data){
       prevention: num0(r.Prevention),
       confiancePhysique: numOrNull(r.ConfiancePhysique),
       confianceMentale: numOrNull(r.ConfianceMentale),
-      commentaire: cleanStr(r.Commentaire)
+      commentaire: cleanStr(r.Commentaire),
+      douleurZone: '', courbaturesZone: '', courbaturesLateralite: ''
     });
   });
 
@@ -2836,12 +2843,23 @@ function jsonToEngine(json){
 }
 
 function upgradeStore(json){
+  var upgraded = false;
   if(!json.version || json.version < 2){
     (json.suivi || []).forEach(function(x){ x.fatigue = num0(x.fatigue) * 2; });
-    json.version = 2;
-    return true;
+    json.version = 2; upgraded = true;
   }
-  return false;
+  if(json.version < 3){
+    (json.profils || []).forEach(function(p){
+      if(!p.etatSuivi) p.etatSuivi = deriveEtatSuivi(p.statutProtocole);
+    });
+    (json.suivi || []).forEach(function(x){
+      if(x.douleurZone === undefined) x.douleurZone = '';
+      if(x.courbaturesZone === undefined) x.courbaturesZone = '';
+      if(x.courbaturesLateralite === undefined) x.courbaturesLateralite = '';
+    });
+    json.version = 3; upgraded = true;
+  }
+  return upgraded;
 }
 
 exports.upgradeStore = upgradeStore;
@@ -3105,7 +3123,35 @@ var storeLoaded = false;
 var saisieSub = 'quotidien';
 var editAlerteId = null, editMatchId = null, editJoueurNom = null;
 
-function emptyStore(){ return {version:2, profils:[], suivi:[], alertes:[], matchs:[]}; }
+function emptyStore(){ return {version:3, profils:[], suivi:[], alertes:[], matchs:[]}; }
+
+var MUSCLE_ZONES = {
+  'Bas du corps': ['Quadriceps','Ischio-jambiers','Adducteurs','Mollet (triceps sural)','Fessiers',
+                   'Psoas / fléchisseurs de hanche','TFL','Tibial antérieur','Aine / pubis',
+                   'Genou','Cheville','Pied / voûte plantaire'],
+  'Tronc': ['Lombaires','Abdominaux','Obliques','Dorsaux'],
+  'Haut du corps': ['Pectoraux','Épaule','Cervicales','Bras / avant-bras'],
+  'Autre': ['Autre zone']
+};
+var LATERALITES = ['Bilatéral','Unilatéral gauche','Unilatéral droit'];
+
+function zoneSelectHtml(id, selected, placeholder){
+  var h = '<select id="'+id+'" onchange="qSelChange(\''+id+'\')" style="width:100%;padding:9px 10px;border:1.5px solid #DDD;border-radius:8px;font-size:.78rem;background:white">';
+  h += '<option value="">'+placeholder+'</option>';
+  Object.keys(MUSCLE_ZONES).forEach(function(g){
+    h += '<optgroup label="'+g+'">';
+    MUSCLE_ZONES[g].forEach(function(z){
+      h += '<option value="'+z+'"'+(selected===z?' selected':'')+'>'+z+'</option>';
+    });
+    h += '</optgroup>';
+  });
+  return h + '</select>';
+}
+
+function profilsActifs(){
+  return storeData.profils.filter(function(p){ return p.etatSuivi !== 'termine'; })
+    .sort(function(a,b){ return a.joueur.localeCompare(b.joueur); });
+}
 
 // ── Chargement / sauvegarde ─────────────────────────────────────────
 async function storeLoad(silent){
@@ -3208,7 +3254,7 @@ function qDate(){ var d=document.getElementById('q-date'); return d && d.value ?
 function renderQuotidien(){
   var sel = document.getElementById('q-joueur');
   var current = sel.value;
-  var profils = storeData.profils.slice().sort(function(a,b){ return a.joueur.localeCompare(b.joueur); });
+  var profils = profilsActifs();
   sel.innerHTML = '<option value="">— Choisir un joueur —</option>'
     + profils.map(function(p){ return '<option value="'+p.joueur+'">'+p.joueur+(p.blessure?' · '+p.blessure.slice(0,30):'')+'</option>'; }).join('');
   if(current) sel.value = current;
@@ -3241,7 +3287,8 @@ function buildQuotidienForm(){
     ex.innerHTML = '<span style="color:#22C55E;font-weight:600">Nouvelle saisie pour '+joueur+' \u2014 '+frOfIso(qDate())+'</span>';
   }
   var v = existing || {soins:0, prevention:0, douleur:0, fatigue:0, courbatures:0,
-                       confianceMentale:null, confiancePhysique:null, commentaire:''};
+                       confianceMentale:null, confiancePhysique:null, commentaire:'',
+                       douleurZone:'', courbaturesZone:'', courbaturesLateralite:''};
 
   var html = '';
   Q_FIELDS.forEach(function(f){
@@ -3259,7 +3306,19 @@ function buildQuotidienForm(){
       var active = (val!==null && val!==undefined && Number(val)===x);
       html += '<button type="button" onclick="qSet(\''+f.key+'\','+x+')" data-v="'+x+'" style="min-width:36px;padding:9px 0;border-radius:8px;border:1.5px solid '+(active?f.color:'#DDD')+';background:'+(active?f.color:'white')+';color:'+(active?'white':'#444')+';cursor:pointer;font-size:.82rem;font-weight:700">'+x+'</button>';
     }
-    html += '</div></div>';
+    html += '</div>';
+    if(f.key === 'douleur'){
+      html += '<div style="margin-top:6px">'+zoneSelectHtml('q-douleur-zone', v.douleurZone||'', '\uD83D\uDCCD Zone de la douleur (si > 0)')+'</div>';
+    }
+    if(f.key === 'courbatures'){
+      html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px">'
+        + '<div>'+zoneSelectHtml('q-courbatures-zone', v.courbaturesZone||'', '\uD83D\uDCCD Zone des courbatures (si > 0)')+'</div>'
+        + '<div><select id="q-courbatures-lat" onchange="qSelChange(\'q-courbatures-lat\')" style="width:100%;padding:9px 10px;border:1.5px solid #DDD;border-radius:8px;font-size:.78rem;background:white">'
+        + '<option value="">\u2194 Lat\u00E9ralit\u00E9</option>'
+        + LATERALITES.map(function(l){ return '<option value="'+l+'"'+((v.courbaturesLateralite||'')===l?' selected':'')+'>'+l+'</option>'; }).join('')
+        + '</select></div></div>';
+    }
+    html += '</div>';
   });
 
   html += '<div style="margin-bottom:14px"><div style="font-size:.82rem;font-weight:700;color:#2D2660;margin-bottom:5px">Commentaires</div>'
@@ -3271,7 +3330,17 @@ function buildQuotidienForm(){
   window._qVals = {soins:v.soins||0, prevention:v.prevention||0,
                    douleur:v.douleur||0, fatigue:v.fatigue||0, courbatures:v.courbatures||0,
                    confianceMentale:(v.confianceMentale===undefined?null:v.confianceMentale),
-                   confiancePhysique:(v.confiancePhysique===undefined?null:v.confiancePhysique)};
+                   confiancePhysique:(v.confiancePhysique===undefined?null:v.confiancePhysique),
+                   douleurZone:v.douleurZone||'', courbaturesZone:v.courbaturesZone||'',
+                   courbaturesLateralite:v.courbaturesLateralite||''};
+}
+
+function qSelChange(id){
+  var el = document.getElementById(id);
+  if(!el) return;
+  if(id==='q-douleur-zone') window._qVals.douleurZone = el.value;
+  else if(id==='q-courbatures-zone') window._qVals.courbaturesZone = el.value;
+  else if(id==='q-courbatures-lat') window._qVals.courbaturesLateralite = el.value;
 }
 
 function qSet(key, val){
@@ -3295,22 +3364,28 @@ async function saveQuotidien(){
   var vals = window._qVals;
   var com = document.getElementById('q-commentaire').value.trim();
   var existing = findSuivi(joueur, dateIso);
+  if(vals.douleur === 0) vals.douleurZone = '';
+  if(vals.courbatures === 0){ vals.courbaturesZone = ''; vals.courbaturesLateralite = ''; }
   if(existing){
     existing.soins = vals.soins; existing.prevention = vals.prevention;
     existing.douleur = vals.douleur; existing.fatigue = vals.fatigue; existing.courbatures = vals.courbatures;
     existing.confianceMentale = vals.confianceMentale; existing.confiancePhysique = vals.confiancePhysique;
+    existing.douleurZone = vals.douleurZone; existing.courbaturesZone = vals.courbaturesZone;
+    existing.courbaturesLateralite = vals.courbaturesLateralite;
     existing.commentaire = com;
   } else {
     storeData.suivi.push({id:newId('s'), date:dateIso, joueur:joueur,
       douleur:vals.douleur, courbatures:vals.courbatures, fatigue:vals.fatigue,
       soins:vals.soins, prevention:vals.prevention,
       confiancePhysique:vals.confiancePhysique, confianceMentale:vals.confianceMentale,
+      douleurZone:vals.douleurZone, courbaturesZone:vals.courbaturesZone,
+      courbaturesLateralite:vals.courbaturesLateralite,
       commentaire:com});
   }
   var ok = await storeSave('Saisie '+joueur+' — '+frOfIso(dateIso));
   if(ok){
     buildQuotidienForm();
-    var profils = storeData.profils;
+    var profils = profilsActifs();
     var faits = profils.filter(function(p){ return findSuivi(p.joueur, dateIso); }).length;
     var manquants = profils.map(function(p){ return p.joueur; }).filter(function(j){ return !findSuivi(j, dateIso); });
     var qa = document.getElementById('q-actions');
@@ -3336,7 +3411,7 @@ function renderDayBoard(){
   if(!box || !storeData) return;
   var dateIso = qDate();
   var cur = qSelectedPlayer();
-  var profils = storeData.profils.slice().sort(function(a,b){ return a.joueur.localeCompare(b.joueur); });
+  var profils = profilsActifs();
   if(!profils.length){ box.innerHTML=''; return; }
   var faits = 0;
   var chips = profils.map(function(p){
@@ -3350,6 +3425,7 @@ function renderDayBoard(){
       + 'style="padding:7px 12px;border-radius:18px;border:2px solid '+bd+';background:'+bg+';color:'+fg+';cursor:pointer;font-size:.74rem;font-weight:700;display:inline-flex;align-items:center;gap:5px">'
       + (e ? '\u2713' : '\u25CB') + ' ' + p.joueur.split(' ').pop()
       + (e ? ' <span style="font-weight:400;opacity:.8">D'+e.douleur+'</span>' : '')
+      + (e && e.courbaturesLateralite && e.courbaturesLateralite.indexOf('Unilat')===0 ? ' <span title="Courbatures unilat\u00E9rales">\u26A0\uFE0F</span>' : '')
       + '</button>';
   }).join(' ');
   box.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px">'
@@ -3382,7 +3458,12 @@ function renderJoueurs(){
   else {
     list.innerHTML = profils.map(function(p){
       var nSuivi = storeData.suivi.filter(function(s){ return s.joueur===p.joueur; }).length;
-      return '<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid #EEE;border-radius:10px;margin-bottom:8px;background:#FAFAFE">'
+      var enCours = p.etatSuivi !== 'termine';
+      var toggle = '<button onclick="toggleEtatSuivi(\''+p.joueur.replace(/'/g,"\\'")+'\')" title="Cliquer pour basculer" '
+        + 'style="padding:6px 14px;border-radius:16px;border:2px solid '+(enCours?'#22C55E':'#999')+';background:'+(enCours?'#DCFCE7':'#F3F4F6')+';color:'+(enCours?'#15803D':'#666')+';cursor:pointer;font-size:.72rem;font-weight:800;flex-shrink:0">'
+        + (enCours?'\uD83D\uDFE2 En cours':'\u2713 Terminé')+'</button>';
+      return '<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid #EEE;border-radius:10px;margin-bottom:8px;background:'+(enCours?'#FAFAFE':'#F7F7F7')+';opacity:'+(enCours?'1':'0.75')+'">'
+        + toggle
         + '<div style="flex:1;min-width:0"><div style="font-weight:700;color:#2D2660">'+p.joueur+'</div>'
         + '<div style="font-size:.72rem;color:#666">'+[p.categorie, p.blessure, p.statutProtocole].filter(Boolean).join(' · ')+'</div>'
         + '<div style="font-size:.68rem;color:#999">Reprise '+frOfIso(p.dateReprise)+' · 1er match '+frOfIso(p.datePremierMatch)+' · '+nSuivi+' saisie(s)</div></div>'
@@ -3391,6 +3472,15 @@ function renderJoueurs(){
     }).join('');
   }
   if(!editJoueurNom) resetJoueurForm();
+}
+
+async function toggleEtatSuivi(nom){
+  var p = null;
+  storeData.profils.forEach(function(x){ if(x.joueur===nom) p=x; });
+  if(!p) return;
+  p.etatSuivi = (p.etatSuivi === 'termine') ? 'en_cours' : 'termine';
+  var ok = await storeSave(nom+' \u2192 '+(p.etatSuivi==='termine'?'Terminé':'En cours'));
+  if(ok){ renderJoueurs(); }
 }
 
 function resetJoueurForm(){
@@ -3437,8 +3527,13 @@ async function saveJoueur(){
     pointsVigilance: document.getElementById('jf-vigilance').value.trim(),
     dateReprise: document.getElementById('jf-reprise').value || null,
     datePremierMatch: document.getElementById('jf-match').value || null,
-    iprrs: iprrs
+    iprrs: iprrs,
+    etatSuivi: 'en_cours'
   };
+  // conserver l'état existant en cas de modification
+  var prev = null;
+  storeData.profils.forEach(function(x){ if(x.joueur===(editJoueurNom||nom)) prev=x; });
+  if(prev && prev.etatSuivi) obj.etatSuivi = prev.etatSuivi;
   var replaced = false;
   var target = editJoueurNom || nom;
   for(var k=0;k<storeData.profils.length;k++){
