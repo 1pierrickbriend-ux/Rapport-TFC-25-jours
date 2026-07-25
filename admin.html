@@ -95,7 +95,8 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);min-height
 
 <div style="background:white;border-bottom:2px solid #E5E3F5;padding:0 28px;display:flex;gap:0">
   <button onclick="showTab('rapports')" id="tab-rapports" style="padding:12px 24px;border:none;background:none;cursor:pointer;font-weight:700;font-size:.85rem;color:#2D2660;border-bottom:3px solid #2D2660">📋 Rapports collectifs</button>
-  <button onclick="showTab('generation')" id="tab-generation" style="padding:12px 24px;border:none;background:none;cursor:pointer;font-weight:600;font-size:.85rem;color:#888;border-bottom:3px solid transparent">⚙️ Génération ODS</button>
+  <button onclick="showTab('saisie')" id="tab-saisie" style="padding:12px 24px;border:none;background:none;cursor:pointer;font-weight:600;font-size:.85rem;color:#888;border-bottom:3px solid transparent">📝 Saisie</button>
+  <button onclick="showTab('generation')" id="tab-generation" style="padding:12px 24px;border:none;background:none;cursor:pointer;font-weight:600;font-size:.85rem;color:#888;border-bottom:3px solid transparent">⚙️ Génération</button>
   <button onclick="showTab('bilans')" id="tab-bilans" style="padding:12px 24px;border:none;background:none;cursor:pointer;font-weight:600;font-size:.85rem;color:#888;border-bottom:3px solid transparent">👤 Bilans individuels</button>
 </div>
 <div class="main">
@@ -715,10 +716,16 @@ function showTab(tab){
   document.getElementById('section-rapports').style.display = tab==='rapports' ? '' : 'none';
   document.getElementById('section-bilans').style.display   = tab==='bilans'   ? '' : 'none';
   document.getElementById('section-generation').style.display = tab==='generation' ? '' : 'none';
-  var tr=document.getElementById('tab-rapports'), tb=document.getElementById('tab-bilans'), tg=document.getElementById('tab-generation');
-  tr.style.color=tab==='rapports'?'#2D2660':'#888'; tr.style.borderBottom=tab==='rapports'?'3px solid #2D2660':'3px solid transparent'; tr.style.fontWeight=tab==='rapports'?'700':'600';
-  tb.style.color=tab==='bilans'?'#2D2660':'#888';   tb.style.borderBottom=tab==='bilans'?'3px solid #2D2660':'3px solid transparent';   tb.style.fontWeight=tab==='bilans'?'700':'600';
-  tg.style.color=tab==='generation'?'#2D2660':'#888'; tg.style.borderBottom=tab==='generation'?'3px solid #2D2660':'3px solid transparent'; tg.style.fontWeight=tab==='generation'?'700':'600';
+  document.getElementById('section-saisie').style.display = tab==='saisie' ? '' : 'none';
+  var defs=[['tab-rapports','rapports'],['tab-bilans','bilans'],['tab-generation','generation'],['tab-saisie','saisie']];
+  defs.forEach(function(d){
+    var el=document.getElementById(d[0]); if(!el) return;
+    el.style.color=tab===d[1]?'#2D2660':'#888';
+    el.style.borderBottom=tab===d[1]?'3px solid #2D2660':'3px solid transparent';
+    el.style.fontWeight=tab===d[1]?'700':'600';
+  });
+  if(tab==='saisie' && !storeLoaded && getToken()) storeLoad();
+  if(tab==='saisie' && storeLoaded) renderSaisie();
   if(tab==='bilans') loadBilans();
 }
 document.addEventListener('DOMContentLoaded', function(){
@@ -950,10 +957,159 @@ function askDeleteBilan(name,sha,joueur){
   document.getElementById('confirm-overlay').classList.add('active');
 }
 </script>
+<div id="section-saisie" style="display:none;max-width:980px;margin:0 auto;padding:0 16px">
+
+  <div id="saisie-store-status" class="publish-status" style="margin-bottom:12px"></div>
+
+  <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+    <button id="ssub-quotidien" onclick="showSaisieSub('quotidien')" style="padding:9px 18px;border:1.5px solid #2D2660;border-radius:20px;background:#2D2660;color:white;font-weight:700;font-size:.78rem;cursor:pointer">📝 Quotidien</button>
+    <button id="ssub-joueurs" onclick="showSaisieSub('joueurs')" style="padding:9px 18px;border:1.5px solid #2D2660;border-radius:20px;background:white;color:#2D2660;font-weight:700;font-size:.78rem;cursor:pointer">👤 Joueurs</button>
+    <button id="ssub-alertes" onclick="showSaisieSub('alertes')" style="padding:9px 18px;border:1.5px solid #2D2660;border-radius:20px;background:white;color:#2D2660;font-weight:700;font-size:.78rem;cursor:pointer">🚨 Alertes</button>
+    <button id="ssub-matchs" onclick="showSaisieSub('matchs')" style="padding:9px 18px;border:1.5px solid #2D2660;border-radius:20px;background:white;color:#2D2660;font-weight:700;font-size:.78rem;cursor:pointer">⚽ Matchs</button>
+    <button id="ssub-donnees" onclick="showSaisieSub('donnees')" style="padding:9px 18px;border:1.5px solid #2D2660;border-radius:20px;background:white;color:#2D2660;font-weight:700;font-size:.78rem;cursor:pointer">🗄️ Données</button>
+  </div>
+
+  <!-- QUOTIDIEN -->
+  <div id="saisie-quotidien">
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-title">📝 Questionnaire quotidien</div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:12px">
+        <select id="q-joueur" onchange="buildQuotidienForm()" style="flex:1;min-width:220px;padding:10px 12px;border:1.5px solid #DDD;border-radius:10px;font-size:.85rem;font-weight:600"></select>
+        <input type="date" id="q-date" onchange="buildQuotidienForm()" style="padding:10px 12px;border:1.5px solid #DDD;border-radius:10px;font-size:.82rem">
+      </div>
+      <div id="q-existing" style="font-size:.78rem;margin-bottom:12px"></div>
+      <div id="q-form" style="display:none"></div>
+    </div>
+  </div>
+
+  <!-- JOUEURS -->
+  <div id="saisie-joueurs" style="display:none">
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-title">👤 Joueurs suivis</div>
+      <div id="joueurs-list"></div>
+    </div>
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-title" id="jf-title">➕ Nouveau joueur</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div><label style="font-size:.72rem;font-weight:700;color:#555">Nom complet *</label>
+          <input id="jf-nom" placeholder="Prénom Nom" style="width:100%;padding:9px 12px;border:1.5px solid #DDD;border-radius:8px;font-size:.82rem;margin-top:3px"></div>
+        <div><label style="font-size:.72rem;font-weight:700;color:#555">Catégorie</label>
+          <input id="jf-cat" placeholder="N3, U19, U17..." style="width:100%;padding:9px 12px;border:1.5px solid #DDD;border-radius:8px;font-size:.82rem;margin-top:3px"></div>
+        <div style="grid-column:1/-1"><label style="font-size:.72rem;font-weight:700;color:#555">Blessure</label>
+          <input id="jf-blessure" placeholder="Ex : Lésion grade 2 quadriceps droit" style="width:100%;padding:9px 12px;border:1.5px solid #DDD;border-radius:8px;font-size:.82rem;margin-top:3px"></div>
+        <div><label style="font-size:.72rem;font-weight:700;color:#555">Statut protocole</label>
+          <input id="jf-etat" placeholder="En cours, Terminé, Arrêté..." style="width:100%;padding:9px 12px;border:1.5px solid #DDD;border-radius:8px;font-size:.82rem;margin-top:3px"></div>
+        <div><label style="font-size:.72rem;font-weight:700;color:#555">Focus prévention</label>
+          <input id="jf-focus" placeholder="Ex : Renforcement excentrique" style="width:100%;padding:9px 12px;border:1.5px solid #DDD;border-radius:8px;font-size:.82rem;margin-top:3px"></div>
+        <div style="grid-column:1/-1"><label style="font-size:.72rem;font-weight:700;color:#555">Points de vigilance</label>
+          <input id="jf-vigilance" placeholder="Ex : Surveiller ischio controlatéral" style="width:100%;padding:9px 12px;border:1.5px solid #DDD;border-radius:8px;font-size:.82rem;margin-top:3px"></div>
+        <div><label style="font-size:.72rem;font-weight:700;color:#555">Date reprise collective</label>
+          <input type="date" id="jf-reprise" style="width:100%;padding:9px 12px;border:1.5px solid #DDD;border-radius:8px;font-size:.82rem;margin-top:3px"></div>
+        <div><label style="font-size:.72rem;font-weight:700;color:#555">Date 1er match</label>
+          <input type="date" id="jf-match" style="width:100%;padding:9px 12px;border:1.5px solid #DDD;border-radius:8px;font-size:.82rem;margin-top:3px"></div>
+      </div>
+      <div style="margin-top:14px">
+        <div style="font-size:.75rem;font-weight:800;color:#6B5CA5;margin-bottom:8px">IPRRS — Questionnaire de confiance (6 × /10)</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px" id="jf-iprrs-grid">
+          <div style="display:flex;align-items:center;gap:8px"><span style="flex:1;font-size:.72rem;color:#555">Pratiquer football</span><input type="number" id="jf-iprrs-0" min="0" max="10" style="width:64px;padding:7px;border:1.5px solid #DDD;border-radius:8px;text-align:center"></div>
+          <div style="display:flex;align-items:center;gap:8px"><span style="flex:1;font-size:.72rem;color:#555">Pratiquer sans douleurs</span><input type="number" id="jf-iprrs-1" min="0" max="10" style="width:64px;padding:7px;border:1.5px solid #DDD;border-radius:8px;text-align:center"></div>
+          <div style="display:flex;align-items:center;gap:8px"><span style="flex:1;font-size:.72rem;color:#555">Me donner à 100 %</span><input type="number" id="jf-iprrs-2" min="0" max="10" style="width:64px;padding:7px;border:1.5px solid #DDD;border-radius:8px;text-align:center"></div>
+          <div style="display:flex;align-items:center;gap:8px"><span style="flex:1;font-size:.72rem;color:#555">Ne pas penser à la blessure</span><input type="number" id="jf-iprrs-3" min="0" max="10" style="width:64px;padding:7px;border:1.5px solid #DDD;border-radius:8px;text-align:center"></div>
+          <div style="display:flex;align-items:center;gap:8px"><span style="flex:1;font-size:.72rem;color:#555">Confiance partie blessée</span><input type="number" id="jf-iprrs-4" min="0" max="10" style="width:64px;padding:7px;border:1.5px solid #DDD;border-radius:8px;text-align:center"></div>
+          <div style="display:flex;align-items:center;gap:8px"><span style="flex:1;font-size:.72rem;color:#555">Capacités tech/physiques</span><input type="number" id="jf-iprrs-5" min="0" max="10" style="width:64px;padding:7px;border:1.5px solid #DDD;border-radius:8px;text-align:center"></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap">
+        <button onclick="saveJoueur()" style="padding:11px 24px;border:none;border-radius:10px;background:#22C55E;color:white;font-weight:800;font-size:.82rem;cursor:pointer">💾 Enregistrer le joueur</button>
+        <button onclick="resetJoueurForm()" style="padding:11px 18px;border:1.5px solid #DDD;border-radius:10px;background:white;color:#666;font-weight:600;font-size:.78rem;cursor:pointer">Annuler</button>
+        <button id="jf-delete" onclick="deleteJoueur()" style="display:none;padding:11px 18px;border:1.5px solid #EF4444;border-radius:10px;background:white;color:#EF4444;font-weight:700;font-size:.78rem;cursor:pointer;margin-left:auto">🗑️ Supprimer ce joueur</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ALERTES -->
+  <div id="saisie-alertes" style="display:none">
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-title">🚨 Alertes</div>
+      <label style="display:flex;align-items:center;gap:6px;font-size:.75rem;color:#666;margin-bottom:10px">
+        <input type="checkbox" id="af-show-all" onchange="renderAlertes()"> Afficher aussi les alertes résolues
+      </label>
+      <div id="alertes-list"></div>
+    </div>
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-title" id="af-title">➕ Nouvelle alerte</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <select id="af-joueur" style="padding:9px 12px;border:1.5px solid #DDD;border-radius:8px;font-size:.82rem"></select>
+        <input type="date" id="af-date" style="padding:9px 12px;border:1.5px solid #DDD;border-radius:8px;font-size:.82rem">
+        <select id="af-niveau" style="padding:9px 12px;border:1.5px solid #DDD;border-radius:8px;font-size:.82rem">
+          <option value="Rouge">🔴 Rouge — impacte le RRI</option>
+          <option value="Orange" selected>🟠 Orange</option>
+          <option value="Jaune">🟡 Jaune</option>
+        </select>
+        <select id="af-statut" style="padding:9px 12px;border:1.5px solid #DDD;border-radius:8px;font-size:.82rem">
+          <option value="Ouverte" selected>Ouverte</option>
+          <option value="Résolue">Résolue</option>
+        </select>
+        <textarea id="af-texte" rows="2" placeholder="Description de l'alerte..." style="grid-column:1/-1;padding:9px 12px;border:1.5px solid #DDD;border-radius:8px;font-size:.82rem;font-family:inherit;resize:vertical"></textarea>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:14px">
+        <button onclick="saveAlerte()" style="padding:11px 24px;border:none;border-radius:10px;background:#22C55E;color:white;font-weight:800;font-size:.82rem;cursor:pointer">💾 Enregistrer l'alerte</button>
+        <button onclick="resetAlerteForm()" style="padding:11px 18px;border:1.5px solid #DDD;border-radius:10px;background:white;color:#666;font-weight:600;font-size:.78rem;cursor:pointer">Annuler</button>
+        <button id="af-delete" onclick="deleteAlerte()" style="display:none;padding:11px 18px;border:1.5px solid #EF4444;border-radius:10px;background:white;color:#EF4444;font-weight:700;font-size:.78rem;cursor:pointer;margin-left:auto">🗑️ Supprimer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MATCHS -->
+  <div id="saisie-matchs" style="display:none">
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-title" id="mf-title">➕ Nouveau match</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <select id="mf-joueur" style="padding:9px 12px;border:1.5px solid #DDD;border-radius:8px;font-size:.82rem"></select>
+        <input type="date" id="mf-date" style="padding:9px 12px;border:1.5px solid #DDD;border-radius:8px;font-size:.82rem">
+        <input id="mf-adv" placeholder="Adversaire" style="padding:9px 12px;border:1.5px solid #DDD;border-radius:8px;font-size:.82rem">
+        <input type="number" id="mf-temps" min="0" max="120" placeholder="Temps de jeu (min)" style="padding:9px 12px;border:1.5px solid #DDD;border-radius:8px;font-size:.82rem">
+        <input id="mf-cat" placeholder="Catégorie du match (N3, U19...)" style="padding:9px 12px;border:1.5px solid #DDD;border-radius:8px;font-size:.82rem">
+      </div>
+      <div style="display:flex;gap:10px;margin-top:14px">
+        <button onclick="saveMatch()" style="padding:11px 24px;border:none;border-radius:10px;background:#22C55E;color:white;font-weight:800;font-size:.82rem;cursor:pointer">💾 Enregistrer le match</button>
+        <button onclick="resetMatchForm()" style="padding:11px 18px;border:1.5px solid #DDD;border-radius:10px;background:white;color:#666;font-weight:600;font-size:.78rem;cursor:pointer">Annuler</button>
+        <button id="mf-delete" onclick="deleteMatch()" style="display:none;padding:11px 18px;border:1.5px solid #EF4444;border-radius:10px;background:white;color:#EF4444;font-weight:700;font-size:.78rem;cursor:pointer;margin-left:auto">🗑️ Supprimer</button>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-title">⚽ Matchs enregistrés</div>
+      <div id="matchs-list"></div>
+    </div>
+  </div>
+
+  <!-- DONNÉES / MIGRATION -->
+  <div id="saisie-donnees" style="display:none">
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-title">🗄️ Données en ligne</div>
+      <div style="font-size:.78rem;color:#666;margin-bottom:10px">Toutes vos saisies sont stockées dans <b>suivi_data.json</b> à la racine de votre dépôt GitHub — persistantes, accessibles depuis n'importe quel appareil, et historisées par Git (chaque enregistrement est un commit récupérable).</div>
+      <button onclick="storeLoad()" style="padding:10px 20px;border:1.5px solid #2D2660;border-radius:10px;background:white;color:#2D2660;font-weight:700;font-size:.78rem;cursor:pointer">🔄 Recharger depuis GitHub</button>
+    </div>
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-title">📦 Migration depuis l'ODS (une seule fois)</div>
+      <div style="font-size:.78rem;color:#666;margin-bottom:10px">Importez <b>Suivi_CDF_FINAL.ods</b> une dernière fois : son contenu devient le suivi_data.json de départ (profils dédoublonnés, historique complet préservé). Ensuite, tout se fait dans l'onglet Saisie.</div>
+      <button onclick="document.getElementById('file-input-migration').click()" style="padding:10px 20px;border:none;border-radius:10px;background:#6B5CA5;color:white;font-weight:700;font-size:.78rem;cursor:pointer">📂 Choisir l'ODS à migrer</button>
+      <input type="file" id="file-input-migration" accept=".ods" style="display:none" onchange="migrerOds(this.files[0])">
+      <div id="migration-status" class="publish-status" style="margin-top:10px"></div>
+    </div>
+  </div>
+
+</div>
 <div id="section-generation" style="display:none;max-width:980px;margin:0 auto;padding:0 16px">
 
   <div class="card" style="margin-bottom:16px">
-    <div class="card-title">⚙️ Import du fichier ODS</div>
+    <div class="card-title">📡 Source des données</div>
+    <div style="font-size:.78rem;color:#666;margin-bottom:10px">Génère directement depuis vos saisies en ligne (suivi_data.json) — plus besoin d'importer quoi que ce soit.</div>
+    <button onclick="chargerDepuisStore()" style="padding:11px 22px;border:none;border-radius:10px;background:#2D2660;color:white;font-weight:800;font-size:.82rem;cursor:pointer">📡 Charger les données en ligne</button>
+  </div>
+
+  <div class="card" style="margin-bottom:16px">
+    <div class="card-title">📂 Ou : import ODS (secours / migration)</div>
     <div style="font-size:.78rem;color:#666;margin-bottom:10px">Déposez <b>Suivi_CDF_FINAL.ods</b> (feuilles PROFIL_JOUEURS, SUIVI_J+1_J+25, ALERTES, MATCHS). Tout est calculé dans le navigateur — rien n'est publié avant votre validation.</div>
     <div id="drop-ods" onclick="document.getElementById('file-input-ods').click()" style="border:2px dashed #C5C0E0;border-radius:12px;padding:28px;text-align:center;cursor:pointer;color:#6B5CA5;font-size:.85rem;font-weight:600;background:#FAFAFE">
       📂 Glissez le fichier .ods ici ou cliquez pour parcourir
@@ -994,7 +1150,7 @@ function askDeleteBilan(name,sha,joueur){
 
 </div>
 <script>
-/* ══ MOTEUR TFC EMBARQUÉ (validé contre les scripts Python d'origine) ══ */
+/* ══ MOTEUR TFC EMBARQUÉ (validé contre les scripts Python d'origine ; fatigue /10 depuis v2) ══ */
 /* ═══════════════════════════════════════════════════════════════════
    TFC — Moteur ODS unifié (port JavaScript des scripts Python)
    Décisions validées :
@@ -1183,9 +1339,9 @@ function computeRRI(cp, cm_, soinsPrev, doul, crb, fat, matchsList, alertes){
   var pc = cv <= 1 ? 15 : cv <= 2 ? 10 : cv <= 4 ? 5 : 0; pts += pc;
   det.courbatures = {pts: pc, max: 15, val: pyFixed(cv,2) + '/10'};
 
-  var fv = n(fat); fv = fv ? fv : 1.0;
-  p = fv <= 1 ? 10 : fv <= 1.5 ? 8 : fv <= 2.5 ? 4 : 0; pts += p;
-  det.fatigue = {pts: p, max: 10, val: pyFixed(fv,2) + '/5'};
+  var fv = n(fat); fv = fv ? fv : 2.0;
+  p = fv <= 2 ? 10 : fv <= 3 ? 8 : fv <= 5 ? 4 : 0; pts += p;
+  det.fatigue = {pts: p, max: 10, val: pyFixed(fv,2) + '/10'};
 
   if (matchsList.length >= 2){
     var refs = matchsList.slice(Math.max(0, matchsList.length-3), matchsList.length-1).map(function(m){ return m.t; });
@@ -1760,8 +1916,8 @@ function ficheModal(p, rd){
     + '     <div style="display:flex;align-items:baseline;gap:4px"><span class="today-val" style="color:'+dc(doulD)+'">'+dj.doul+'</span><span class="today-max">/10</span></div>\n'
     + '     <div class="bar sm" style="margin-bottom:8px"><div class="bar-fill" style="width:'+Math.min(100,Math.trunc(doulD*10))+'%;background:'+dc(doulD)+'"></div></div>\n'
     + '     <div class="today-lbl">Fatigue</div>\n'
-    + '     <div style="display:flex;align-items:baseline;gap:4px"><span class="today-val" style="color:'+MID+'">'+dj.fat+'</span><span class="today-max">/5</span></div>\n'
-    + '     <div class="bar sm" style="margin-bottom:8px"><div class="bar-fill" style="width:'+Math.min(100,Math.trunc(fatD*20))+'%;background:'+MID+'"></div></div>\n'
+    + '     <div style="display:flex;align-items:baseline;gap:4px"><span class="today-val" style="color:'+MID+'">'+dj.fat+'</span><span class="today-max">/10</span></div>\n'
+    + '     <div class="bar sm" style="margin-bottom:8px"><div class="bar-fill" style="width:'+Math.min(100,Math.trunc(fatD*10))+'%;background:'+MID+'"></div></div>\n'
     + '     <div class="today-lbl">Courbatures</div>\n'
     + '     <div style="display:flex;align-items:baseline;gap:4px"><span class="today-val" style="color:'+ORANGE+'">'+dj.crb+'</span><span class="today-max">/10</span></div>\n'
     + '     <div class="bar sm"><div class="bar-fill" style="width:'+Math.min(100,Math.trunc(crbD*10))+'%;background:'+ORANGE+'"></div></div>\n'
@@ -1883,7 +2039,7 @@ function generateReportHTML(players, rd, logoDataUrl){
     return '<tr>\n<td class="s-name" style="color:'+rc(p.rri)+'">'+p.nom+'</td>\n'
       + '<td>'+sbar(p.doul, 10, dc(p.doul))+'</td>\n'
       + '<td>'+sbar(p.crb, 10, p.crb > 0 ? ORANGE : GREEN)+'</td>\n'
-      + '<td>'+sbar(p.fat, 5, MID)+'</td>\n</tr>';
+      + '<td>'+sbar(p.fat, 10, MID)+'</td>\n</tr>';
   }).join('');
 
   var navFiches = players.map(function(p){
@@ -1936,7 +2092,7 @@ function generateReportHTML(players, rd, logoDataUrl){
     + '      <table class="synth-table">\n        <thead><tr><th>Joueur</th><th>Avancement J+25</th><th>Tendance douleur</th><th>Indice confiance</th></tr></thead>\n'
     + '        <tbody>'+synthRows+'</tbody>\n      </table>\n    </div>\n'
     + '    <div class="card-section">\n      <div class="section-bar">■ Comparatif douleur · courbatures · fatigue</div>\n'
-    + '      <table class="synth-table">\n        <thead><tr><th>Joueur</th><th>Douleur moy. /10</th><th>Courbatures moy. /10</th><th>Fatigue moy. /5</th></tr></thead>\n'
+    + '      <table class="synth-table">\n        <thead><tr><th>Joueur</th><th>Douleur moy. /10</th><th>Courbatures moy. /10</th><th>Fatigue moy. /10</th></tr></thead>\n'
     + '        <tbody>'+compRows+'</tbody>\n      </table>\n    </div>\n  </div>\n\n'
     + '  <!-- VUE DIRECTEUR SPORTIF -->\n  <div class="page-section" id="ds">\n'
     + '    <div class="section-title-bar"><h2>Vue Directeur Sportif</h2><span>Cliquez sur une carte pour le détail RRI et la justification temps de jeu</span></div>\n'
@@ -2285,7 +2441,7 @@ function generateBilanHTML(p, rd, photoDataUrl, tfcLogoDataUrl){
 
   var doulCol = p.doul > 3 ? RED : p.doul > 1 ? ORANGE : GREEN;
   var crbCol = p.crb > 2 ? ORANGE : GREEN;
-  var fatCol = p.fat > 2.5 ? ORANGE : GREEN;
+  var fatCol = p.fat > 5 ? ORANGE : GREEN;
 
   return '<!DOCTYPE html>\n<html lang="fr">\n<head>\n<meta charset="UTF-8">\n'
     + '<meta name="viewport" content="width=device-width,initial-scale=1">\n'
@@ -2391,9 +2547,9 @@ function generateBilanHTML(p, rd, photoDataUrl, tfcLogoDataUrl){
     + '      </div>\n      <div>\n'
     + '        <div style="display:flex;justify-content:space-between;align-items:baseline">\n'
     + '          <span style="font-size:.75rem;color:'+LABEL+'">Fatigue moyenne</span>\n'
-    + '          <span style="font-size:1rem;font-weight:800;color:'+fatCol+'">'+f1(p.fat)+'/5</span>\n'
+    + '          <span style="font-size:1rem;font-weight:800;color:'+fatCol+'">'+f1(p.fat)+'/10</span>\n'
     + '        </div>\n'
-    + '        <div class="bar"><div class="bar-fill" style="width:'+Math.min(100,Math.trunc(p.fat*20))+'%;background:'+fatCol+'"></div></div>\n'
+    + '        <div class="bar"><div class="bar-fill" style="width:'+Math.min(100,Math.trunc(p.fat*10))+'%;background:'+fatCol+'"></div></div>\n'
     + '      </div>\n    </div>\n\n'
     + '    <div class="card">\n      <div class="card-title">IPRRS — Readiness retour compétition</div>\n'
     + '      <div style="display:flex;align-items:center;gap:8px">\n'
@@ -2476,6 +2632,223 @@ function generateBilanHTML(p, rd, photoDataUrl, tfcLogoDataUrl){
 exports.generateBilanHTML = generateBilanHTML;
 exports.rsFullBilan = rsFull;
 })(typeof window !== 'undefined' ? (window.TFCBilan = {}) : module.exports);
+
+/* ═══════════════════════════════════════════════════════════════════
+   TFC — Couche de données suivi_data.json
+   - odsToJson : convertit un classeur parsé (loadWorkbook) en JSON de stockage
+   - jsonToEngine : reconstruit la structure attendue par le moteur
+     (strictement identique à la sortie de loadWorkbook)
+   Schéma v1 :
+   {
+     version: 1,
+     profils: [{ joueur, categorie, blessure, statutProtocole, focusPrevention,
+                 pointsVigilance, dateReprise: "YYYY-MM-DD"|null,
+                 datePremierMatch: "YYYY-MM-DD"|null, iprrs: [6 nombres] }],
+     suivi:   [{ id, date: "YYYY-MM-DD", joueur, douleur, fatigue, courbatures,
+                 soins, prevention, confiancePhysique|null, confianceMentale|null,
+                 commentaire }],
+     alertes: [{ id, date: "YYYY-MM-DD"|null, joueur, niveau, statut, texte }],
+     matchs:  [{ id, date: "YYYY-MM-DD"|null, joueur, adversaire, temps, categorie }]
+   }
+   ═══════════════════════════════════════════════════════════════════ */
+(function(exports){
+var E = (typeof window !== 'undefined' && window.TFCEngine) ? window.TFCEngine : require('./tfc_engine_core.js');
+
+var IPRRS_CANON = ['Pratiquer football','Pratiquer sans douleurs','Me donner à 100 %',
+  'Ne pas me concentrer sur la blessure','Confiance en la partie du corps blessée',
+  'Capacités techniques / physiques'];
+
+function isoOf(d){
+  if(!d) return null;
+  if(d instanceof Date){
+    var p = function(n){ return String(n).padStart(2,'0'); };
+    return d.getUTCFullYear()+'-'+p(d.getUTCMonth()+1)+'-'+p(d.getUTCDate());
+  }
+  return null;
+}
+function dateOfIso(s){
+  if(!s) return null;
+  var m = String(s).match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if(!m) return null;
+  return new Date(Date.UTC(+m[1], +m[2]-1, +m[3]));
+}
+function cleanStr(v){
+  var s = (v === null || v === undefined) ? '' : String(v).trim();
+  return (s === 'nan' || s === 'None' || s === '—') ? '' : s;
+}
+function num0(v){ var n = Number(v); return isNaN(n) ? 0 : n; }
+function numOrNull(v){
+  if(v === null || v === undefined || v === '') return null;
+  var n = Number(v); return isNaN(n) ? null : n;
+}
+function genId(prefix, i){ return prefix + '_' + Date.now().toString(36) + '_' + i; }
+
+// ── ODS (déjà parsé par loadWorkbook) → JSON de stockage ─────────────
+function odsToJson(data){
+  var out = {version: 2, profils: [], suivi: [], alertes: [], matchs: []};  // v2 : fatigue sur /10
+
+  // Profils : un par joueur, la DERNIÈRE ligne gagne (comportement identique au moteur/pidx)
+  var byPlayer = {};
+  var order = [];
+  data.P.forEach(function(r){
+    var j = cleanStr(r['Joueur']);
+    if(!j) return;
+    if(!(j in byPlayer)) order.push(j);
+    byPlayer[j] = r;
+  });
+  order.forEach(function(j){
+    var r = byPlayer[j];
+    var dr = null, dm = null;
+    Object.keys(r).forEach(function(c){
+      var cl = c.toLowerCase();
+      if(dm === null && cl.indexOf('1er match') >= 0 && r[c]) dm = (r[c] instanceof Date) ? r[c] : E.parseDDMMYYYY(r[c]);
+      if(dr === null && cl.indexOf('reprise') >= 0 && r[c]) dr = (r[c] instanceof Date) ? r[c] : E.parseDDMMYYYY(r[c]);
+    });
+    var etat = r['Statut protocole'] !== null && r['Statut protocole'] !== undefined ? r['Statut protocole'] : r['état de suivi'];
+    var iprrs = data.IPRRS_COLS.map(function(c){
+      var v = numOrNull(r[c]); return v === null ? 0 : v;
+    });
+    while(iprrs.length < 6) iprrs.push(0);
+    out.profils.push({
+      joueur: j,
+      categorie: cleanStr(r['Catégorie']),
+      blessure: cleanStr(r['Blessure']),
+      statutProtocole: cleanStr(etat),
+      focusPrevention: cleanStr(r['Focus prévention']),
+      pointsVigilance: cleanStr(r['Points de vigilance']),
+      dateReprise: isoOf(dr),
+      datePremierMatch: isoOf(dm),
+      iprrs: iprrs.slice(0,6)
+    });
+  });
+
+  data.S.forEach(function(r, i){
+    var j = cleanStr(r.Joueur);
+    if(!j || !r.Date) return;
+    out.suivi.push({
+      id: genId('s', i),
+      date: isoOf(r.Date),
+      joueur: j,
+      douleur: num0(r.Douleur),
+      fatigue: num0(r.Fatigue) * 2,  // ODS en /5 -> stockage /10
+      courbatures: num0(r.Courbatures),
+      soins: num0(r.Soins),
+      prevention: num0(r.Prevention),
+      confiancePhysique: numOrNull(r.ConfiancePhysique),
+      confianceMentale: numOrNull(r.ConfianceMentale),
+      commentaire: cleanStr(r.Commentaire)
+    });
+  });
+
+  data.A.forEach(function(r, i){
+    var txt = cleanStr(r['Alerte identifiée']);
+    var j = cleanStr(r['Joueur']);
+    if(!j && !txt) return;
+    out.alertes.push({
+      id: genId('a', i),
+      date: isoOf(r.Date),
+      joueur: j,
+      niveau: cleanStr(r['Niveau']) || 'Orange',
+      statut: cleanStr(r['Statut']) || 'Ouverte',
+      texte: txt
+    });
+  });
+
+  data.M.forEach(function(r, i){
+    var j = cleanStr(r['Joueur']);
+    if(!j) return;
+    out.matchs.push({
+      id: genId('m', i),
+      date: isoOf(r.Date),
+      joueur: j,
+      adversaire: cleanStr(r['Adversaire']),
+      temps: num0(r.Temps),
+      categorie: cleanStr(r['Catégorie'])
+    });
+  });
+
+  return out;
+}
+
+// ── JSON de stockage → structure moteur (identique à loadWorkbook) ───
+function jsonToEngine(json){
+  var P = (json.profils || []).map(function(pf){
+    var row = {
+      'Joueur': pf.joueur,
+      'Catégorie': pf.categorie || null,
+      'Blessure': pf.blessure || null,
+      'Statut protocole': pf.statutProtocole || null,
+      'Focus prévention': pf.focusPrevention || null,
+      'Points de vigilance': pf.pointsVigilance || null,
+      'Date reprise collective': dateOfIso(pf.dateReprise),
+      'Date 1er match': dateOfIso(pf.datePremierMatch)
+    };
+    IPRRS_CANON.forEach(function(c, i){
+      row[c] = (pf.iprrs && pf.iprrs[i] !== undefined) ? pf.iprrs[i] : 0;
+    });
+    return row;
+  });
+
+  var S = (json.suivi || []).map(function(s){
+    return {
+      Date: dateOfIso(s.date),
+      Joueur: s.joueur,
+      Douleur: num0(s.douleur),
+      Fatigue: num0(s.fatigue),
+      Courbatures: num0(s.courbatures),
+      Soins: num0(s.soins),
+      Prevention: num0(s.prevention),
+      ConfiancePhysique: numOrNull(s.confiancePhysique),
+      ConfianceMentale: numOrNull(s.confianceMentale),
+      Commentaire: s.commentaire || null
+    };
+  });
+
+  var A = (json.alertes || []).map(function(a){
+    return {
+      Date: dateOfIso(a.date),
+      Joueur: a.joueur,
+      'Alerte identifiée': a.texte || null,
+      'Niveau': a.niveau || null,
+      'Statut': a.statut || null
+    };
+  });
+
+  var M = (json.matchs || []).map(function(m){
+    return {
+      Date: dateOfIso(m.date),
+      Joueur: m.joueur,
+      'Adversaire': m.adversaire || null,
+      'Catégorie': m.categorie || null,
+      Temps: num0(m.temps)
+    };
+  });
+
+  var pidx = {}, pidxNorm = {};
+  P.forEach(function(r){
+    var j = String(r['Joueur'] || '').trim();
+    if(j){ pidx[j] = r; pidxNorm[E.normName(j)] = r; }
+  });
+
+  return {P: P, S: S, A: A, M: M, pidx: pidx, pidxNorm: pidxNorm, IPRRS_COLS: IPRRS_CANON.slice()};
+}
+
+function upgradeStore(json){
+  if(!json.version || json.version < 2){
+    (json.suivi || []).forEach(function(x){ x.fatigue = num0(x.fatigue) * 2; });
+    json.version = 2;
+    return true;
+  }
+  return false;
+}
+
+exports.upgradeStore = upgradeStore;
+exports.odsToJson = odsToJson;
+exports.jsonToEngine = jsonToEngine;
+exports.IPRRS_CANON = IPRRS_CANON;
+exports.isoOf = isoOf;
+exports.dateOfIso = dateOfIso;
+})(typeof window !== 'undefined' ? (window.TFCStore = {}) : module.exports);
 
 /* ═══════════════════════════════════════════════════════════════════
    ONGLET GÉNÉRATION ODS — orchestration
@@ -2719,10 +3092,539 @@ async function publierGeneration(){
   btn.disabled = false;
 }
 
+/* ═══════════════════════════════════════════════════════════════════
+   ONGLET SAISIE — questionnaire quotidien + joueurs + alertes + matchs
+   Stockage : suivi_data.json dans le dépôt GitHub (via ghGet/ghPut)
+   ═══════════════════════════════════════════════════════════════════ */
+var STORE_PATH = 'suivi_data.json';
+var storeData = null;      // contenu du JSON
+var storeSha = null;       // sha GitHub courant
+var storeLoaded = false;
+var saisieSub = 'quotidien';
+var editAlerteId = null, editMatchId = null, editJoueurNom = null;
+
+function emptyStore(){ return {version:2, profils:[], suivi:[], alertes:[], matchs:[]}; }
+
+// ── Chargement / sauvegarde ─────────────────────────────────────────
+async function storeLoad(silent){
+  var st = document.getElementById('saisie-store-status');
+  if(!getToken()){
+    if(st && !silent){ st.className='publish-status err'; st.textContent='✗ Configurez votre token GitHub (onglet Rapports) pour accéder aux données.'; }
+    return false;
+  }
+  if(st && !silent){ st.className='publish-status loading'; st.textContent='Chargement des données...'; }
+  try{
+    var f = await ghGet(STORE_PATH);
+    if(f && f.content){
+      storeData = JSON.parse(decodeURIComponent(escape(atob(f.content.replace(/\n/g,'')))));
+      storeSha = f.sha;
+      if(TFCStore.upgradeStore(storeData)){
+        await storeSave('Migration automatique fatigue /5 \u2192 /10');
+      }
+    } else {
+      storeData = emptyStore();
+      storeSha = null;
+    }
+    storeLoaded = true;
+    if(st && !silent){
+      st.className='publish-status ok';
+      st.textContent = storeSha
+        ? '✓ Données chargées — '+storeData.profils.length+' joueurs · '+storeData.suivi.length+' saisies · '+storeData.alertes.length+' alertes · '+storeData.matchs.length+' matchs'
+        : 'ℹ️ Aucun suivi_data.json dans le dépôt — commencez par la migration ODS ou créez vos joueurs.';
+    }
+    renderSaisie();
+    return true;
+  } catch(e){
+    if(st){ st.className='publish-status err'; st.textContent='✗ Erreur de chargement : '+e.message; }
+    return false;
+  }
+}
+
+async function storeSave(label){
+  var st = document.getElementById('saisie-store-status');
+  st.className='publish-status loading'; st.textContent='Enregistrement...';
+  var content = JSON.stringify(storeData, null, 1);
+  var ok = await ghPut(STORE_PATH, content, storeSha);
+  if(!ok){
+    // conflit de sha probable : on recharge le sha et on retente une fois
+    var f = await ghGet(STORE_PATH);
+    storeSha = f ? f.sha : null;
+    ok = await ghPut(STORE_PATH, content, storeSha);
+  }
+  if(ok){
+    var f2 = await ghGet(STORE_PATH);
+    storeSha = f2 ? f2.sha : storeSha;
+    st.className='publish-status ok'; st.textContent='✓ '+(label || 'Enregistré')+' — données à jour sur GitHub.';
+    showToast('✓ '+(label || 'Enregistré'));
+    return true;
+  }
+  st.className='publish-status err'; st.textContent='✗ Échec de l\'enregistrement — vérifiez votre token et votre connexion.';
+  return false;
+}
+
+function newId(prefix){ return prefix+'_'+Date.now().toString(36)+'_'+Math.floor(Math.random()*1e4).toString(36); }
+function todayIso(){ return new Date().toISOString().slice(0,10); }
+function frOfIso(iso){ if(!iso) return '—'; var m=iso.match(/(\d{4})-(\d{2})-(\d{2})/); return m ? m[3]+'/'+m[2]+'/'+m[1] : iso; }
+
+// ── Navigation interne ──────────────────────────────────────────────
+function showSaisieSub(sub){
+  saisieSub = sub;
+  ['quotidien','joueurs','alertes','matchs','donnees'].forEach(function(s){
+    var sec = document.getElementById('saisie-'+s);
+    if(sec) sec.style.display = s===sub ? '' : 'none';
+    var btn = document.getElementById('ssub-'+s);
+    if(btn){
+      btn.style.background = s===sub ? '#2D2660' : 'white';
+      btn.style.color = s===sub ? 'white' : '#2D2660';
+    }
+  });
+  renderSaisie();
+}
+
+function renderSaisie(){
+  if(!storeLoaded) return;
+  if(saisieSub==='quotidien') renderQuotidien();
+  else if(saisieSub==='joueurs') renderJoueurs();
+  else if(saisieSub==='alertes') renderAlertes();
+  else if(saisieSub==='matchs') renderMatchs();
+}
+
+// ═══ 1. QUESTIONNAIRE QUOTIDIEN ═════════════════════════════════════
+var Q_FIELDS = [
+  {key:'soins',             label:'Soins faits',        max:5,  step:1,  color:'#0EA5E9', help:'nombre d\'entretiens du jour', nullable:false},
+  {key:'prevention',        label:'Préventions faites', max:5,  step:1,  color:'#14B8A6', help:'nombre d\'entretiens du jour', nullable:false},
+  {key:'douleur',           label:'Douleur',            max:10, step:1,  color:'#EF4444', help:'0 = aucune · 10 = maximale', nullable:false},
+  {key:'fatigue',           label:'Fatigue',            max:10, step:1,  color:'#6B5CA5', help:'0 = frais · 10 = épuisé', nullable:false},
+  {key:'courbatures',       label:'Courbatures',        max:10, step:1,  color:'#FB923C', help:'0 = aucune · 10 = très fortes', nullable:false},
+  {key:'confianceMentale',  label:'Confiance mentale',  max:10, step:1,  color:'#3B82F6', help:'0 = nulle · 10 = totale', nullable:true},
+  {key:'confiancePhysique', label:'Confiance physique', max:10, step:1,  color:'#22C55E', help:'0 = nulle · 10 = totale', nullable:true}
+];
+
+function qSelectedPlayer(){ var s=document.getElementById('q-joueur'); return s ? s.value : ''; }
+function qDate(){ var d=document.getElementById('q-date'); return d && d.value ? d.value : todayIso(); }
+
+function renderQuotidien(){
+  var sel = document.getElementById('q-joueur');
+  var current = sel.value;
+  var profils = storeData.profils.slice().sort(function(a,b){ return a.joueur.localeCompare(b.joueur); });
+  sel.innerHTML = '<option value="">— Choisir un joueur —</option>'
+    + profils.map(function(p){ return '<option value="'+p.joueur+'">'+p.joueur+(p.blessure?' · '+p.blessure.slice(0,30):'')+'</option>'; }).join('');
+  if(current) sel.value = current;
+  if(!document.getElementById('q-date').value) document.getElementById('q-date').value = todayIso();
+  buildQuotidienForm();
+}
+
+function findSuivi(joueur, dateIso){
+  for(var i=0;i<storeData.suivi.length;i++){
+    var s = storeData.suivi[i];
+    if(s.joueur===joueur && s.date===dateIso) return s;
+  }
+  return null;
+}
+
+function buildQuotidienForm(){
+  var wrap = document.getElementById('q-form');
+  var joueur = qSelectedPlayer();
+  wrap.style.display = '';
+  var ex = document.getElementById('q-existing');
+  var existing = joueur ? findSuivi(joueur, qDate()) : null;
+  if(!joueur){
+    ex.innerHTML = '<span style="color:#888">Choisissez un joueur ci-dessus pour enregistrer la saisie du '+frOfIso(qDate())+'.</span>';
+  } else if(existing){
+    ex.innerHTML = '<span style="color:#B45309;font-weight:700">\u270F\uFE0F Une saisie existe d\u00E9j\u00E0 pour '+joueur+' le '+frOfIso(qDate())+' \u2014 vous la modifiez.</span>';
+  } else {
+    ex.innerHTML = '<span style="color:#22C55E;font-weight:600">Nouvelle saisie pour '+joueur+' \u2014 '+frOfIso(qDate())+'</span>';
+  }
+  var v = existing || {soins:0, prevention:0, douleur:0, fatigue:0, courbatures:0,
+                       confianceMentale:null, confiancePhysique:null, commentaire:''};
+
+  var html = '';
+  Q_FIELDS.forEach(function(f){
+    var val = v[f.key];
+    html += '<div style="margin-bottom:14px">'
+      + '<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px">'
+      + '<span style="font-size:.82rem;font-weight:700;color:#2D2660">'+f.label+' <span style="font-weight:400;color:#999;font-size:.68rem">/'+f.max+'</span></span>'
+      + '<span style="font-size:.66rem;color:#999">'+f.help+'</span></div>'
+      + '<div style="display:flex;flex-wrap:wrap;gap:4px" id="qbtns-'+f.key+'">';
+    if(f.nullable){
+      var selNone = (val===null||val===undefined);
+      html += '<button type="button" onclick="qSet(\''+f.key+'\',null)" data-v="null" style="padding:7px 10px;border-radius:8px;border:1.5px solid #DDD;background:'+(selNone?'#888':'white')+';color:'+(selNone?'white':'#888')+';cursor:pointer;font-size:.72rem;font-weight:600">N/R</button>';
+    }
+    for(var x=0; x<=f.max; x+=f.step){
+      var active = (val!==null && val!==undefined && Number(val)===x);
+      html += '<button type="button" onclick="qSet(\''+f.key+'\','+x+')" data-v="'+x+'" style="min-width:36px;padding:9px 0;border-radius:8px;border:1.5px solid '+(active?f.color:'#DDD')+';background:'+(active?f.color:'white')+';color:'+(active?'white':'#444')+';cursor:pointer;font-size:.82rem;font-weight:700">'+x+'</button>';
+    }
+    html += '</div></div>';
+  });
+
+  html += '<div style="margin-bottom:14px"><div style="font-size:.82rem;font-weight:700;color:#2D2660;margin-bottom:5px">Commentaires</div>'
+    + '<textarea id="q-commentaire" rows="3" placeholder="Observations de la s\u00E9ance, ressenti, points techniques..." style="width:100%;padding:10px 12px;border:1.5px solid #DDD;border-radius:10px;font-size:.82rem;font-family:inherit;resize:vertical">'+(v.commentaire||'')+'</textarea></div>';
+
+  html += '<button onclick="saveQuotidien()" style="padding:12px 28px;border:none;border-radius:10px;background:#22C55E;color:white;font-weight:800;font-size:.88rem;cursor:pointer;width:100%">\uD83D\uDCBE '+(existing?'Mettre \u00E0 jour la saisie':'Enregistrer la saisie')+'</button>';
+
+  wrap.innerHTML = html;
+  window._qVals = {soins:v.soins||0, prevention:v.prevention||0,
+                   douleur:v.douleur||0, fatigue:v.fatigue||0, courbatures:v.courbatures||0,
+                   confianceMentale:(v.confianceMentale===undefined?null:v.confianceMentale),
+                   confiancePhysique:(v.confiancePhysique===undefined?null:v.confiancePhysique)};
+}
+
+function qSet(key, val){
+  window._qVals[key] = val;
+  var f = null;
+  Q_FIELDS.forEach(function(x){ if(x.key===key) f=x; });
+  var box = document.getElementById('qbtns-'+key);
+  Array.prototype.forEach.call(box.querySelectorAll('button'), function(b){
+    var bv = b.dataset.v==='null' ? null : Number(b.dataset.v);
+    var active = (val===null && bv===null) || (val!==null && bv!==null && bv===val);
+    var col = (bv===null) ? '#888' : f.color;
+    b.style.background = active ? col : 'white';
+    b.style.color = active ? 'white' : (bv===null?'#888':'#444');
+    b.style.borderColor = active ? col : '#DDD';
+  });
+}
+async function saveQuotidien(){
+  var joueur = qSelectedPlayer();
+  if(!joueur) return;
+  var dateIso = qDate();
+  var vals = window._qVals;
+  var com = document.getElementById('q-commentaire').value.trim();
+  var existing = findSuivi(joueur, dateIso);
+  if(existing){
+    existing.soins = vals.soins; existing.prevention = vals.prevention;
+    existing.douleur = vals.douleur; existing.fatigue = vals.fatigue; existing.courbatures = vals.courbatures;
+    existing.confianceMentale = vals.confianceMentale; existing.confiancePhysique = vals.confiancePhysique;
+    existing.commentaire = com;
+  } else {
+    storeData.suivi.push({id:newId('s'), date:dateIso, joueur:joueur,
+      douleur:vals.douleur, courbatures:vals.courbatures, fatigue:vals.fatigue,
+      soins:vals.soins, prevention:vals.prevention,
+      confiancePhysique:vals.confiancePhysique, confianceMentale:vals.confianceMentale,
+      commentaire:com});
+  }
+  var ok = await storeSave('Saisie '+joueur+' — '+frOfIso(dateIso));
+  if(ok) buildQuotidienForm();
+}
+
+// ═══ 2. JOUEURS ═════════════════════════════════════════════════════
+function renderJoueurs(){
+  var list = document.getElementById('joueurs-list');
+  var profils = storeData.profils.slice().sort(function(a,b){ return a.joueur.localeCompare(b.joueur); });
+  if(!profils.length){ list.innerHTML='<div class="empty-list">Aucun joueur — créez le premier ci-dessous ou migrez votre ODS (sous-onglet Données).</div>'; }
+  else {
+    list.innerHTML = profils.map(function(p){
+      var nSuivi = storeData.suivi.filter(function(s){ return s.joueur===p.joueur; }).length;
+      return '<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid #EEE;border-radius:10px;margin-bottom:8px;background:#FAFAFE">'
+        + '<div style="flex:1;min-width:0"><div style="font-weight:700;color:#2D2660">'+p.joueur+'</div>'
+        + '<div style="font-size:.72rem;color:#666">'+[p.categorie, p.blessure, p.statutProtocole].filter(Boolean).join(' · ')+'</div>'
+        + '<div style="font-size:.68rem;color:#999">Reprise '+frOfIso(p.dateReprise)+' · 1er match '+frOfIso(p.datePremierMatch)+' · '+nSuivi+' saisie(s)</div></div>'
+        + '<button onclick="editJoueur(\''+p.joueur.replace(/'/g,"\\'")+'\')" style="padding:6px 14px;border:1.5px solid #2D2660;border-radius:8px;background:white;color:#2D2660;cursor:pointer;font-size:.72rem;font-weight:700">Modifier</button>'
+        + '</div>';
+    }).join('');
+  }
+  if(!editJoueurNom) resetJoueurForm();
+}
+
+function resetJoueurForm(){
+  editJoueurNom = null;
+  document.getElementById('jf-title').textContent = '➕ Nouveau joueur';
+  ['jf-nom','jf-cat','jf-blessure','jf-etat','jf-focus','jf-vigilance','jf-reprise','jf-match'].forEach(function(id){ document.getElementById(id).value=''; });
+  for(var i=0;i<6;i++) document.getElementById('jf-iprrs-'+i).value='';
+  document.getElementById('jf-delete').style.display='none';
+}
+
+function editJoueur(nom){
+  var p = null;
+  storeData.profils.forEach(function(x){ if(x.joueur===nom) p=x; });
+  if(!p) return;
+  editJoueurNom = nom;
+  document.getElementById('jf-title').textContent = '✏️ Modifier — '+nom;
+  document.getElementById('jf-nom').value = p.joueur;
+  document.getElementById('jf-cat').value = p.categorie||'';
+  document.getElementById('jf-blessure').value = p.blessure||'';
+  document.getElementById('jf-etat').value = p.statutProtocole||'';
+  document.getElementById('jf-focus').value = p.focusPrevention||'';
+  document.getElementById('jf-vigilance').value = p.pointsVigilance||'';
+  document.getElementById('jf-reprise').value = p.dateReprise||'';
+  document.getElementById('jf-match').value = p.datePremierMatch||'';
+  for(var i=0;i<6;i++) document.getElementById('jf-iprrs-'+i).value = (p.iprrs && p.iprrs[i]!==undefined) ? p.iprrs[i] : '';
+  document.getElementById('jf-delete').style.display='';
+  document.getElementById('jf-nom').scrollIntoView({behavior:'smooth', block:'center'});
+}
+
+async function saveJoueur(){
+  var nom = document.getElementById('jf-nom').value.trim();
+  if(!nom){ alert('Le nom du joueur est obligatoire.'); return; }
+  var iprrs = [];
+  for(var i=0;i<6;i++){
+    var v = Number(document.getElementById('jf-iprrs-'+i).value);
+    iprrs.push(isNaN(v) ? 0 : Math.max(0, Math.min(10, v)));
+  }
+  var obj = {
+    joueur: nom,
+    categorie: document.getElementById('jf-cat').value.trim(),
+    blessure: document.getElementById('jf-blessure').value.trim(),
+    statutProtocole: document.getElementById('jf-etat').value.trim(),
+    focusPrevention: document.getElementById('jf-focus').value.trim(),
+    pointsVigilance: document.getElementById('jf-vigilance').value.trim(),
+    dateReprise: document.getElementById('jf-reprise').value || null,
+    datePremierMatch: document.getElementById('jf-match').value || null,
+    iprrs: iprrs
+  };
+  var replaced = false;
+  var target = editJoueurNom || nom;
+  for(var k=0;k<storeData.profils.length;k++){
+    if(storeData.profils[k].joueur===target){ storeData.profils[k]=obj; replaced=true; break; }
+  }
+  if(!replaced){
+    // pas de doublon silencieux : si un profil du même nom existe, on le remplace
+    var dup=false;
+    for(var k2=0;k2<storeData.profils.length;k2++){
+      if(storeData.profils[k2].joueur===nom){ storeData.profils[k2]=obj; dup=true; break; }
+    }
+    if(!dup) storeData.profils.push(obj);
+  }
+  // renommage : répercuter sur suivi/alertes/matchs
+  if(editJoueurNom && editJoueurNom!==nom){
+    storeData.suivi.forEach(function(s){ if(s.joueur===editJoueurNom) s.joueur=nom; });
+    storeData.alertes.forEach(function(a){ if(a.joueur===editJoueurNom) a.joueur=nom; });
+    storeData.matchs.forEach(function(m){ if(m.joueur===editJoueurNom) m.joueur=nom; });
+  }
+  var ok = await storeSave('Profil '+nom);
+  if(ok){ resetJoueurForm(); renderJoueurs(); }
+}
+
+async function deleteJoueur(){
+  if(!editJoueurNom) return;
+  var n = storeData.suivi.filter(function(s){ return s.joueur===editJoueurNom; }).length;
+  if(!window.confirm('Supprimer '+editJoueurNom+' et TOUTES ses données ('+n+' saisies, alertes et matchs associés) ?\n\nCette action est irréversible.')) return;
+  storeData.profils = storeData.profils.filter(function(p){ return p.joueur!==editJoueurNom; });
+  storeData.suivi = storeData.suivi.filter(function(s){ return s.joueur!==editJoueurNom; });
+  storeData.alertes = storeData.alertes.filter(function(a){ return a.joueur!==editJoueurNom; });
+  storeData.matchs = storeData.matchs.filter(function(m){ return m.joueur!==editJoueurNom; });
+  var ok = await storeSave('Suppression '+editJoueurNom);
+  if(ok){ resetJoueurForm(); renderJoueurs(); }
+}
+
+// ═══ 3. ALERTES ═════════════════════════════════════════════════════
+function renderAlertes(){
+  fillPlayerSelect('af-joueur');
+  var list = document.getElementById('alertes-list');
+  var showAll = document.getElementById('af-show-all').checked;
+  var items = storeData.alertes.slice().sort(function(a,b){ return (b.date||'').localeCompare(a.date||''); })
+    .filter(function(a){ return showAll || String(a.statut).toLowerCase()==='ouverte'; });
+  var cols = {rouge:'#EF4444', orange:'#FB923C', jaune:'#EAB308'};
+  if(!items.length){ list.innerHTML='<div class="empty-list">'+(showAll?'Aucune alerte enregistrée.':'Aucune alerte ouverte. ✓')+'</div>'; return; }
+  list.innerHTML = items.map(function(a){
+    var c = cols[String(a.niveau).toLowerCase()] || '#FB923C';
+    var open = String(a.statut).toLowerCase()==='ouverte';
+    return '<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-left:4px solid '+c+';border-radius:8px;margin-bottom:8px;background:'+(open?'#FFF7ED':'#F8F8F8')+'">'
+      + '<span class="cat-badge" style="background:'+c+'">'+a.niveau+'</span>'
+      + '<div style="flex:1;min-width:0"><div style="font-weight:700;color:#2D2660;font-size:.82rem">'+a.joueur+'</div>'
+      + '<div style="font-size:.76rem;color:#444">'+a.texte+'</div>'
+      + '<div style="font-size:.68rem;color:#999">'+frOfIso(a.date)+' · '+a.statut+'</div></div>'
+      + (open ? '<button onclick="resoudreAlerte(\''+a.id+'\')" style="padding:6px 12px;border:1.5px solid #22C55E;border-radius:8px;background:white;color:#22C55E;cursor:pointer;font-size:.7rem;font-weight:700">✓ Résoudre</button>' : '')
+      + '<button onclick="editAlerte(\''+a.id+'\')" style="padding:6px 12px;border:1.5px solid #2D2660;border-radius:8px;background:white;color:#2D2660;cursor:pointer;font-size:.7rem;font-weight:700">Modifier</button>'
+      + '</div>';
+  }).join('');
+}
+
+function resetAlerteForm(){
+  editAlerteId = null;
+  document.getElementById('af-title').textContent='➕ Nouvelle alerte';
+  document.getElementById('af-date').value = todayIso();
+  document.getElementById('af-niveau').value = 'Orange';
+  document.getElementById('af-statut').value = 'Ouverte';
+  document.getElementById('af-texte').value = '';
+  document.getElementById('af-delete').style.display='none';
+}
+
+function editAlerte(id){
+  var a=null; storeData.alertes.forEach(function(x){ if(x.id===id) a=x; });
+  if(!a) return;
+  editAlerteId = id;
+  document.getElementById('af-title').textContent='✏️ Modifier l\'alerte';
+  document.getElementById('af-joueur').value = a.joueur;
+  document.getElementById('af-date').value = a.date || todayIso();
+  document.getElementById('af-niveau').value = a.niveau || 'Orange';
+  document.getElementById('af-statut').value = a.statut || 'Ouverte';
+  document.getElementById('af-texte').value = a.texte || '';
+  document.getElementById('af-delete').style.display='';
+}
+
+async function resoudreAlerte(id){
+  var a=null; storeData.alertes.forEach(function(x){ if(x.id===id) a=x; });
+  if(!a) return;
+  a.statut = 'Résolue';
+  var ok = await storeSave('Alerte résolue — '+a.joueur);
+  if(ok) renderAlertes();
+}
+
+async function saveAlerte(){
+  var joueur = document.getElementById('af-joueur').value;
+  var texte = document.getElementById('af-texte').value.trim();
+  if(!joueur){ alert('Choisissez un joueur.'); return; }
+  if(!texte){ alert('Décrivez l\'alerte.'); return; }
+  var obj = {
+    id: editAlerteId || newId('a'),
+    date: document.getElementById('af-date').value || todayIso(),
+    joueur: joueur,
+    niveau: document.getElementById('af-niveau').value,
+    statut: document.getElementById('af-statut').value,
+    texte: texte
+  };
+  if(editAlerteId){
+    for(var k=0;k<storeData.alertes.length;k++) if(storeData.alertes[k].id===editAlerteId){ storeData.alertes[k]=obj; break; }
+  } else storeData.alertes.push(obj);
+  var ok = await storeSave('Alerte '+joueur);
+  if(ok){ resetAlerteForm(); renderAlertes(); }
+}
+
+async function deleteAlerte(){
+  if(!editAlerteId) return;
+  if(!window.confirm('Supprimer définitivement cette alerte ?')) return;
+  storeData.alertes = storeData.alertes.filter(function(a){ return a.id!==editAlerteId; });
+  var ok = await storeSave('Alerte supprimée');
+  if(ok){ resetAlerteForm(); renderAlertes(); }
+}
+
+// ═══ 4. MATCHS ══════════════════════════════════════════════════════
+function renderMatchs(){
+  fillPlayerSelect('mf-joueur');
+  var list = document.getElementById('matchs-list');
+  var items = storeData.matchs.slice().sort(function(a,b){ return (b.date||'').localeCompare(a.date||''); });
+  if(!items.length){ list.innerHTML='<div class="empty-list">Aucun match enregistré.</div>'; return; }
+  list.innerHTML = items.map(function(m){
+    return '<div style="display:flex;align-items:center;gap:10px;padding:9px 12px;border:1px solid #EEE;border-radius:8px;margin-bottom:6px;background:#FAFAFE">'
+      + '<div style="font-weight:800;color:#22C55E;font-size:1rem;min-width:42px">'+m.temps+'\'</div>'
+      + '<div style="flex:1;min-width:0"><div style="font-weight:700;color:#2D2660;font-size:.82rem">'+m.joueur+'</div>'
+      + '<div style="font-size:.74rem;color:#666">vs '+(m.adversaire||'—')+(m.categorie?' · '+m.categorie:'')+' · '+frOfIso(m.date)+'</div></div>'
+      + '<button onclick="editMatch(\''+m.id+'\')" style="padding:6px 12px;border:1.5px solid #2D2660;border-radius:8px;background:white;color:#2D2660;cursor:pointer;font-size:.7rem;font-weight:700">Modifier</button>'
+      + '</div>';
+  }).join('');
+}
+
+function resetMatchForm(){
+  editMatchId = null;
+  document.getElementById('mf-title').textContent='➕ Nouveau match';
+  document.getElementById('mf-date').value = todayIso();
+  document.getElementById('mf-adv').value = '';
+  document.getElementById('mf-temps').value = '';
+  document.getElementById('mf-cat').value = '';
+  document.getElementById('mf-delete').style.display='none';
+}
+
+function editMatch(id){
+  var m=null; storeData.matchs.forEach(function(x){ if(x.id===id) m=x; });
+  if(!m) return;
+  editMatchId = id;
+  document.getElementById('mf-title').textContent='✏️ Modifier le match';
+  document.getElementById('mf-joueur').value = m.joueur;
+  document.getElementById('mf-date').value = m.date || todayIso();
+  document.getElementById('mf-adv').value = m.adversaire || '';
+  document.getElementById('mf-temps').value = m.temps;
+  document.getElementById('mf-cat').value = m.categorie || '';
+  document.getElementById('mf-delete').style.display='';
+}
+
+async function saveMatch(){
+  var joueur = document.getElementById('mf-joueur').value;
+  if(!joueur){ alert('Choisissez un joueur.'); return; }
+  var temps = parseInt(document.getElementById('mf-temps').value, 10);
+  if(isNaN(temps) || temps < 0){ alert('Temps de jeu invalide (minutes).'); return; }
+  var obj = {
+    id: editMatchId || newId('m'),
+    date: document.getElementById('mf-date').value || todayIso(),
+    joueur: joueur,
+    adversaire: document.getElementById('mf-adv').value.trim(),
+    temps: temps,
+    categorie: document.getElementById('mf-cat').value.trim()
+  };
+  if(editMatchId){
+    for(var k=0;k<storeData.matchs.length;k++) if(storeData.matchs[k].id===editMatchId){ storeData.matchs[k]=obj; break; }
+  } else storeData.matchs.push(obj);
+  var ok = await storeSave('Match '+joueur+' — '+obj.temps+'\'');
+  if(ok){ resetMatchForm(); renderMatchs(); }
+}
+
+async function deleteMatch(){
+  if(!editMatchId) return;
+  if(!window.confirm('Supprimer définitivement ce match ?')) return;
+  storeData.matchs = storeData.matchs.filter(function(m){ return m.id!==editMatchId; });
+  var ok = await storeSave('Match supprimé');
+  if(ok){ resetMatchForm(); renderMatchs(); }
+}
+
+function fillPlayerSelect(id){
+  var sel = document.getElementById(id);
+  if(!sel) return;
+  var cur = sel.value;
+  var profils = storeData.profils.slice().sort(function(a,b){ return a.joueur.localeCompare(b.joueur); });
+  sel.innerHTML = '<option value="">— Joueur —</option>'
+    + profils.map(function(p){ return '<option value="'+p.joueur+'">'+p.joueur+'</option>'; }).join('');
+  if(cur) sel.value = cur;
+}
+
+// ═══ 5. DONNÉES / MIGRATION ═════════════════════════════════════════
+async function migrerOds(file){
+  if(!file) return;
+  var st = document.getElementById('migration-status');
+  st.className='publish-status loading'; st.textContent='Lecture de l\'ODS...';
+  try{
+    var buf = await file.arrayBuffer();
+    var wb = XLSX.read(buf, {type:'array', cellDates:true});
+    var data = TFCEngine.loadWorkbook(wb, XLSX);
+    var json = TFCStore.odsToJson(data);
+    var msg = json.profils.length+' joueurs · '+json.suivi.length+' saisies · '+json.alertes.length+' alertes · '+json.matchs.length+' matchs';
+    var hasData = storeData && (storeData.profils.length || storeData.suivi.length);
+    var q = hasData
+      ? 'ATTENTION : des données existent déjà en ligne ('+storeData.profils.length+' joueurs, '+storeData.suivi.length+' saisies).\n\nLa migration va les REMPLACER par le contenu de l\'ODS ('+msg+').\n\nContinuer ?'
+      : 'Migrer le contenu de l\'ODS vers suivi_data.json ?\n\n'+msg;
+    if(!window.confirm(q)){ st.textContent=''; return; }
+    storeData = json;
+    var ok = await storeSave('Migration ODS → suivi_data.json');
+    if(ok){
+      st.className='publish-status ok';
+      st.textContent = '✓ Migration terminée — '+msg+'. Votre ODS n\'est plus nécessaire.';
+      renderSaisie();
+    }
+  } catch(e){
+    st.className='publish-status err';
+    st.textContent='✗ Migration impossible : '+e.message;
+  }
+  document.getElementById('file-input-migration').value='';
+}
+
+// ═══ GÉNÉRATION DEPUIS LE STORE ═════════════════════════════════════
+async function chargerDepuisStore(){
+  var st = document.getElementById('ods-status');
+  st.className='publish-status loading'; st.textContent='Chargement des données en ligne...';
+  if(!storeLoaded){
+    var ok = await storeLoad(true);
+    if(!ok){ st.className='publish-status err'; st.textContent='✗ Impossible de charger suivi_data.json — token configuré ?'; return; }
+  }
+  if(!storeData.suivi.length){
+    st.className='publish-status err';
+    st.textContent='✗ Aucune saisie dans les données en ligne — utilisez l\'onglet Saisie ou migrez votre ODS.';
+    return;
+  }
+  odsData = TFCStore.jsonToEngine(storeData);
+  odsFileName = 'suivi_data.json (en ligne)';
+  st.className='publish-status ok';
+  st.textContent='✓ Données en ligne chargées — '+storeData.profils.length+' profils · '+storeData.suivi.length+' saisies · '+storeData.alertes.length+' alertes · '+storeData.matchs.length+' matchs';
+  document.getElementById('gen-analyse-row').style.display='flex';
+  document.getElementById('gen-preview-card').style.display='none';
+}
+
 document.addEventListener('DOMContentLoaded', function(){
   setupDropOds();
   var gd = document.getElementById('gen-date');
   if(gd && !gd.value){ var t=new Date(); gd.value = t.toISOString().slice(0,10); }
+  resetAlerteForm(); resetMatchForm();
+  if(getToken()) storeLoad(true).then(function(){
+    var st = document.getElementById('saisie-store-status');
+    if(storeLoaded && st){ st.className='publish-status ok'; st.textContent = storeSha ? ('✓ Données en ligne — '+storeData.profils.length+' joueurs · '+storeData.suivi.length+' saisies · '+storeData.alertes.length+' alertes · '+storeData.matchs.length+' matchs') : 'ℹ️ Aucun suivi_data.json — migrez votre ODS (sous-onglet Données) ou créez vos joueurs.'; }
+  });
 });
 </script>
 <div class="toast" id="toast"></div>
