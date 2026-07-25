@@ -20,7 +20,21 @@
    ]
   }
  ],
- "suivi": [],
+ "suivi": [
+  {
+   "id": "s_mrzzhm9z_7mf",
+   "date": "2026-07-25",
+   "joueur": "Frederique Efuele",
+   "douleur": 4,
+   "courbatures": 4,
+   "fatigue": 6,
+   "soins": 2,
+   "prevention": 2,
+   "confiancePhysique": 5,
+   "confianceMentale": 4,
+   "commentaire": ""
+  }
+ ],
  "alertes": [],
  "matchs": []
 }
