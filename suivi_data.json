@@ -56,6 +56,22 @@
    "douleurZone": "",
    "courbaturesZone": "",
    "courbaturesLateralite": ""
+  },
+  {
+   "id": "s_ms05y3eh_230",
+   "date": "2026-07-25",
+   "joueur": "Darren Bique",
+   "douleur": 0,
+   "courbatures": 1,
+   "fatigue": 1,
+   "soins": 2,
+   "prevention": 3,
+   "confiancePhysique": 9,
+   "confianceMentale": 10,
+   "douleurZone": "",
+   "courbaturesZone": "Quadriceps",
+   "courbaturesLateralite": "Bilatéral",
+   "commentaire": ""
   }
  ],
  "alertes": [],
