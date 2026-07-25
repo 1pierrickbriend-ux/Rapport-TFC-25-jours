@@ -19,6 +19,25 @@
     0
    ],
    "etatSuivi": "en_cours"
+  },
+  {
+   "joueur": "Darren Bique",
+   "categorie": "N2",
+   "blessure": "Lésion Grade 1 Quadriceps Droit",
+   "statutProtocole": "",
+   "focusPrevention": "Isométrie Quadri / terciaire",
+   "pointsVigilance": "Sprint pas avant le 30/07",
+   "dateReprise": "2026-07-25",
+   "datePremierMatch": null,
+   "iprrs": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "etatSuivi": "en_cours"
   }
  ],
  "suivi": [
