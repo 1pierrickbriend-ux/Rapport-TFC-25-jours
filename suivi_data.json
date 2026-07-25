@@ -1,0 +1,26 @@
+{
+ "version": 2,
+ "profils": [
+  {
+   "joueur": "Frederique Efuele",
+   "categorie": "N2",
+   "blessure": "Lésion Grade 2 adducteur Droit",
+   "statutProtocole": "En cours",
+   "focusPrevention": "Pubalgie",
+   "pointsVigilance": "",
+   "dateReprise": "2026-07-25",
+   "datePremierMatch": null,
+   "iprrs": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ]
+  }
+ ],
+ "suivi": [],
+ "alertes": [],
+ "matchs": []
+}
