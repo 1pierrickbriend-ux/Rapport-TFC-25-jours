@@ -126,32 +126,6 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);min-height
   </div>
 
   <div id="section-rapports">
-  <!-- UPLOAD NOUVEAU RAPPORT -->
-  <div class="card">
-    <div class="card-title">📤 Publier un nouveau rapport</div>
-    <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
-      <input type="file" id="file-input" accept=".html" onchange="handleFile(this.files[0])">
-      <div class="drop-zone-icon">📂</div>
-      <div class="drop-zone-text">Glissez votre rapport ici ou cliquez pour choisir</div>
-      <div class="drop-zone-sub">Fichier HTML généré par votre script</div>
-    </div>
-
-    <div class="preview-card" id="preview-card">
-      <div class="preview-row">
-        <div style="font-size:2rem">📋</div>
-        <div class="preview-info">
-          <div class="preview-date" id="preview-date">—</div>
-          <div class="preview-meta" id="preview-meta">—</div>
-          <div class="preview-cats" id="preview-cats"></div>
-        </div>
-      </div>
-      <div class="publish-row">
-        <button class="btn btn-primary" id="publish-btn" onclick="publishReport()">✓ Publier en ligne</button>
-        <span class="publish-status" id="publish-status"></span>
-      </div>
-    </div>
-  </div>
-
   <!-- LISTE DES RAPPORTS -->
   <div class="card">
     <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px">
@@ -167,29 +141,6 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);min-height
 
   <!-- SECTION BILANS -->
   <div id="section-bilans" style="display:none">
-  <div class="card">
-    <div class="card-title">👤 Publier un bilan individuel</div>
-    <div class="drop-zone" id="drop-zone-bilan" onclick="document.getElementById('file-input-bilan').click()">
-      <input type="file" id="file-input-bilan" accept=".html" onchange="handleBilan(this.files[0])">
-      <div class="drop-zone-icon">📂</div>
-      <div class="drop-zone-text">Glissez le bilan HTML d'un joueur ici</div>
-      <div class="drop-zone-sub">Fichier Bilan_NomJoueur.html généré par votre script</div>
-    </div>
-    <div class="preview-card" id="preview-bilan-card">
-      <div class="preview-row">
-        <div style="font-size:2rem">👤</div>
-        <div class="preview-info">
-          <div class="preview-date" id="preview-bilan-nom">—</div>
-          <div class="preview-meta" id="preview-bilan-meta">—</div>
-          <div class="preview-cats" id="preview-bilan-cats"></div>
-        </div>
-      </div>
-      <div class="publish-row">
-        <button class="btn btn-primary" id="publish-bilan-btn" onclick="publishBilan()">✓ Publier le bilan</button>
-        <span class="publish-status" id="publish-bilan-status"></span>
-      </div>
-    </div>
-  </div>
   <!-- PHOTOS JOUEURS -->
   <div class="card">
     <div class="card-title">📸 Photos joueurs</div>
@@ -297,8 +248,6 @@ function populateSeasonSelect(selectId, seasonsPresent, selected){
   }).join('');
 }
 
-let currentFile = null;
-let currentMeta = null;
 let deleteTarget = null;
 let manifest = {};
 
@@ -363,65 +312,7 @@ window.addEventListener('load', ()=>{
     verifyToken(t);
   }
   loadManifest();
-  setupDrop();
 });
-
-// ── DRAG & DROP ────────────────────────────────────────────────────────────
-function setupDrop(){
-  const dz = document.getElementById('drop-zone');
-  dz.addEventListener('dragover', e=>{e.preventDefault();dz.classList.add('drag-over');});
-  dz.addEventListener('dragleave', ()=>dz.classList.remove('drag-over'));
-  dz.addEventListener('drop', e=>{
-    e.preventDefault(); dz.classList.remove('drag-over');
-    const f = e.dataTransfer.files[0];
-    if(f && f.name.endsWith('.html')) handleFile(f);
-  });
-}
-
-function extractJoueursStatuts(html){
-  const NORMALIZE = {'PRÊT':'PRÊT','SURV.':'SURVEILLANCE','SURVEILLANCE':'SURVEILLANCE','VIGIL.':'VIGILANCE','VIGILANCE':'VIGILANCE'};
-  const re = /<span class="pano-name">([^<]+)<\/span>[\s\S]*?<span class="rri-badge"[^>]*>([^<]+)<\/span>/g;
-  const seen = new Set();
-  const joueurs = [];
-  let m;
-  while((m = re.exec(html)) !== null){
-    const nom = m[1].trim();
-    if(seen.has(nom)) continue;
-    seen.add(nom);
-    const statutRaw = m[2].trim();
-    joueurs.push({nom, statut: NORMALIZE[statutRaw] || statutRaw});
-  }
-  const statuts = {'PRÊT':0,'SURVEILLANCE':0,'VIGILANCE':0};
-  joueurs.forEach(j=>{ if(statuts[j.statut] !== undefined) statuts[j.statut]++; });
-  return {joueurs, statuts};
-}
-
-function handleFile(file){
-  if(!file) return;
-  currentFile = file;
-  const reader = new FileReader();
-  reader.onload = e => {
-    const html = e.target.result;
-    const getMeta = name => {
-      const m = html.match(new RegExp(`name="${name}"\\s+content="([^"]+)"`));
-      return m ? m[1] : '';
-    };
-    const date = getMeta('tfc-date') || '—';
-    const cats = getMeta('tfc-categories').split(',').filter(Boolean);
-    const players = getMeta('tfc-players') || '';
-    const {joueurs, statuts} = extractJoueursStatuts(html);
-    currentMeta = {date, cats, players, joueurs, statuts};
-
-    document.getElementById('preview-date').textContent = 'Entretiens du ' + date;
-    document.getElementById('preview-meta').textContent =
-      players + ' joueur' + (players>1?'s':'') + (cats.length ? ' · Catégories :' : '');
-    const cb = document.getElementById('preview-cats');
-    cb.innerHTML = cats.map(c=>`<span class="cat-badge" style="background:${catColor(c)}">${c}</span>`).join('');
-    document.getElementById('preview-card').style.display = 'block';
-    document.getElementById('publish-status').textContent = '';
-  };
-  reader.readAsText(file);
-}
 
 // ── GITHUB API ─────────────────────────────────────────────────────────────
 async function ghGet(path){
@@ -517,61 +408,6 @@ async function pollDeployment(url, statusEl, maxWait=120, interval=10){
   return false;
 }
 // ── PUBLIER ────────────────────────────────────────────────────────────────
-async function publishReport(){
-  if(!currentFile || !currentMeta) return;
-  if(!getToken()){ alert('Configurez d\'abord votre token GitHub.'); return; }
-
-  const st = document.getElementById('publish-status');
-  const btn = document.getElementById('publish-btn');
-  btn.disabled = true;
-  st.className = 'publish-status loading';
-  st.textContent = 'Publication en cours...';
-
-  try{
-    // Nom du fichier dans rapports/
-    const d = currentMeta.date.replace(/\//g,'');
-    const filename = `rapports/rapport_${d}.html`;
-
-    // Détection doublon (prop 5)
-    if(manifest[`rapport_${d}.html`]){
-      const confirm = window.confirm(`Un rapport du ${currentMeta.date} existe déjà en ligne.\n\nÉcraser ce rapport ?`);
-      if(!confirm){ btn.disabled=false; st.textContent=''; return; }
-    }
-
-    // Lire le contenu binaire du fichier
-    const arrayBuffer = await currentFile.arrayBuffer();
-
-    // Vérifier si fichier existe (pour obtenir SHA)
-    const existing = await ghGet(filename);
-    const sha = existing ? existing.sha : null;
-
-    // Uploader le rapport
-    const ok = await ghPutBinary(filename, arrayBuffer, sha);
-    if(!ok) throw new Error('Échec upload rapport');
-
-    // Mettre à jour le manifest
-    manifest[`rapport_${d}.html`] = {
-      date: currentMeta.date,
-      categories: currentMeta.cats,
-      players: parseInt(currentMeta.players) || 0,
-      statuts: currentMeta.statuts || {'PRÊT':0,'SURVEILLANCE':0,'VIGILANCE':0},
-      joueurs: currentMeta.joueurs || [],
-      saison: seasonOf(currentMeta.date)
-    };
-    await saveManifest();
-
-    st.className = 'publish-status ok';
-    st.textContent = '✓ Rapport envoyé sur GitHub — vérification du déploiement...';
-    await loadManifest();
-    const reportUrl = `${SITE}/rapports/${filename.replace('rapports/','')}`;
-    pollDeployment(reportUrl, st);
-  } catch(e){
-    st.className = 'publish-status err';
-    st.textContent = '✗ Erreur : ' + e.message;
-  }
-  btn.disabled = false;
-}
-
 // ── LISTE DES RAPPORTS ─────────────────────────────────────────────────────
 function relativeAge(dateStr){
   const m = dateStr.match(/(\d{2})\/(\d{2})\/(\d{4})/);
@@ -727,11 +563,6 @@ function showTab(tab){
   if(tab==='bilans') loadBilans();
 }
 document.addEventListener('DOMContentLoaded', function(){
-  var dz=document.getElementById('drop-zone-bilan');
-  if(!dz) return;
-  dz.addEventListener('dragover',function(e){e.preventDefault();dz.classList.add('drag-over');});
-  dz.addEventListener('dragleave',function(){dz.classList.remove('drag-over');});
-  dz.addEventListener('drop',function(e){e.preventDefault();dz.classList.remove('drag-over');var f=e.dataTransfer.files[0];if(f&&f.name.endsWith('.html'))handleBilan(f);});
   var dzp=document.getElementById('drop-zone-photo');
   if(dzp){
     dzp.addEventListener('dragover',function(e){e.preventDefault();dzp.classList.add('drag-over');});
@@ -739,53 +570,6 @@ document.addEventListener('DOMContentLoaded', function(){
     dzp.addEventListener('drop',function(e){e.preventDefault();dzp.classList.remove('drag-over');var f=e.dataTransfer.files[0];if(f&&f.type.indexOf('image/')===0)handlePhotoFile(f);});
   }
 });
-
-var currentBilanFile=null, currentBilanMeta=null;
-
-function handleBilan(file){
-  if(!file) return;
-  currentBilanFile=file;
-  var reader=new FileReader();
-  reader.onload=function(e){
-    var html=e.target.result;
-    function getMeta(name){var m=html.match(new RegExp('name="'+name+'"\s+content="([^"]+)"'));return m?m[1]:'';}
-    var joueur=getMeta('tfc-joueur')||file.name.replace('Bilan_','').replace('.html','').replace(/_/g,' ');
-    var catRaw=getMeta('tfc-categorie')||''; var cat=(['','—','nan','None'].includes(catRaw)?'':catRaw), statut=getMeta('tfc-statut')||'', rri=getMeta('tfc-rri')||'', date=getMeta('tfc-date')||'';
-    var jp=getMeta('tfc-jp')||'', dateFinProto=getMeta('tfc-date-fin-proto')||'';
-    currentBilanMeta={joueur:joueur,cat:cat,statut:statut,rri:rri,date:date,jp:jp,dateFinProto:dateFinProto};
-    document.getElementById('preview-bilan-nom').textContent=joueur;
-    document.getElementById('preview-bilan-meta').textContent=[cat,statut?'RRI '+rri+'/100':'',date].filter(Boolean).join(' · ');
-    var cols={'PRET':'#22C55E','SURVEILLANCE':'#FB923C','VIGILANCE':'#EF4444'};
-    var st2=statut.replace('É','E').replace('Ê','E');
-    document.getElementById('preview-bilan-cats').innerHTML=statut?'<span class="cat-badge" style="background:'+(cols[st2]||'#6B5CA5')+'">'+statut+'</span>':'';
-    document.getElementById('preview-bilan-card').style.display='block';
-    document.getElementById('publish-bilan-status').textContent='';
-  };
-  reader.readAsText(file);
-}
-
-async function publishBilan(){
-  if(!currentBilanFile||!currentBilanMeta) return;
-  if(!getToken()){alert('Configurez d\'abord votre token GitHub.');return;}
-  var st=document.getElementById('publish-bilan-status'), btn=document.getElementById('publish-bilan-btn');
-  btn.disabled=true; st.className='publish-status loading'; st.textContent='Publication en cours...';
-  try{
-    var nomFichier='Bilan_'+currentBilanMeta.joueur.replace(/ /g,'_')+'.html';
-    var filename='bilans/'+nomFichier;
-    var arrayBuffer=await currentBilanFile.arrayBuffer();
-    var existing=await ghGet(filename);
-    var sha=existing?existing.sha:null;
-    var ok=await ghPutBinary(filename,arrayBuffer,sha);
-    if(!ok) throw new Error('Echec upload bilan');
-    manifest['bilan_'+nomFichier]={joueur:currentBilanMeta.joueur,cat:currentBilanMeta.cat,statut:currentBilanMeta.statut,rri:currentBilanMeta.rri,date:currentBilanMeta.date,jp:currentBilanMeta.jp,dateFinProto:currentBilanMeta.dateFinProto,fichier:nomFichier,type:'bilan',saison:seasonOf(currentBilanMeta.date)};
-    await saveManifest();
-    st.className='publish-status ok'; st.textContent='✓ Bilan envoyé sur GitHub — vérification du déploiement...';
-    await loadBilans();
-    const bilanUrl=`${SITE}/bilans/${nomFichier}`;
-    pollDeployment(bilanUrl, st);
-  } catch(e){ st.className='publish-status err'; st.textContent='Erreur : '+e.message; }
-  btn.disabled=false;
-}
 
 async function loadBilans(){
   var list=document.getElementById('bilans-list');
@@ -1140,6 +924,7 @@ function askDeleteBilan(name,sha,joueur){
         <input type="checkbox" id="gen-cb-rapport" checked> Publier le rapport collectif
       </label>
       <button onclick="apercuRapport()" style="padding:8px 16px;border:1.5px solid #2D2660;border-radius:8px;background:white;color:#2D2660;font-weight:700;font-size:.78rem;cursor:pointer">Aperçu rapport</button>
+      <button onclick="telechargerRapport()" style="padding:8px 16px;border:1.5px solid #22C55E;border-radius:8px;background:white;color:#22C55E;font-weight:700;font-size:.78rem;cursor:pointer">⬇️ Télécharger (WhatsApp)</button>
       <button id="gen-publish-btn" onclick="publierGeneration()" style="padding:10px 24px;border:none;border-radius:8px;background:#22C55E;color:white;font-weight:800;font-size:.82rem;cursor:pointer">🚀 Générer et publier la sélection</button>
     </div>
     <div id="gen-publish-status" class="publish-status" style="margin-top:10px"></div>
@@ -2385,8 +2170,7 @@ function generateBilanHTML(p, rd, photoDataUrl, tfcLogoDataUrl){
 
   var lastObsTxt = p.commentaires.length ? p.commentaires[p.commentaires.length-1].txt : '—';
   var lastObsHtml = '<div style="font-size:.8rem;color:'+LABEL+';font-style:italic;line-height:1.6">'+lastObsTxt+'</div>';
-  var btnHist = p.commentaires.length > 1
-    ? '<button class="toggle-btn" onclick="toggle(\'all-comments\')">&#9660; Voir tout l&#39;historique des commentaires</button>' : '';
+  var btnHist = p.commentaires.length > 1;
 
   // Détail IPRRS
   var iprrsDetailHtml = IPRRS_LABELS_COURTS.map(function(lbl, i){
@@ -2422,9 +2206,6 @@ function generateBilanHTML(p, rd, photoDataUrl, tfcLogoDataUrl){
     + '  body{zoom:.7;-webkit-print-color-adjust:exact;print-color-adjust:exact}\n'
     + '  .main{max-width:none;padding:6px 8px}\n'
     + '  .card,.row{break-inside:avoid;page-break-inside:avoid}\n'
-    + '  .toggle-btn{display:none !important}\n'
-    + '  .collapsible{max-height:none !important;overflow:visible !important}\n'
-    + '  #all-comments > div{max-height:none !important;overflow:visible !important}\n'
     + '  #frise-info-box{display:none !important}\n'
     + '}\n'
     + '*{box-sizing:border-box;margin:0;padding:0}\n'
@@ -2438,10 +2219,9 @@ function generateBilanHTML(p, rd, photoDataUrl, tfcLogoDataUrl){
     + '.card-title{font-size:.64rem;font-weight:800;color:'+LABEL+';letter-spacing:.07em;text-transform:uppercase;margin-bottom:8px}\n'
     + '.bar{background:rgba(255,255,255,0.1);border-radius:4px;height:6px;overflow:hidden;margin-top:4px}\n'
     + '.bar-fill{height:100%;border-radius:4px}\n'
-    + '.toggle-btn{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:'+LABEL+';padding:4px 12px;border-radius:16px;cursor:pointer;font-size:.7rem;font-weight:600;margin-top:8px;display:inline-block}\n'
-    + '.toggle-btn:hover{background:rgba(255,255,255,0.15)}\n'
-    + '.collapsible{max-height:0;overflow:hidden;transition:max-height .4s ease}\n'
-    + '.collapsible.open{max-height:2000px}\n'
+    + 'details>summary{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:'+LABEL+';padding:4px 12px;border-radius:16px;cursor:pointer;font-size:.7rem;font-weight:600;display:inline-block;list-style:none}\n'
+    + 'details>summary::-webkit-details-marker{display:none}\n'
+    + 'details>summary:hover{background:rgba(255,255,255,0.15)}\n'
     + '.row{display:grid;gap:10px;margin-bottom:10px}\n'
     + '.lbl-s{font-size:.68rem;color:'+LABEL+'}\n'
     + '.val-s{font-weight:600;font-size:.78rem;color:white;margin-top:1px}\n'
@@ -2468,10 +2248,12 @@ function generateBilanHTML(p, rd, photoDataUrl, tfcLogoDataUrl){
     + '      </div>\n    </div>\n'
     + '    <div class="card" style="border-left:3px solid '+GOLD+'">\n'
     + '      <div class="card-title" style="color:'+GOLD+'">Observations</div>\n'
-    + '      '+lastObsHtml+'\n      '+btnHist+'\n'
-    + '      <div class="collapsible" id="all-comments">\n'
-    + '        <div style="margin-top:8px;max-height:200px;overflow-y:auto;border-radius:8px;border:1px solid rgba(255,255,255,0.08)">'+comHtml+'</div>\n'
-    + '      </div>\n    </div>\n'
+    + '      '+lastObsHtml+'\n'
+    + (btnHist
+      ? '      <details style="margin-top:8px"><summary>&#9660; Voir tout l\'historique des commentaires</summary>'
+        +'<div style="margin-top:8px;max-height:200px;overflow-y:auto;border-radius:8px;border:1px solid rgba(255,255,255,0.08)">'+comHtml+'</div></details>\n'
+      : '')
+    + '    </div>\n'
     + '    <div class="card" style="text-align:center">\n'
     + '      <div class="card-title" style="text-align:left">RRI final /100</div>\n'
     + '      <div style="font-size:2.3rem;font-weight:800;line-height:1;color:'+col+'">'+p.rri+'<span style="font-size:.95rem;color:#E8E4F8;font-weight:400">/100</span></div>\n'
@@ -2482,10 +2264,9 @@ function generateBilanHTML(p, rd, photoDataUrl, tfcLogoDataUrl){
     + '      <div style="display:flex;justify-content:center;gap:8px;margin-top:8px;font-size:.6rem">\n'
     + '        <span style="color:'+GREEN2+'">●≥80</span><span style="color:'+ORANGE+'">●60-79</span><span style="color:'+RED+'">●&lt;60</span>\n'
     + '      </div>\n'
-    + '      <button class="toggle-btn" onclick="toggle(\'rri-detail\')">▶ 8 composantes</button>\n'
-    + '      <div class="collapsible" id="rri-detail" style="margin-top:8px;text-align:left">\n'
-    + '        <table><tbody>'+rriRows+'</tbody></table>\n'
-    + '      </div>\n    </div>\n'
+    + '      <details style="margin-top:8px;text-align:left"><summary>▶ 8 composantes</summary>\n'
+    + '        <table style="margin-top:6px"><tbody>'+rriRows+'</tbody></table>\n'
+    + '      </details>\n    </div>\n'
     + '    <div class="card" style="padding:6px;display:flex;align-items:stretch">\n      <div style="width:100%;min-height:140px">'+photoHtml+'</div>\n    </div>\n'
     + '  </div>\n\n'
     + '  <!-- LIGNE 2 : FRISE — PIÈCE MAÎTRESSE -->\n  <div class="card" style="border:2px solid '+GOLD+';margin-bottom:10px">\n'
@@ -2549,21 +2330,16 @@ function generateBilanHTML(p, rd, photoDataUrl, tfcLogoDataUrl){
     + '        <div>\n'
     + '          <div style="font-size:1.5rem;font-weight:800;color:'+GREEN+'">'+f0(p.iprrsTotal)+'<span style="font-size:.8rem;color:#E8E4F8">/60</span></div>\n'
     + '          <div style="font-size:.66rem;color:'+LABEL+'">Readiness compét.</div>\n'
-    + '          <button class="toggle-btn" onclick="toggle(\'iprrs-detail\')" style="font-size:.66rem;padding:3px 10px">▶ 6 questions</button>\n'
     + '        </div>\n      </div>\n'
-    + '      <div class="collapsible" id="iprrs-detail" style="margin-top:8px">\n'
-    + '        '+iprrsDetailHtml+'\n      </div>\n    </div>\n'
+    + '      <details style="margin-top:8px"><summary style="font-size:.72rem">▶ 6 questions</summary>\n'
+    + '        <div style="margin-top:6px">'+iprrsDetailHtml+'</div>\n      </details>\n    </div>\n'
     + '  </div>\n\n'
     + '  <!-- LIGNE 5 : ALERTES -->\n  <div class="card" style="margin-bottom:10px">\n'
     + '      <div class="card-title">Alertes identifiées</div>\n      '+alHtml+'\n  </div>\n\n</div>\n\n'
     + '<!-- FOOTER -->\n<div class="footer">\n'
     + '  <span>Bilan de fin de protocole — '+p.nom+' — TFC Cellule Performance & Réathlétisation — '+todayStr+'</span>\n'
     + '  <span>PIERRICK BRIEND</span>\n</div>\n\n'
-    + '<scr'+'ipt>\nfunction toggle(id){\n  var el=document.getElementById(id);\n  if(!el) return;\n'
-    + "  el.classList.toggle('open');\n  var btn=el.previousElementSibling;\n"
-    + "  if(btn && btn.classList.contains('toggle-btn'))\n"
-    + "    btn.textContent = el.classList.contains('open')\n"
-    + "      ? btn.textContent.replace('▶','▼')\n      : btn.textContent.replace('▼','▶');\n}\n"
+    + '<scr'+'ipt>\n'
     + 'function showPopup(e, msg){\n  e.stopPropagation();\n'
     + "  var box = document.getElementById('frise-info-box');\n  if(!box) return;\n"
     + "  box.textContent = msg;\n  box.style.display = 'block';\n  box.style.opacity = '1';\n}\n"
@@ -2867,7 +2643,7 @@ function analyserODS(){
       + '<td style="padding:8px 10px"><span class="cat-badge" style="background:'+c+'">'+statut+'</span></td>'
       + '<td style="padding:8px 10px;font-size:.78rem">'+(p.jp !== null ? 'J+'+p.jp : '—')+'</td>'
       + '<td style="padding:8px 10px;font-size:.78rem">'+p.matchs.length+'</td>'
-      + '<td style="padding:8px 10px"><button onclick="apercuBilan('+i+')" style="padding:4px 10px;border:1.5px solid #2D2660;border-radius:6px;background:white;color:#2D2660;cursor:pointer;font-size:.72rem;font-weight:600">Aperçu bilan</button></td>'
+      + '<td style="padding:8px 10px;white-space:nowrap"><button onclick="apercuBilan('+i+')" style="padding:4px 10px;border:1.5px solid #2D2660;border-radius:6px;background:white;color:#2D2660;cursor:pointer;font-size:.72rem;font-weight:600">Aperçu</button> <button onclick="telechargerBilan('+i+')" style="padding:4px 10px;border:1.5px solid #22C55E;border-radius:6px;background:white;color:#22C55E;cursor:pointer;font-size:.72rem;font-weight:600">⬇️</button></td>'
       + '</tr>';
   }).join('');
   card.style.display='block';
@@ -2935,6 +2711,39 @@ async function apercuBilan(idx){
   var photo = await fetchRepoImage('photos/' + p.nom.replace(/ /g,'_') + '.jpg');
   openHtmlPreview(TFCBilan.generateBilanHTML(p, genRd, photo, logo));
   st.className='publish-status ok'; st.textContent='✓ Aperçu du bilan de '+p.nom+' ouvert (non publié).';
+}
+
+// ── Téléchargement direct (fichier HTML interactif, prêt pour WhatsApp) ─────
+function downloadHtml(filename, htmlContent){
+  var blob = new Blob([htmlContent], {type:'text/html'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
+}
+
+async function telechargerRapport(){
+  if(!genPlayers.length) return;
+  var st = document.getElementById('gen-publish-status');
+  st.className='publish-status loading'; st.textContent='Préparation du fichier (photos + logo)...';
+  var logo = await fetchTfcLogo();
+  await attachPhotos(genPlayers);
+  var html = TFCReport.generateReportHTML(genPlayers, genRd, logo);
+  downloadHtml('rapport_'+TFCEngine.ddmmyyyy(genRd).replace(/\//g,'')+'.html', html);
+  st.className='publish-status ok'; st.textContent='✓ Rapport téléchargé — prêt à envoyer sur WhatsApp.';
+}
+
+async function telechargerBilan(idx){
+  var p = genPlayers[idx];
+  if(!p) return;
+  var st = document.getElementById('gen-publish-status');
+  st.className='publish-status loading'; st.textContent='Préparation du bilan de '+p.nom+'...';
+  var logo = await fetchTfcLogo();
+  var photo = await fetchRepoImage('photos/' + p.nom.replace(/ /g,'_') + '.jpg');
+  var html = TFCBilan.generateBilanHTML(p, genRd, photo, logo);
+  downloadHtml('Bilan_'+p.nom.replace(/ /g,'_')+'.html', html);
+  st.className='publish-status ok'; st.textContent='✓ Bilan de '+p.nom+' téléchargé — prêt à envoyer sur WhatsApp.';
 }
 
 // ── Publication ─────────────────────────────────────────────────────
