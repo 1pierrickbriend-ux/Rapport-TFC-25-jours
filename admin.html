@@ -1114,15 +1114,6 @@ function askDeleteBilan(name,sha,joueur){
     <div class="card-title">📡 Source des données</div>
     <div style="font-size:.78rem;color:#666;margin-bottom:10px">Le rapport et les bilans se génèrent ici à partir de vos saisies en ligne, puis se publient : ils deviennent alors visibles par le staff sur le portail (index.html) et dans les onglets Rapports / Bilans. Chaque bilan embarque un bouton 📄 Télécharger en PDF pour l'envoi WhatsApp.</div>
     <button onclick="chargerDepuisStore()" style="padding:11px 22px;border:none;border-radius:10px;background:#2D2660;color:white;font-weight:800;font-size:.82rem;cursor:pointer">📡 Charger les données en ligne</button>
-  </div>
-
-  <div class="card" style="margin-bottom:16px">
-    <div class="card-title">📂 Ou : import ODS (secours / migration)</div>
-    <div style="font-size:.78rem;color:#666;margin-bottom:10px">Déposez <b>Suivi_CDF_FINAL.ods</b> (feuilles PROFIL_JOUEURS, SUIVI_J+1_J+25, ALERTES, MATCHS). Tout est calculé dans le navigateur — rien n'est publié avant votre validation.</div>
-    <div id="drop-ods" onclick="document.getElementById('file-input-ods').click()" style="border:2px dashed #C5C0E0;border-radius:12px;padding:28px;text-align:center;cursor:pointer;color:#6B5CA5;font-size:.85rem;font-weight:600;background:#FAFAFE">
-      📂 Glissez le fichier .ods ici ou cliquez pour parcourir
-    </div>
-    <input type="file" id="file-input-ods" accept=".ods" style="display:none" onchange="handleOdsFile(this.files[0])">
     <div id="ods-status" class="publish-status" style="margin-top:10px"></div>
     <div id="gen-analyse-row" style="display:none;margin-top:14px;align-items:center;gap:12px;flex-wrap:wrap">
       <label style="font-size:.78rem;font-weight:600;color:#333">Date de référence :</label>
@@ -2842,38 +2833,6 @@ var genRd = null;            // date de référence (Date UTC)
 var repoImgCache = {};       // cache des images du dépôt (photos + logo)
 var tfcLogoCache = undefined; // undefined = pas encore cherché, null = introuvable
 
-function setupDropOds(){
-  var dz = document.getElementById('drop-ods');
-  if(!dz) return;
-  ['dragenter','dragover'].forEach(function(ev){ dz.addEventListener(ev, function(e){ e.preventDefault(); dz.classList.add('drag'); }); });
-  ['dragleave','drop'].forEach(function(ev){ dz.addEventListener(ev, function(e){ e.preventDefault(); dz.classList.remove('drag'); }); });
-  dz.addEventListener('drop', function(e){ if(e.dataTransfer.files.length) handleOdsFile(e.dataTransfer.files[0]); });
-}
-
-async function handleOdsFile(file){
-  if(!file) return;
-  var st = document.getElementById('ods-status');
-  if(!/\.ods$/i.test(file.name)){
-    st.className='publish-status err'; st.textContent='✗ Le fichier doit être un .ods'; return;
-  }
-  st.className='publish-status loading'; st.textContent='Lecture du fichier...';
-  try{
-    var buf = await file.arrayBuffer();
-    var wb = XLSX.read(buf, {type:'array', cellDates:true});
-    odsData = TFCEngine.loadWorkbook(wb, XLSX);
-    odsFileName = file.name;
-    var nS = odsData.S.length, nP = odsData.P.length, nA = odsData.A.length, nM = odsData.M.length;
-    st.className='publish-status ok';
-    st.textContent = '✓ ' + file.name + ' — ' + nP + ' profils · ' + nS + ' lignes de suivi · ' + nA + ' alertes · ' + nM + ' matchs';
-    document.getElementById('gen-analyse-row').style.display='';
-    document.getElementById('gen-preview-card').style.display='none';
-  } catch(e){
-    odsData = null;
-    st.className='publish-status err';
-    st.textContent = '✗ Lecture impossible : ' + e.message + ' — vérifiez que les 4 feuilles (PROFIL_JOUEURS, SUIVI_J+1_J+25, ALERTES, MATCHS) sont présentes.';
-  }
-}
-
 function genRefDate(){
   var v = document.getElementById('gen-date').value;
   if(!v) return null;
@@ -3820,7 +3779,6 @@ async function chargerDepuisStore(){
 }
 
 document.addEventListener('DOMContentLoaded', function(){
-  setupDropOds();
   var gd = document.getElementById('gen-date');
   if(gd && !gd.value){ var t=new Date(); gd.value = t.toISOString().slice(0,10); }
   resetAlerteForm(); resetMatchForm();
