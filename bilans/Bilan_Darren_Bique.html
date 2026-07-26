@@ -7,237 +7,195 @@
 <meta name="tfc-categorie" content="N2">
 <meta name="tfc-statut" content="SURVEILLANCE">
 <meta name="tfc-rri" content="79">
-<meta name="tfc-date" content="25/07/2026">
+<meta name="tfc-date" content="26/07/2026">
 <meta name="tfc-jp" content="">
 <meta name="tfc-date-fin-proto" content="">
 <title>Bilan — Darren Bique — TFC</title>
 <style>
+@page{size:A4 landscape;margin:8mm}
+@media print{
+  #btn-pdf{display:none !important}
+  body{zoom:.7;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .main{max-width:none;padding:6px 8px}
+  .card,.row{break-inside:avoid;page-break-inside:avoid}
+  .toggle-btn{display:none !important}
+  .collapsible{max-height:none !important;overflow:visible !important}
+  #all-comments > div{max-height:none !important;overflow:visible !important}
+  #frise-info-box{display:none !important}
+}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Segoe UI',system-ui,sans-serif;background:#F4F2FA;color:#1E1A50;min-height:100vh}
-.header{background:#261C5E;padding:16px 24px;display:flex;align-items:center;gap:16px;border-bottom:3px solid #D4AF37}
-.h-title{font-size:1.25rem;font-weight:800;letter-spacing:.04em;color:white}
-.h-sub{font-size:.75rem;color:#EAE7FC;margin-top:3px}
-.badge{font-size:.72rem;font-weight:700;color:white;padding:3px 10px;border-radius:20px;flex-shrink:0}
-.main{max-width:1100px;margin:0 auto;padding:20px 20px}
-.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
-.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px}
-.grid-4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:16px;margin-bottom:16px}
-.card{background:#261C5E;border-radius:12px;padding:16px;border:1px solid rgba(255,255,255,0.08)}
-.card-title{font-size:.7rem;font-weight:800;color:#EAE7FC;letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px}
-.kpi-val{font-size:1.8rem;font-weight:800}
-.kpi-lbl{font-size:.72rem;color:#EAE7FC;margin-top:3px;text-transform:uppercase}
-.bar{background:rgba(255,255,255,0.1);border-radius:4px;height:6px;overflow:hidden;margin-top:5px}
+.header{background:#261C5E;padding:10px 20px;display:flex;align-items:center;gap:14px;border-bottom:3px solid #D4AF37}
+.h-title{font-size:1.05rem;font-weight:800;letter-spacing:.03em;color:white}
+.h-sub{font-size:.7rem;color:#EAE7FC;margin-top:2px}
+.badge{font-size:.7rem;font-weight:700;color:white;padding:3px 10px;border-radius:20px;flex-shrink:0}
+.main{max-width:1500px;margin:0 auto;padding:14px 16px}
+.card{background:#261C5E;border-radius:10px;padding:12px 14px;border:1px solid rgba(255,255,255,0.08)}
+.card-title{font-size:.64rem;font-weight:800;color:#EAE7FC;letter-spacing:.07em;text-transform:uppercase;margin-bottom:8px}
+.bar{background:rgba(255,255,255,0.1);border-radius:4px;height:6px;overflow:hidden;margin-top:4px}
 .bar-fill{height:100%;border-radius:4px}
-.section-full{margin-bottom:16px}
-.toggle-btn{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#EAE7FC;padding:6px 14px;border-radius:20px;cursor:pointer;font-size:.75rem;font-weight:600;margin-top:10px;display:inline-block}
+.toggle-btn{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#EAE7FC;padding:4px 12px;border-radius:16px;cursor:pointer;font-size:.7rem;font-weight:600;margin-top:8px;display:inline-block}
 .toggle-btn:hover{background:rgba(255,255,255,0.15)}
 .collapsible{max-height:0;overflow:hidden;transition:max-height .4s ease}
 .collapsible.open{max-height:2000px}
-.rri-score{font-size:3rem;font-weight:800;line-height:1}
-.footer{background:#261C5E;border-top:1px solid rgba(255,255,255,0.1);padding:12px 24px;display:flex;justify-content:space-between;font-size:.75rem;color:#E8E4F8;margin-top:24px}
+.row{display:grid;gap:10px;margin-bottom:10px}
+.lbl-s{font-size:.68rem;color:#EAE7FC}
+.val-s{font-weight:600;font-size:.78rem;color:white;margin-top:1px}
+.footer{background:#261C5E;border-top:1px solid rgba(255,255,255,0.1);padding:8px 20px;display:flex;justify-content:space-between;font-size:.7rem;color:#E8E4F8;margin-top:14px}
 table{width:100%;border-collapse:collapse}
 tr:nth-child(even) td{background:rgba(255,255,255,0.03)}
-@media(max-width:700px){.grid-2,.grid-3,.grid-4{grid-template-columns:1fr}}
+@media(max-width:1000px){.row{grid-template-columns:1fr !important}}
 </style>
 </head>
 <body>
+
+<button id="btn-pdf" onclick="window.print()" title="Enregistrer en PDF puis partager sur WhatsApp" style="position:fixed;top:12px;right:12px;z-index:99;padding:10px 18px;border:none;border-radius:24px;background:#C9A84C;color:#1E1A50;font-weight:800;font-size:.8rem;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.35)">📄 Télécharger en PDF</button>
 
 <!-- HEADER -->
 <div class="header">
   
   <div style="flex:1">
-    <div class="h-title">25 JOURS DE REPRISE COMPÉTITION / DARREN BIQUE</div>
-    <div class="h-sub">N2 · Lésion Grade 1 Quadriceps Droit · TFC Cellule Performance & Réathlétisation</div>
+    <div class="h-title">BILAN DE FIN DE PROTOCOLE / DARREN BIQUE</div>
+    <div class="h-sub">N2 · Lésion Grade 1 Quadriceps Droit · TFC Cellule Performance & Réathlétisation · 26/07/2026</div>
   </div>
   <span class="badge" style="background:#FB923C">—</span>
 </div>
 
 <div class="main">
 
-  <!-- ROW 0 : COMMENTAIRE DU JOUR -->
-  <div class="card section-full" style="margin-bottom:16px;border-left:3px solid #D4AF37;border-radius:0 12px 12px 0">
-    <div class="card-title" style="color:#D4AF37">Observations</div>
-    <div style="font-size:.8rem;color:#EAE7FC;font-style:italic;line-height:1.6">—</div>
-    
-    <div class="collapsible" id="all-comments">
-      <div style="margin-top:10px;max-height:250px;overflow-y:auto;border-radius:8px;border:1px solid rgba(255,255,255,0.08)"><div style="color:#E8E4F8;font-style:italic;padding:10px;font-size:.78rem">Aucun commentaire saisi</div></div>
-    </div>
-  </div>
-
-  <!-- ROW 1 : INFOS + RRI + PHOTO -->
-  <div style="display:grid;grid-template-columns:1.2fr 1.2fr .8fr;gap:16px;margin-bottom:16px">
-
+  <!-- LIGNE 1 : INFOS PROTOCOLE · OBSERVATIONS · RRI · PHOTO -->
+  <div class="row" style="grid-template-columns:1.15fr 1.55fr .95fr .55fr">
     <div class="card">
       <div class="card-title">Informations protocole</div>
-      <div style="display:flex;flex-direction:column;gap:8px">
-        <div><span style="font-size:.75rem;color:#EAE7FC">Blessure</span><div style="font-weight:700;font-size:.9rem;color:#D4AF37;margin-top:2px">Lésion Grade 1 Quadriceps Droit</div></div>
-        <div><span style="font-size:.75rem;color:#EAE7FC">Date reprise</span><div style="font-weight:600;font-size:.85rem;margin-top:2px;color:white">25/07/2026</div></div>
-        <div><span style="font-size:.75rem;color:#EAE7FC">Date 1er match</span><div style="font-weight:600;font-size:.85rem;margin-top:2px;color:white">—</div></div>
-        <div><span style="font-size:.75rem;color:#EAE7FC">Jours entraînement → 1er match</span>
-          <div style="font-size:1.5rem;font-weight:800;color:#D4AF37;margin-top:2px">— jours</div></div>
-        <div><span style="font-size:.75rem;color:#EAE7FC">Soins · Prévention</span>
-          <div style="font-weight:600;margin-top:2px;color:white">2 · 3 <span style="font-size:.72rem;color:#E8E4F8">entretiens</span></div></div>
-        <div><span style="font-size:.75rem;color:#EAE7FC">Focus prévention</span>
-          <div style="font-size:.8rem;margin-top:2px;color:white">Isométrie Quadri / terciaire</div></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 12px">
+        <div style="grid-column:1/-1"><span class="lbl-s">Blessure</span><div style="font-weight:700;font-size:.8rem;color:#D4AF37">Lésion Grade 1 Quadriceps Droit</div></div>
+        <div><span class="lbl-s">Reprise</span><div class="val-s">25/07/2026</div></div>
+        <div><span class="lbl-s">1er match</span><div class="val-s">—</div></div>
+        <div><span class="lbl-s">Entraînement → 1er match</span><div class="val-s" style="color:#D4AF37;font-weight:700">—</div></div>
+        <div><span class="lbl-s">Soins · Préventions</span><div class="val-s">Soins : 2 · Préventions : 3</div></div>
+        <div style="grid-column:1/-1"><span class="lbl-s">Focus prévention</span><div style="font-size:.72rem;color:white;margin-top:1px">Isométrie Quadri / terciaire</div></div>
       </div>
     </div>
-
+    <div class="card" style="border-left:3px solid #D4AF37">
+      <div class="card-title" style="color:#D4AF37">Observations</div>
+      <div style="font-size:.8rem;color:#EAE7FC;font-style:italic;line-height:1.6">—</div>
+      
+      <div class="collapsible" id="all-comments">
+        <div style="margin-top:8px;max-height:200px;overflow-y:auto;border-radius:8px;border:1px solid rgba(255,255,255,0.08)"><div style="color:#E8E4F8;font-style:italic;padding:10px;font-size:.78rem">Aucun commentaire saisi</div></div>
+      </div>
+    </div>
     <div class="card" style="text-align:center">
-      <div class="card-title" style="text-align:left">RRI — Indice de Retour Compétition /100</div>
-      <div style="font-size:.72rem;color:#EAE7FC;text-align:left;margin-bottom:10px">Score composite : Psychologie · Condition physique · Alertes médicales</div>
-      <div class="rri-score" style="color:#FB923C">79<span style="font-size:1.2rem;color:#E8E4F8;font-weight:400">/100</span></div>
-      <div style="margin:8px auto;max-width:200px">
-        <div class="bar" style="height:10px"><div class="bar-fill" style="width:79%;background:#FB923C"></div></div>
+      <div class="card-title" style="text-align:left">RRI final /100</div>
+      <div style="font-size:2.3rem;font-weight:800;line-height:1;color:#FB923C">79<span style="font-size:.95rem;color:#E8E4F8;font-weight:400">/100</span></div>
+      <div style="margin:6px auto;max-width:160px">
+        <div class="bar" style="height:8px"><div class="bar-fill" style="width:79%;background:#FB923C"></div></div>
       </div>
-      <span style="font-size:.8rem;font-weight:700;color:#FB923C;border:2px solid #FB923C;padding:3px 14px;border-radius:20px">SURVEILLANCE</span>
-      <div style="margin-top:12px">
-        <button class="toggle-btn" onclick="toggle('rri-detail')">▶ Détail des 8 composantes</button>
+      <span style="font-size:.74rem;font-weight:700;color:#FB923C;border:2px solid #FB923C;padding:2px 12px;border-radius:16px">SURVEILLANCE</span>
+      <div style="display:flex;justify-content:center;gap:8px;margin-top:8px;font-size:.6rem">
+        <span style="color:#22C55E">●≥80</span><span style="color:#FB923C">●60-79</span><span style="color:#EF4444">●&lt;60</span>
       </div>
-      <div class="collapsible" id="rri-detail" style="margin-top:10px">
-        <table><thead><tr>
-          <th style="text-align:left;font-size:.72rem;color:#E8E4F8;padding:4px 8px">Composante</th>
-          <th style="font-size:.72rem;color:#E8E4F8;padding:4px 8px">Valeur</th>
-          <th style="font-size:.72rem;color:#E8E4F8;padding:4px 8px">Progression</th>
-          <th style="font-size:.72rem;color:#E8E4F8;padding:4px 8px">Score</th>
-        </tr></thead><tbody><tr><td style="padding:5px 8px;font-size:.78rem;font-weight:600;color:#EAE7FC">Confiance Physique</td><td style="padding:5px 8px;font-style:italic;font-size:.72rem;color:#E8E4F8">9/10</td><td style="padding:5px 8px"><div style="background:rgba(255,255,255,0.1);border-radius:3px;height:6px;width:80px;overflow:hidden"><div style="width:93%;height:100%;background:#4ADE80;border-radius:3px"></div></div></td><td style="padding:5px 8px;font-weight:700;font-size:.82rem;color:#4ADE80">14/15</td></tr><tr><td style="padding:5px 8px;font-size:.78rem;font-weight:600;color:#EAE7FC">Confiance Mentale</td><td style="padding:5px 8px;font-style:italic;font-size:.72rem;color:#E8E4F8">10/10</td><td style="padding:5px 8px"><div style="background:rgba(255,255,255,0.1);border-radius:3px;height:6px;width:80px;overflow:hidden"><div style="width:100%;height:100%;background:#4ADE80;border-radius:3px"></div></div></td><td style="padding:5px 8px;font-weight:700;font-size:.82rem;color:#4ADE80">15/15</td></tr><tr><td style="padding:5px 8px;font-size:.78rem;font-weight:600;color:#EAE7FC">Soins + Prévention</td><td style="padding:5px 8px;font-style:italic;font-size:.72rem;color:#E8E4F8">5 pts</td><td style="padding:5px 8px"><div style="background:rgba(255,255,255,0.1);border-radius:3px;height:6px;width:80px;overflow:hidden"><div style="width:0%;height:100%;background:#4ADE80;border-radius:3px"></div></div></td><td style="padding:5px 8px;font-weight:700;font-size:.82rem;color:#4ADE80">0/15</td></tr><tr><td style="padding:5px 8px;font-size:.78rem;font-weight:600;color:#EAE7FC">Douleur moyenne</td><td style="padding:5px 8px;font-style:italic;font-size:.72rem;color:#E8E4F8">0.00/10</td><td style="padding:5px 8px"><div style="background:rgba(255,255,255,0.1);border-radius:3px;height:6px;width:80px;overflow:hidden"><div style="width:100%;height:100%;background:#4ADE80;border-radius:3px"></div></div></td><td style="padding:5px 8px;font-weight:700;font-size:.82rem;color:#4ADE80">20/20</td></tr><tr><td style="padding:5px 8px;font-size:.78rem;font-weight:600;color:#EAE7FC">Courbatures</td><td style="padding:5px 8px;font-style:italic;font-size:.72rem;color:#E8E4F8">1.00/10</td><td style="padding:5px 8px"><div style="background:rgba(255,255,255,0.1);border-radius:3px;height:6px;width:80px;overflow:hidden"><div style="width:100%;height:100%;background:#4ADE80;border-radius:3px"></div></div></td><td style="padding:5px 8px;font-weight:700;font-size:.82rem;color:#4ADE80">15/15</td></tr><tr><td style="padding:5px 8px;font-size:.78rem;font-weight:600;color:#EAE7FC">Fatigue</td><td style="padding:5px 8px;font-style:italic;font-size:.72rem;color:#E8E4F8">1.00/10</td><td style="padding:5px 8px"><div style="background:rgba(255,255,255,0.1);border-radius:3px;height:6px;width:80px;overflow:hidden"><div style="width:100%;height:100%;background:#4ADE80;border-radius:3px"></div></div></td><td style="padding:5px 8px;font-weight:700;font-size:.82rem;color:#4ADE80">10/10</td></tr><tr><td style="padding:5px 8px;font-size:.78rem;font-weight:600;color:#EAE7FC">Progression matchs</td><td style="padding:5px 8px;font-style:italic;font-size:.72rem;color:#E8E4F8">—</td><td style="padding:5px 8px"><div style="background:rgba(255,255,255,0.1);border-radius:3px;height:6px;width:80px;overflow:hidden"><div style="width:0%;height:100%;background:#4ADE80;border-radius:3px"></div></div></td><td style="padding:5px 8px;font-weight:700;font-size:.82rem;color:#4ADE80">0/5</td></tr><tr><td style="padding:5px 8px;font-size:.78rem;font-weight:600;color:#EAE7FC">Alertes rouges</td><td style="padding:5px 8px;font-style:italic;font-size:.72rem;color:#E8E4F8">0 rouge(s)</td><td style="padding:5px 8px"><div style="background:rgba(255,255,255,0.1);border-radius:3px;height:6px;width:80px;overflow:hidden"><div style="width:100%;height:100%;background:#4ADE80;border-radius:3px"></div></div></td><td style="padding:5px 8px;font-weight:700;font-size:.82rem;color:#4ADE80">5/5</td></tr></tbody></table>
-      </div>
-      <div style="display:flex;justify-content:center;gap:12px;margin-top:14px;font-size:.7rem">
-        <span style="color:#22C55E">● ≥80 PRÊT</span>
-        <span style="color:#FB923C">● 60-79 SURV.</span>
-        <span style="color:#EF4444">● &lt;60 VIGIL.</span>
+      <button class="toggle-btn" onclick="toggle('rri-detail')">▶ 8 composantes</button>
+      <div class="collapsible" id="rri-detail" style="margin-top:8px;text-align:left">
+        <table><tbody><tr><td style="padding:5px 8px;font-size:.78rem;font-weight:600;color:#EAE7FC">Confiance Physique</td><td style="padding:5px 8px;font-style:italic;font-size:.72rem;color:#E8E4F8">9/10</td><td style="padding:5px 8px"><div style="background:rgba(255,255,255,0.1);border-radius:3px;height:6px;width:80px;overflow:hidden"><div style="width:93%;height:100%;background:#4ADE80;border-radius:3px"></div></div></td><td style="padding:5px 8px;font-weight:700;font-size:.82rem;color:#4ADE80">14/15</td></tr><tr><td style="padding:5px 8px;font-size:.78rem;font-weight:600;color:#EAE7FC">Confiance Mentale</td><td style="padding:5px 8px;font-style:italic;font-size:.72rem;color:#E8E4F8">10/10</td><td style="padding:5px 8px"><div style="background:rgba(255,255,255,0.1);border-radius:3px;height:6px;width:80px;overflow:hidden"><div style="width:100%;height:100%;background:#4ADE80;border-radius:3px"></div></div></td><td style="padding:5px 8px;font-weight:700;font-size:.82rem;color:#4ADE80">15/15</td></tr><tr><td style="padding:5px 8px;font-size:.78rem;font-weight:600;color:#EAE7FC">Soins + Prévention</td><td style="padding:5px 8px;font-style:italic;font-size:.72rem;color:#E8E4F8">5 pts</td><td style="padding:5px 8px"><div style="background:rgba(255,255,255,0.1);border-radius:3px;height:6px;width:80px;overflow:hidden"><div style="width:0%;height:100%;background:#4ADE80;border-radius:3px"></div></div></td><td style="padding:5px 8px;font-weight:700;font-size:.82rem;color:#4ADE80">0/15</td></tr><tr><td style="padding:5px 8px;font-size:.78rem;font-weight:600;color:#EAE7FC">Douleur moyenne</td><td style="padding:5px 8px;font-style:italic;font-size:.72rem;color:#E8E4F8">0.00/10</td><td style="padding:5px 8px"><div style="background:rgba(255,255,255,0.1);border-radius:3px;height:6px;width:80px;overflow:hidden"><div style="width:100%;height:100%;background:#4ADE80;border-radius:3px"></div></div></td><td style="padding:5px 8px;font-weight:700;font-size:.82rem;color:#4ADE80">20/20</td></tr><tr><td style="padding:5px 8px;font-size:.78rem;font-weight:600;color:#EAE7FC">Courbatures</td><td style="padding:5px 8px;font-style:italic;font-size:.72rem;color:#E8E4F8">1.00/10</td><td style="padding:5px 8px"><div style="background:rgba(255,255,255,0.1);border-radius:3px;height:6px;width:80px;overflow:hidden"><div style="width:100%;height:100%;background:#4ADE80;border-radius:3px"></div></div></td><td style="padding:5px 8px;font-weight:700;font-size:.82rem;color:#4ADE80">15/15</td></tr><tr><td style="padding:5px 8px;font-size:.78rem;font-weight:600;color:#EAE7FC">Fatigue</td><td style="padding:5px 8px;font-style:italic;font-size:.72rem;color:#E8E4F8">1.00/10</td><td style="padding:5px 8px"><div style="background:rgba(255,255,255,0.1);border-radius:3px;height:6px;width:80px;overflow:hidden"><div style="width:100%;height:100%;background:#4ADE80;border-radius:3px"></div></div></td><td style="padding:5px 8px;font-weight:700;font-size:.82rem;color:#4ADE80">10/10</td></tr><tr><td style="padding:5px 8px;font-size:.78rem;font-weight:600;color:#EAE7FC">Progression matchs</td><td style="padding:5px 8px;font-style:italic;font-size:.72rem;color:#E8E4F8">—</td><td style="padding:5px 8px"><div style="background:rgba(255,255,255,0.1);border-radius:3px;height:6px;width:80px;overflow:hidden"><div style="width:0%;height:100%;background:#4ADE80;border-radius:3px"></div></div></td><td style="padding:5px 8px;font-weight:700;font-size:.82rem;color:#4ADE80">0/5</td></tr><tr><td style="padding:5px 8px;font-size:.78rem;font-weight:600;color:#EAE7FC">Alertes rouges</td><td style="padding:5px 8px;font-style:italic;font-size:.72rem;color:#E8E4F8">0 rouge(s)</td><td style="padding:5px 8px"><div style="background:rgba(255,255,255,0.1);border-radius:3px;height:6px;width:80px;overflow:hidden"><div style="width:100%;height:100%;background:#4ADE80;border-radius:3px"></div></div></td><td style="padding:5px 8px;font-weight:700;font-size:.82rem;color:#4ADE80">5/5</td></tr></tbody></table>
       </div>
     </div>
-
-    <div class="card" style="padding:8px">
-      <div style="min-height:180px"><div style="width:100%;height:100%;border-radius:10px;background:#2D2660;display:flex;align-items:center;justify-content:center;color:white;font-size:2.5rem;font-weight:800">DB</div></div>
+    <div class="card" style="padding:6px;display:flex;align-items:stretch">
+      <div style="width:100%;min-height:140px"><div style="width:100%;height:100%;border-radius:10px;background:#2D2660;display:flex;align-items:center;justify-content:center;color:white;font-size:2.5rem;font-weight:800">DB</div></div>
     </div>
-
   </div>
 
-  <!-- ROW 2 : MOYENNES + IPRRS + COMPARAISON -->
-  <div class="grid-3">
+  <!-- LIGNE 2 : FRISE — PIÈCE MAÎTRESSE -->
+  <div class="card" style="border:2px solid #D4AF37;margin-bottom:10px">
+    <div class="card-title" style="color:#D4AF37">■ Frise chronologique des 25 jours — Douleur · Courbatures · Matchs · Alertes (cliquez sur un point pour le détail)</div>
+    <div style="color:#E8E4F8;font-style:italic;text-align:center;padding:20px">Date du 1er match non renseignée</div>
+    <div id="frise-info-box" style="display:none;margin-top:8px;padding:8px 12px;background:#2D2660;color:white;border-radius:8px;font-size:.78rem;font-weight:600;border:2px solid #C9A84C;line-height:1.4"></div>
+  </div>
+
+  <!-- LIGNE 3 : ÉVOLUTION RRI · COMPARAISON -->
+  <div class="row" style="grid-template-columns:2fr 1fr">
     <div class="card">
-      <div class="card-title">Moyennes sur 25 jours</div>
-      <div style="margin-bottom:10px">
-        <div style="display:flex;justify-content:space-between;align-items:baseline">
-          <span style="font-size:.75rem;color:#EAE7FC">Douleur moyenne</span>
-          <span style="font-size:1rem;font-weight:800;color:#4ADE80">0.0/10</span>
-        </div>
-        <div class="bar"><div class="bar-fill" style="width:0%;background:#4ADE80"></div></div>
-      </div>
-      <div style="margin-bottom:10px">
-        <div style="display:flex;justify-content:space-between;align-items:baseline">
-          <span style="font-size:.75rem;color:#EAE7FC">Courbatures moyenne</span>
-          <span style="font-size:1rem;font-weight:800;color:#4ADE80">1.0/10</span>
-        </div>
-        <div class="bar"><div class="bar-fill" style="width:10%;background:#4ADE80"></div></div>
-      </div>
-      <div>
-        <div style="display:flex;justify-content:space-between;align-items:baseline">
-          <span style="font-size:.75rem;color:#EAE7FC">Fatigue moyenne</span>
-          <span style="font-size:1rem;font-weight:800;color:#4ADE80">1.0/10</span>
-        </div>
-        <div class="bar"><div class="bar-fill" style="width:10%;background:#4ADE80"></div></div>
+      <div class="card-title">■ Évolution du RRI séance par séance</div>
+      <div style="color:#E8E4F8;font-style:italic;font-size:.75rem;padding:10px">Données insuffisantes (minimum 2 séances).</div>
+      <div style="display:flex;gap:12px;margin-top:6px;font-size:.68rem">
+        <span style="color:#22C55E">● PRÊT ≥80</span><span style="color:#FB923C">● SURVEILLANCE 60-79</span><span style="color:#EF4444">● VIGILANCE &lt;60</span>
       </div>
     </div>
-
-    <div class="card">
-      <div class="card-title">IPRRS — Readiness retour compétition</div>
-      <div style="display:flex;align-items:center;gap:8px">
-        
-        <div style="text-align:center">
-          <div style="font-size:2rem;font-weight:800;color:#4ADE80">0<span style="font-size:.9rem;color:#E8E4F8">/60</span></div>
-          <div style="font-size:.72rem;color:#EAE7FC">Readiness compét.</div>
-          <button class="toggle-btn" onclick="toggle('iprrs-detail')" style="margin-top:8px;font-size:.72rem">▶ Détail des 6 questions</button>
-        </div>
-      </div>
-      <div class="collapsible" id="iprrs-detail" style="margin-top:10px">
-        <div style="display:flex;align-items:center;gap:10px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.07)"><span style="font-size:.75rem;color:#EAE7FC;flex:1">Football</span><div style="background:rgba(255,255,255,0.1);border-radius:4px;height:6px;width:80px;overflow:hidden"><div style="width:0%;height:100%;background:#555;border-radius:4px"></div></div><span style="font-size:.78rem;font-weight:700;color:#555;min-width:32px;text-align:right">0/10</span></div><div style="display:flex;align-items:center;gap:10px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.07)"><span style="font-size:.75rem;color:#EAE7FC;flex:1">Sans douleur</span><div style="background:rgba(255,255,255,0.1);border-radius:4px;height:6px;width:80px;overflow:hidden"><div style="width:0%;height:100%;background:#555;border-radius:4px"></div></div><span style="font-size:.78rem;font-weight:700;color:#555;min-width:32px;text-align:right">0/10</span></div><div style="display:flex;align-items:center;gap:10px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.07)"><span style="font-size:.75rem;color:#EAE7FC;flex:1">Donner 100%</span><div style="background:rgba(255,255,255,0.1);border-radius:4px;height:6px;width:80px;overflow:hidden"><div style="width:0%;height:100%;background:#555;border-radius:4px"></div></div><span style="font-size:.78rem;font-weight:700;color:#555;min-width:32px;text-align:right">0/10</span></div><div style="display:flex;align-items:center;gap:10px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.07)"><span style="font-size:.75rem;color:#EAE7FC;flex:1">Pas penser blessure</span><div style="background:rgba(255,255,255,0.1);border-radius:4px;height:6px;width:80px;overflow:hidden"><div style="width:0%;height:100%;background:#555;border-radius:4px"></div></div><span style="font-size:.78rem;font-weight:700;color:#555;min-width:32px;text-align:right">0/10</span></div><div style="display:flex;align-items:center;gap:10px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.07)"><span style="font-size:.75rem;color:#EAE7FC;flex:1">Confiance corps</span><div style="background:rgba(255,255,255,0.1);border-radius:4px;height:6px;width:80px;overflow:hidden"><div style="width:0%;height:100%;background:#555;border-radius:4px"></div></div><span style="font-size:.78rem;font-weight:700;color:#555;min-width:32px;text-align:right">0/10</span></div><div style="display:flex;align-items:center;gap:10px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.07)"><span style="font-size:.75rem;color:#EAE7FC;flex:1">Capacités tech/phys</span><div style="background:rgba(255,255,255,0.1);border-radius:4px;height:6px;width:80px;overflow:hidden"><div style="width:0%;height:100%;background:#555;border-radius:4px"></div></div><span style="font-size:.78rem;font-weight:700;color:#555;min-width:32px;text-align:right">0/10</span></div>
-      </div>
-    </div>
-
     <div class="card">
       <div class="card-title">Évolution J+1 → J+25</div>
       <div style="color:#E8E4F8;font-style:italic;font-size:.78rem">Données insuffisantes</div>
     </div>
   </div>
 
-  <!-- ROW 3 : ALERTES -->
-  <div class="card section-full" style="margin-bottom:16px">
+  <!-- LIGNE 4 : MATCHS · MOYENNES · IPRRS -->
+  <div class="row" style="grid-template-columns:1.5fr 1fr 1fr">
+    <div class="card">
+      <div class="card-title">■ Matchs du protocole — temps de jeu et progressivité</div>
+      <div style="margin-bottom:10px"><div style="color:#E8E4F8;font-style:italic">Aucun match enregistré</div></div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+        <span class="lbl-s">Minutes cumulées</span>
+        <span style="font-size:.72rem;font-weight:700;color:#EF4444">0' / 270' · 0% de la cible de progression</span>
+      </div>
+      <div style="background:rgba(255,255,255,0.1);border-radius:8px;height:12px;overflow:hidden">
+        <div style="width:0%;height:100%;background:#EF4444;border-radius:8px"></div>
+      </div>
+      <svg viewBox="0 0 500 70" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;overflow:visible;margin-top:10px">
+        <rect width="500" height="70" fill="rgba(255,255,255,0.05)" rx="4"/>
+        <line x1="0" y1="60" x2="500" y2="60" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+        
+      </svg>
+    </div>
+    <div class="card">
+      <div class="card-title">Moyennes sur le protocole</div>
+      <div style="margin-bottom:8px">
+        <div style="display:flex;justify-content:space-between;align-items:baseline">
+          <span class="lbl-s">Douleur moyenne</span>
+          <span style="font-size:.9rem;font-weight:800;color:#4ADE80">0.0/10</span>
+        </div>
+        <div class="bar"><div class="bar-fill" style="width:0%;background:#4ADE80"></div></div>
+      </div>
+      <div style="margin-bottom:8px">
+        <div style="display:flex;justify-content:space-between;align-items:baseline">
+          <span class="lbl-s">Courbatures moyenne</span>
+          <span style="font-size:.9rem;font-weight:800;color:#4ADE80">1.0/10</span>
+        </div>
+        <div class="bar"><div class="bar-fill" style="width:10%;background:#4ADE80"></div></div>
+      </div>
+      <div style="margin-bottom:8px">
+        <div style="display:flex;justify-content:space-between;align-items:baseline">
+          <span class="lbl-s">Fatigue moyenne</span>
+          <span style="font-size:.9rem;font-weight:800;color:#4ADE80">1.0/10</span>
+        </div>
+        <div class="bar"><div class="bar-fill" style="width:10%;background:#4ADE80"></div></div>
+      </div>
+      <div style="font-size:.74rem;color:white;font-weight:600;margin-top:10px">Soins : 2 · Préventions : 3</div>
+    </div>
+    <div class="card">
+      <div class="card-title">IPRRS — Readiness retour compétition</div>
+      <div style="display:flex;align-items:center;gap:12px">
+        
+        <div>
+          <div style="font-size:1.5rem;font-weight:800;color:#4ADE80">0<span style="font-size:.8rem;color:#E8E4F8">/60</span></div>
+          <div style="font-size:.66rem;color:#EAE7FC">Readiness compét.</div>
+          <button class="toggle-btn" onclick="toggle('iprrs-detail')" style="font-size:.66rem;padding:3px 10px">▶ 6 questions</button>
+        </div>
+      </div>
+      <div class="collapsible" id="iprrs-detail" style="margin-top:8px">
+        <div style="display:flex;align-items:center;gap:10px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.07)"><span style="font-size:.75rem;color:#EAE7FC;flex:1">Football</span><div style="background:rgba(255,255,255,0.1);border-radius:4px;height:6px;width:80px;overflow:hidden"><div style="width:0%;height:100%;background:#555;border-radius:4px"></div></div><span style="font-size:.78rem;font-weight:700;color:#555;min-width:32px;text-align:right">0/10</span></div><div style="display:flex;align-items:center;gap:10px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.07)"><span style="font-size:.75rem;color:#EAE7FC;flex:1">Sans douleur</span><div style="background:rgba(255,255,255,0.1);border-radius:4px;height:6px;width:80px;overflow:hidden"><div style="width:0%;height:100%;background:#555;border-radius:4px"></div></div><span style="font-size:.78rem;font-weight:700;color:#555;min-width:32px;text-align:right">0/10</span></div><div style="display:flex;align-items:center;gap:10px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.07)"><span style="font-size:.75rem;color:#EAE7FC;flex:1">Donner 100%</span><div style="background:rgba(255,255,255,0.1);border-radius:4px;height:6px;width:80px;overflow:hidden"><div style="width:0%;height:100%;background:#555;border-radius:4px"></div></div><span style="font-size:.78rem;font-weight:700;color:#555;min-width:32px;text-align:right">0/10</span></div><div style="display:flex;align-items:center;gap:10px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.07)"><span style="font-size:.75rem;color:#EAE7FC;flex:1">Pas penser blessure</span><div style="background:rgba(255,255,255,0.1);border-radius:4px;height:6px;width:80px;overflow:hidden"><div style="width:0%;height:100%;background:#555;border-radius:4px"></div></div><span style="font-size:.78rem;font-weight:700;color:#555;min-width:32px;text-align:right">0/10</span></div><div style="display:flex;align-items:center;gap:10px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.07)"><span style="font-size:.75rem;color:#EAE7FC;flex:1">Confiance corps</span><div style="background:rgba(255,255,255,0.1);border-radius:4px;height:6px;width:80px;overflow:hidden"><div style="width:0%;height:100%;background:#555;border-radius:4px"></div></div><span style="font-size:.78rem;font-weight:700;color:#555;min-width:32px;text-align:right">0/10</span></div><div style="display:flex;align-items:center;gap:10px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.07)"><span style="font-size:.75rem;color:#EAE7FC;flex:1">Capacités tech/phys</span><div style="background:rgba(255,255,255,0.1);border-radius:4px;height:6px;width:80px;overflow:hidden"><div style="width:0%;height:100%;background:#555;border-radius:4px"></div></div><span style="font-size:.78rem;font-weight:700;color:#555;min-width:32px;text-align:right">0/10</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LIGNE 5 : ALERTES -->
+  <div class="card" style="margin-bottom:10px">
       <div class="card-title">Alertes identifiées</div>
       <div style="color:#4ADE80;font-size:.78rem;font-style:italic">Aucune alerte identifiée</div>
-  </div>
-
-  <!-- ROW 3b : ÉVOLUTION RRI -->
-  <div class="card section-full" style="margin-bottom:16px">
-    <div class="card-title">■ Évolution du RRI séance par séance</div>
-    <div style="color:#E8E4F8;font-style:italic;font-size:.78rem;padding:12px">Données insuffisantes pour tracer la courbe (minimum 2 séances requises).</div>
-    <div style="display:flex;gap:16px;margin-top:8px;font-size:.75rem">
-      <span style="color:#22C55E">● Zone PRÊT (≥80)</span>
-      <span style="color:#FB923C">● Zone SURVEILLANCE (60-79)</span>
-      <span style="color:#EF4444">● Zone VIGILANCE (&lt;60)</span>
-    </div>
-  </div>
-
-  <!-- ROW 4 : TIMELINE -->
-  <div class="card section-full">
-    <div class="card-title">■ Frise chronologique — cliquez sur un point pour le détail</div>
-    <div style="color:#E8E4F8;font-style:italic;text-align:center;padding:20px">Date du 1er match non renseignée</div>
-    <div id="frise-info-box" style="display:none;margin-top:10px;padding:10px 14px;background:#2D2660;color:white;border-radius:8px;font-size:.82rem;font-weight:600;border:2px solid #C9A84C;line-height:1.5"></div>
-  </div>
-
-  <!-- ROW 4b : CHARGE MATCH CUMULÉE -->
-  <div class="card section-full" style="margin-bottom:16px">
-    <div class="card-title">■ Charge match cumulée — progression vers la cible saison</div>
-    <div style="display:flex;gap:20px;align-items:center;flex-wrap:wrap">
-      <div style="flex:1;min-width:200px">
-        <div style="display:flex;justify-content:space-between;margin-bottom:6px">
-          <span style="font-size:.75rem;color:#EAE7FC">Minutes jouées</span>
-          <span style="font-size:.75rem;font-weight:700;color:#EF4444">0' / 270'</span>
-        </div>
-        <div style="background:rgba(255,255,255,0.1);border-radius:8px;height:14px;overflow:hidden">
-          <div style="width:0%;height:100%;background:#EF4444;border-radius:8px;transition:width .6s"></div>
-        </div>
-        <div style="display:flex;justify-content:space-between;margin-top:4px">
-          <span style="font-size:.72rem;color:#E8E4F8">0'</span>
-          <span style="font-size:.75rem;font-weight:700;color:#EF4444">0% de la cible</span>
-          <span style="font-size:.72rem;color:#E8E4F8">270'</span>
-        </div>
-      </div>
-      <div style="flex:1;min-width:200px">
-        <div style="font-size:.72rem;color:#EAE7FC;margin-bottom:6px;font-weight:600">Progression match par match</div>
-        <svg viewBox="0 0 500 70" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;overflow:visible">
-          <rect width="500" height="70" fill="rgba(255,255,255,0.05)" rx="4"/>
-          <line x1="0" y1="60" x2="500" y2="60" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
-          
-        </svg>
-      </div>
-      <div style="background:rgba(255,255,255,0.06);border-radius:10px;padding:14px 18px;text-align:center;flex-shrink:0">
-        <div style="font-size:.72rem;color:#EAE7FC;margin-bottom:4px">Total cumulé</div>
-        <div style="font-size:2rem;font-weight:800;color:#EF4444">0'</div>
-        <div style="font-size:.72rem;color:#EAE7FC;margin-top:2px">0 matchs</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ROW 5 : TEMPS DE JEU -->
-  <div class="card section-full">
-    <div class="card-title">Temps de jeu — progression par match</div>
-    <div style="display:flex;gap:20px;align-items:flex-start">
-      <div style="flex:1"><div style="color:#E8E4F8;font-style:italic">Aucun match enregistré</div></div>
-      <div style="background:rgba(255,255,255,0.06);border-radius:10px;padding:16px;text-align:center;min-width:120px">
-        <div style="font-size:.72rem;color:#EAE7FC;margin-bottom:6px">Total minutes jouées</div>
-        <div style="font-size:2.5rem;font-weight:800;color:#4ADE80">0'</div>
-        <div style="font-size:.72rem;color:#EAE7FC;margin-top:4px">0 matchs</div>
-      </div>
-    </div>
   </div>
 
 </div>
 
 <!-- FOOTER -->
 <div class="footer">
-  <span>Bilan individuel — Darren Bique — TFC Cellule Performance & Réathlétisation — 25/07/2026</span>
+  <span>Bilan de fin de protocole — Darren Bique — TFC Cellule Performance & Réathlétisation — 26/07/2026</span>
   <span>PIERRICK BRIEND</span>
 </div>
 
