@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="tfc-date" content="26/07/2026">
+<meta name="tfc-categories" content="N2">
+<meta name="tfc-players" content="2">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TFC · Rapport Suivi · 26 juil. 2026</title>
+<style>
+:root{--dark:#2D2660;--mid:#6B5CA5;--gold:#C9A84C;--green:#22C55E;--orange:#FB923C;--red:#EF4444;--bg:#EEEAF6}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:#1a1a2e;min-height:100vh}
+.layout{display:flex;min-height:100vh}
+.sidebar{width:190px;background:var(--dark);position:sticky;top:0;height:100vh;overflow-y:auto;flex-shrink:0;display:flex;flex-direction:column}
+.sidebar-logo{padding:16px;text-align:center;border-bottom:1px solid rgba(255,255,255,.1)}
+.sidebar-logo img,.sidebar-logo>div{margin:0 auto 8px}
+.sidebar-club{color:white;font-weight:800;font-size:.85rem;letter-spacing:.05em}
+.sidebar-date{color:var(--gold);font-size:.68rem;margin-top:2px}
+.sidebar-section{padding:12px 14px 4px;color:rgba(255,255,255,.4);font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+.nav-link{display:flex;align-items:center;gap:8px;padding:7px 14px;color:rgba(255,255,255,.7);text-decoration:none;font-size:.73rem;transition:.15s;cursor:pointer;border:none;background:none;width:100%;text-align:left}
+.nav-link:hover{background:rgba(255,255,255,.08);color:white}
+.nav-rri{font-weight:800;font-size:.82rem;min-width:26px}
+hr.nav-sep{margin:6px 14px;border:none;border-top:1px solid rgba(255,255,255,.1)}
+.main{flex:1;min-width:0;padding:24px 28px;overflow-x:hidden}
+.report-header{background:var(--dark);border-radius:12px;padding:18px 24px;display:flex;align-items:center;gap:16px;margin-bottom:28px;border-bottom:3px solid var(--gold)}
+.rh-text h1{color:white;font-size:1.15rem;font-weight:800;letter-spacing:.04em}
+.rh-text p{color:var(--gold);font-size:.73rem;margin-top:3px}
+.rh-stats{margin-left:auto;display:flex;gap:10px}
+.stat-chip{background:rgba(255,255,255,.1);border-radius:8px;padding:6px 14px;text-align:center}
+.stat-chip .v{font-size:1.3rem;font-weight:800;color:white}
+.stat-chip .l{font-size:.58rem;color:rgba(255,255,255,.6);text-transform:uppercase}
+.page-section{margin-bottom:36px}
+.section-title-bar{display:flex;align-items:baseline;gap:12px;margin-bottom:14px}
+.section-title-bar h2{font-size:.92rem;font-weight:800;color:var(--dark);letter-spacing:.08em;text-transform:uppercase}
+.section-title-bar span{font-size:.72rem;color:var(--mid)}
+.pano-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.pano-card{background:#FAFAFE;border-radius:10px;border:2px solid #ccc;cursor:pointer;transition:transform .18s,box-shadow .18s;overflow:hidden;display:block;padding:0;-webkit-tap-highlight-color:transparent}
+.pano-card:hover{transform:translateY(-4px);box-shadow:0 10px 30px rgba(45,38,96,.2)}
+.pano-head{background:var(--dark);padding:9px 12px;display:flex;align-items:flex-start;justify-content:space-between;gap:6px}
+.pano-name{display:block;color:white;font-weight:700;font-size:.85rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pano-sub{display:block;color:rgba(255,255,255,.55);font-size:.63rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+.pano-photo{height:110px;overflow:hidden;background:#EEE}
+.pano-photo img{width:100%;height:100%;object-fit:cover;object-position:top}
+.pano-photo-placeholder{height:110px;display:flex;align-items:center;justify-content:center;font-size:1.8rem;font-weight:800;color:white}
+.pano-kpis{display:flex;border-bottom:1px solid #EEE;padding:7px 10px}
+.pano-kpi{flex:1;text-align:center}
+.pano-kv{display:block;font-size:1.25rem;font-weight:800}
+.pano-kl{display:block;font-size:.55rem;color:#aaa;text-transform:uppercase;margin-top:1px}
+.pano-rri{padding:8px 10px}
+.pano-rri-row{display:flex;align-items:center;gap:6px}
+.pano-rri-score{font-size:1.25rem;font-weight:800}
+.pano-rri-max{font-size:.65rem;color:#aaa}
+.pano-tap{text-align:right;font-size:.6rem;color:var(--mid);font-weight:600;margin-top:4px}
+.badge{font-size:.6rem;font-weight:700;color:white;padding:2px 7px;border-radius:20px;white-space:nowrap;flex-shrink:0}
+.rri-badge{font-size:.65rem;font-weight:700;border:1.5px solid;border-radius:20px;padding:1px 7px;display:inline-block}
+.bar{background:#E5E3F5;border-radius:4px;height:5px;overflow:hidden;margin-top:5px}
+.bar-fill{height:100%;border-radius:4px}
+.bar.lg{height:8px}
+.bar.sm{height:4px}
+.card-section{background:#FAFAFE;border-radius:10px;padding:18px 20px;margin-bottom:14px}
+.section-bar{background:var(--mid);color:white;padding:6px 14px;border-radius:6px;font-size:.73rem;font-weight:700;margin-bottom:12px}
+.synth-table{width:100%;border-collapse:collapse;font-size:.77rem}
+.synth-table th{color:#999;font-size:.63rem;font-weight:600;padding:0 8px 6px;text-align:left;border-bottom:1px solid #EEE}
+.synth-table td{padding:6px 8px;border-bottom:1px solid #F5F5F5}
+.synth-table tr:nth-child(even) td{background:#F8F7FF}
+.s-name{font-weight:700}
+.proto-mini{background:#EEE;border-radius:3px;height:6px;width:110px;overflow:hidden;display:inline-block;vertical-align:middle;margin-right:6px}
+.proto-mini-fill{height:100%;border-radius:3px}
+.sbar-wrap{display:flex;align-items:center;gap:8px}
+.sbar-wrap .bar{flex:1;max-width:120px;height:8px}
+.sbar-val{font-size:.7rem;font-weight:700;min-width:28px}
+.modal-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;-webkit-overflow-scrolling:touch;background:rgba(20,15,50,.75);z-index:9999;align-items:center;justify-content:center;padding:16px}
+.modal-overlay:target{display:flex;animation:fadeIn .2s ease}
+@keyframes fadeIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
+.modal-close-btn{background:rgba(255,255,255,.15);border:none;color:white;width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-left:auto}
+.modal-close-btn:hover{background:rgba(255,255,255,.3)}
+.fiche-modal-box{background:white;border-radius:14px;width:100%;max-width:1100px;max-height:94vh;overflow-y:auto;-webkit-overflow-scrolling:touch;box-shadow:0 32px 80px rgba(20,15,50,.5)}
+.fm-header{background:var(--dark);padding:16px 24px;border-radius:14px 14px 0 0;display:flex;align-items:center;gap:16px;border-bottom:3px solid var(--gold)}
+.fm-title{font-size:1.3rem;font-weight:800;color:white;letter-spacing:.04em}
+.fm-sub{color:rgba(255,255,255,.55);font-size:.77rem;margin-top:2px}
+.fm-tend{font-size:.78rem;font-weight:700;padding:3px 10px;border-radius:12px;border:1.5px solid}
+.fm-content{padding:20px 24px}
+.fm-kpi-row{display:flex;gap:8px;margin-bottom:14px}
+.fm-kpi{flex:1;background:#F8F7FF;border:1px solid #E5E3F5;border-radius:10px;padding:10px 14px;text-align:center}
+.fm-kpi-val{font-size:1.5rem;font-weight:800}
+.fm-kpi-lbl{font-size:.62rem;color:#888;margin-top:2px;text-transform:uppercase}
+.fm-proto{display:flex;align-items:center;gap:12px;padding:10px 16px;border-radius:8px;margin-bottom:14px;font-size:.83rem}
+.fm-body{display:grid;grid-template-columns:1.3fr .75fr 1.5fr 1fr;gap:16px;margin-bottom:14px}
+.info-lbl{font-weight:700;color:var(--dark);font-size:.75rem}
+.info-val{color:#444;font-size:.75rem;margin-left:4px}
+.info-row{display:flex;align-items:baseline;gap:4px;margin-bottom:6px}
+.match-grid{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.match-chip{background:var(--dark);color:white;border-radius:7px;padding:4px 8px;text-align:center}
+.match-chip .m-adv{font-size:.58rem;opacity:.7}
+.match-chip .m-t{font-size:.8rem;font-weight:700}
+.al-row{display:flex;align-items:center;gap:6px;padding:4px 8px;background:#FAFAFA;border-radius:4px;margin-top:4px;font-size:.72rem}
+.obs-title{font-weight:700;color:var(--dark);font-size:.78rem;margin-bottom:6px}
+.obs-text{font-style:italic;font-size:.76rem;color:#444;line-height:1.55}
+.today-lbl{font-size:.72rem;color:#666;margin-bottom:2px}
+.today-val{font-size:1.2rem;font-weight:800}
+.today-max{font-size:.62rem;color:#aaa;font-weight:400}
+.fm-conf{background:#F8F7FF;border-radius:10px;padding:12px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px;border:1px solid #E5E3F5}
+.fm-conf-title{font-size:.65rem;font-weight:800;color:var(--mid);letter-spacing:.07em;text-transform:uppercase;white-space:nowrap}
+.conf-bar{flex:1;min-width:120px;background:#EEE;border-radius:6px;height:12px;overflow:hidden}
+.conf-bar-fill{height:100%;border-radius:6px}
+.conf-score{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:.82rem;font-weight:800;flex-shrink:0}
+.fm-frise{background:#F8F7FF;border-radius:10px;padding:16px;border:1px solid #E5E3F5}
+.fm-frise-title{font-size:.73rem;font-weight:700;color:var(--dark);margin-bottom:12px;letter-spacing:.04em}
+.rri-modal-box{background:white;border-radius:14px;width:100%;max-width:860px;max-height:90vh;overflow-y:auto;-webkit-overflow-scrolling:touch;box-shadow:0 24px 60px rgba(20,15,50,.4)}
+.rri-modal-body{display:grid;grid-template-columns:1fr 1fr;gap:0}
+.rri-left{padding:18px 20px;border-right:1px solid #EEE}
+.rri-right{padding:18px 20px}
+.comp-table{width:100%;border-collapse:collapse;font-size:.77rem}
+.comp-table th{color:#999;font-size:.62rem;font-weight:600;padding:0 6px 6px;text-align:left}
+.comp-table td{padding:4px 6px}
+.comp-table tr:nth-child(even) td{background:#F8F7FF}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.comp-bar{background:#EEE;border-radius:3px;height:5px;overflow:hidden;width:70px}
+.comp-bar-fill{height:100%;border-radius:3px}
+.info-box{background:#F8F7FF;border-radius:8px;padding:10px 14px;margin-bottom:8px;border:1px solid #E5E3F5}
+.info-box .lbl{font-size:.6rem;font-weight:700;color:var(--mid);letter-spacing:.06em;margin-bottom:3px}
+.info-box .val{font-size:1rem;font-weight:700;color:var(--dark)}
+.sec-title{font-size:.67rem;font-weight:800;color:var(--mid);letter-spacing:.08em;margin-bottom:10px;text-transform:uppercase}
+@media(max-width:900px){
+  .sidebar{display:none}
+  .pano-grid{grid-template-columns:repeat(2,1fr)}
+  .fm-body{grid-template-columns:1fr 1fr}
+  .rri-modal-body{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body ontouchstart="">
+<div class="layout">
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div style="width:48px;height:48px;border-radius:50%;background:#6B5CA5;display:flex;align-items:center;justify-content:center;border:2px solid #C9A84C"><span style="color:white;font-size:.65rem;font-weight:800;text-align:center;line-height:1.1">TFC<br>PERF</span></div>
+    <div class="sidebar-club">TOULOUSE FC</div>
+    <div class="sidebar-date">26 juil. 2026</div>
+  </div>
+  <div class="sidebar-section">Sections</div>
+  <a class="nav-link" href="#panorama">📋 Panorama</a>
+  <a class="nav-link" href="#synthese">📊 Synthèse</a>
+  <hr class="nav-sep">
+  <div class="sidebar-section">Fiches joueurs</div>
+  <button class="nav-link" onclick="openFiche('frederiqueefuele')"><span class="nav-rri" style="color:#EF4444">24</span>Efuele</button><button class="nav-link" onclick="openFiche('darrenbique')"><span class="nav-rri" style="color:#FB923C">79</span>Bique</button>
+</nav>
+
+<!-- CONTENU -->
+<main class="main">
+
+  <div class="report-header">
+    <div style="width:48px;height:48px;border-radius:50%;background:#6B5CA5;display:flex;align-items:center;justify-content:center;border:2px solid #C9A84C"><span style="color:white;font-size:.65rem;font-weight:800;text-align:center;line-height:1.1">TFC<br>PERF</span></div>
+    <div class="rh-text">
+      <h1>TOULOUSE FOOTBALL CLUB</h1>
+      <p>Cellule Performance &amp; Réathlétisation · Rapport de suivi · 26 juil. 2026</p>
+    </div>
+    <div class="rh-stats">
+      <div class="stat-chip"><div class="v">2</div><div class="l">Joueurs</div></div>
+      <div class="stat-chip"><div class="v" style="color:#22C55E">0</div><div class="l">Prêts</div></div>
+      <div class="stat-chip"><div class="v" style="color:#FB923C">1</div><div class="l">Surv.</div></div>
+      <div class="stat-chip"><div class="v" style="color:#EF4444">1</div><div class="l">Vigilance</div></div>
+    </div>
+  </div>
+
+  <!-- PANORAMA -->
+  <div class="page-section" id="panorama">
+    <div class="section-title-bar"><h2>Panorama joueurs</h2><span>Triés par RRI · Fiche complète et détail RRI accessibles depuis chaque carte</span></div>
+    <div class="pano-grid"><div class="pano-card" style="border-color:#EF4444">
+ <a href="#fiche-frederiqueefuele" style="text-decoration:none;color:inherit;display:block">
+  <div class="pano-head">
+    <div style="min-width:0"><span class="pano-name">Frederique Efuele</span><span class="pano-sub">Lésion Grade 2 adducteur Droit</span></div>
+    <span class="badge" style="background:#FB923C">En cours</span>
+  </div>
+  <div class="pano-photo-placeholder" style="background:#6B5CA5">FE</div>
+  <div class="pano-kpis">
+    <div class="pano-kpi"><span class="pano-kv" style="color:#EF4444">4</span><span class="pano-kl">Douleur</span></div>
+    <div class="pano-kpi"><span class="pano-kv" style="color:#6B5CA5">6</span><span class="pano-kl">Fatigue</span></div>
+    <div class="pano-kpi"><span class="pano-kv" style="color:#FB923C">4</span><span class="pano-kl">Courb.</span></div>
+  </div>
+  <div class="pano-rri">
+    <div class="pano-rri-row">
+      <span class="pano-rri-score" style="color:#EF4444">24<span class="pano-rri-max">/100</span></span>
+      <span class="rri-badge" style="color:#EF4444;border-color:#EF4444">VIGILANCE</span>
+    </div>
+    <div class="bar"><div class="bar-fill" style="width:24%;background:#EF4444"></div></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px">
+      <span style="font-size:.62rem;color:#888;font-weight:600">En attente du 1er match</span>
+    </div>
+    <div class="bar sm" style="margin-top:3px"><div class="bar-fill" style="width:0%;background:#EF4444"></div></div>
+  </div>
+ </a>
+ <div style="display:flex;border-top:1px solid #EEE">
+  <a href="#fiche-frederiqueefuele" style="flex:1;text-align:center;padding:8px 0;font-size:.68rem;font-weight:700;color:#6B5CA5;text-decoration:none">Fiche complète →</a>
+  <a href="#rri-frederiqueefuele" style="flex:1;text-align:center;padding:8px 0;font-size:.68rem;font-weight:700;color:#EF4444;text-decoration:none;border-left:1px solid #EEE">Détail RRI →</a>
+ </div>
+</div><div class="pano-card" style="border-color:#FB923C">
+ <a href="#fiche-darrenbique" style="text-decoration:none;color:inherit;display:block">
+  <div class="pano-head">
+    <div style="min-width:0"><span class="pano-name">Darren Bique</span><span class="pano-sub">Lésion Grade 1 Quadriceps Droit</span></div>
+    <span class="badge" style="background:#FB923C">—</span>
+  </div>
+  <div class="pano-photo-placeholder" style="background:#6B5CA5">DB</div>
+  <div class="pano-kpis">
+    <div class="pano-kpi"><span class="pano-kv" style="color:#22C55E">0</span><span class="pano-kl">Douleur</span></div>
+    <div class="pano-kpi"><span class="pano-kv" style="color:#6B5CA5">1</span><span class="pano-kl">Fatigue</span></div>
+    <div class="pano-kpi"><span class="pano-kv" style="color:#FB923C">1</span><span class="pano-kl">Courb.</span></div>
+  </div>
+  <div class="pano-rri">
+    <div class="pano-rri-row">
+      <span class="pano-rri-score" style="color:#FB923C">79<span class="pano-rri-max">/100</span></span>
+      <span class="rri-badge" style="color:#FB923C;border-color:#FB923C">SURV.</span>
+    </div>
+    <div class="bar"><div class="bar-fill" style="width:79%;background:#FB923C"></div></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px">
+      <span style="font-size:.62rem;color:#888;font-weight:600">En attente du 1er match</span>
+    </div>
+    <div class="bar sm" style="margin-top:3px"><div class="bar-fill" style="width:0%;background:#EF4444"></div></div>
+  </div>
+ </a>
+ <div style="display:flex;border-top:1px solid #EEE">
+  <a href="#fiche-darrenbique" style="flex:1;text-align:center;padding:8px 0;font-size:.68rem;font-weight:700;color:#6B5CA5;text-decoration:none">Fiche complète →</a>
+  <a href="#rri-darrenbique" style="flex:1;text-align:center;padding:8px 0;font-size:.68rem;font-weight:700;color:#FB923C;text-decoration:none;border-left:1px solid #EEE">Détail RRI →</a>
+ </div>
+</div></div>
+  </div>
+
+  <!-- SYNTHESE -->
+  <div class="page-section" id="synthese">
+    <div class="section-title-bar"><h2>Synthèse du groupe</h2></div>
+    <div class="card-section">
+      <div class="section-bar">■ Avancement · RRI · Tendance · Moyennes</div>
+      <table class="synth-table">
+        <thead><tr><th>Joueur</th><th>Avancement</th><th>RRI</th><th>Tendance douleur</th><th>Confiance</th><th>Douleur /10</th><th>Courb. /10</th><th>Fatigue /10</th></tr></thead>
+        <tbody><tr>
+<td class="s-name" style="color:#EF4444">Frederique Efuele</td>
+<td><span style='font-size:.72rem;color:#aaa;font-style:italic'>En attente</span></td>
+<td><span style="font-weight:800;color:#EF4444">24</span> <span class="rri-badge" style="color:#EF4444;border-color:#EF4444">VIGILANCE</span></td>
+<td style="color:#2D2660;font-weight:600">→ Stable</td>
+<td><span class="badge" style="background:#FB923C">Fragile</span>&nbsp;9/20</td>
+<td><div class="sbar-wrap"><div class="bar lg" style="max-width:130px;flex:1"><div class="bar-fill" style="width:40%;background:#EF4444"></div></div><span class="sbar-val" style="color:#EF4444">4.00</span></div></td>
+<td><div class="sbar-wrap"><div class="bar lg" style="max-width:130px;flex:1"><div class="bar-fill" style="width:40%;background:#FB923C"></div></div><span class="sbar-val" style="color:#FB923C">4.00</span></div></td>
+<td><div class="sbar-wrap"><div class="bar lg" style="max-width:130px;flex:1"><div class="bar-fill" style="width:60%;background:#6B5CA5"></div></div><span class="sbar-val" style="color:#6B5CA5">6.00</span></div></td>
+</tr><tr>
+<td class="s-name" style="color:#FB923C">Darren Bique</td>
+<td><span style='font-size:.72rem;color:#aaa;font-style:italic'>En attente</span></td>
+<td><span style="font-weight:800;color:#FB923C">79</span> <span class="rri-badge" style="color:#FB923C;border-color:#FB923C">SURV.</span></td>
+<td style="color:#2D2660;font-weight:600">→ Stable</td>
+<td><span class="badge" style="background:#22C55E">Prêt</span>&nbsp;19/20</td>
+<td><div class="sbar-wrap"><div class="bar lg" style="max-width:130px;flex:1"><div class="bar-fill" style="width:0%;background:#22C55E"></div></div><span class="sbar-val" style="color:#22C55E">0.00</span></div></td>
+<td><div class="sbar-wrap"><div class="bar lg" style="max-width:130px;flex:1"><div class="bar-fill" style="width:10%;background:#FB923C"></div></div><span class="sbar-val" style="color:#FB923C">1.00</span></div></td>
+<td><div class="sbar-wrap"><div class="bar lg" style="max-width:130px;flex:1"><div class="bar-fill" style="width:10%;background:#6B5CA5"></div></div><span class="sbar-val" style="color:#6B5CA5">1.00</span></div></td>
+</tr></tbody>
+      </table>
+    </div>
+  </div>
+
+</main>
+</div>
+
+<!-- MODALES FICHES (cachées) -->
+<div class="modal-overlay" id="fiche-frederiqueefuele">
+ <a href="#_" style="position:absolute;top:0;left:0;right:0;bottom:0;z-index:0"></a>
+ <div class="fiche-modal-box" style="position:relative;z-index:1">
+  <div class="fm-header">
+   <div>
+    <div class="fm-title">FREDERIQUE EFUELE</div>
+    <div class="fm-sub">N2 · Lésion Grade 2 adducteur Droit</div>
+   </div>
+   <span class="badge" style="background:#FB923C;font-size:.7rem">En cours</span>
+   <span class="fm-tend" style="color:#2D2660;border-color:#2D2660">→ Stable</span>
+   <a href="#_" class="modal-close-btn" style="text-decoration:none;display:flex">✕</a>
+  </div>
+  <div class="fm-content">
+   <div class="fm-kpi-row">
+    <div class="fm-kpi" style="background:#DCFCE7;border-color:#22C55E"><div class="fm-kpi-val" style="color:#EF4444">4.0</div><div class="fm-kpi-lbl">Douleur moy.</div></div>
+    <div class="fm-kpi" style="border-color:#FB923C"><div class="fm-kpi-val" style="color:#FB923C">4.0</div><div class="fm-kpi-lbl">Courbatures moy.</div></div>
+    <div class="fm-kpi"><div class="fm-kpi-val" style="color:#6B5CA5">6.0</div><div class="fm-kpi-lbl">Fatigue moy.</div></div>
+    <div class="fm-kpi"><div class="fm-kpi-val" style="color:#2D2660">2</div><div class="fm-kpi-lbl">Soins</div></div>
+    <div class="fm-kpi"><div class="fm-kpi-val" style="color:#2D2660">2</div><div class="fm-kpi-lbl">Préventions</div></div>
+    <div class="fm-kpi" style="background:#F3F0FC"><div class="fm-kpi-val" style="color:#EF4444">24</div><div class="fm-kpi-lbl">RRI /100</div></div>
+   </div>
+   <div class="fm-frise" style="margin-bottom:14px">
+    <div class="fm-frise-title">■ Frise chronologique — Phases · Douleur · Courbatures · Matchs</div>
+    <div style="padding:20px;color:#aaa;font-style:italic;text-align:center">Frise non disponible — date du 1er match non renseignée</div>
+   </div>
+   <div style="background:#F8F7FF;border-radius:10px;padding:12px 16px;margin-bottom:14px;border:1px solid #E5E3F5">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px">
+     <span style="font-weight:700;color:#6B5CA5;font-size:.83rem">En attente du premier match — protocole non démarré</span>
+     
+    </div>
+    <div style="position:relative;height:20px;border-radius:10px;overflow:hidden;background:#EEE">
+     <div style="position:absolute;left:0;top:0;width:25%;height:100%;background:#EDE7F6"></div>
+     <div style="position:absolute;left:25%;top:0;width:25%;height:100%;background:#E3F2FD"></div>
+     <div style="position:absolute;left:50%;top:0;width:25%;height:100%;background:#E8F5E9"></div>
+     <div style="position:absolute;left:75%;top:0;width:25%;height:100%;background:#FFF3E0"></div>
+     <div style="position:absolute;left:0;top:0;width:0%;height:100%;background:#EF4444;opacity:.85;border-radius:10px;transition:width .5s"></div>
+     <div style="position:absolute;left:0%;top:50%;transform:translate(-50%,-50%);width:14px;height:14px;background:white;border:3px solid #EF4444;border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,.2)"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;margin-top:5px">
+     <span style="font-size:.6rem;color:#6B5CA5;font-weight:600">J+1</span>
+     <span style="font-size:.6rem;color:#6B5CA5;font-weight:600">Phase 1 · J+7</span>
+     <span style="font-size:.6rem;color:#6B5CA5;font-weight:600">Phase 2 · J+14</span>
+     <span style="font-size:.6rem;color:#6B5CA5;font-weight:600">Phase 3 · J+21</span>
+     <span style="font-size:.6rem;color:#6B5CA5;font-weight:600">J+25 ✓</span>
+    </div>
+   </div>
+   <div class="fm-body">
+    <div>
+     <div class="info-row"><span class="info-lbl">Catégorie :</span><span class="info-val">N2</span></div>
+     <div class="info-row"><span class="info-lbl">Focus prévent. :</span><span class="info-val">Pubalgie</span></div>
+     <div class="info-row"><span class="info-lbl">Vigilance :</span><span class="info-val">—</span></div>
+     <div style="margin-top:8px"><span class="info-lbl">Matchs joués :</span></div>
+     <div class="match-grid"><span style="color:#aaa;font-style:italic;font-size:.75rem">Aucun match enregistré</span></div>
+     
+    </div>
+    <div style="min-height:180px"><div style="height:100%;background:#6B5CA5;border-radius:10px;display:flex;align-items:center;justify-content:center;color:white;font-size:2.8rem;font-weight:800">FE</div></div>
+    <div>
+     <div class="obs-title">Observations</div>
+     <div class="obs-text">—</div>
+    </div>
+    <div>
+     <div style="font-weight:700;color:#2D2660;font-size:.75rem;margin-bottom:10px">Données du jour <span style="color:#aaa;font-weight:400;font-size:.65rem">26/07/2026</span></div>
+     <div class="today-lbl">Douleur</div>
+     <div style="display:flex;align-items:baseline;gap:4px"><span class="today-val" style="color:#EF4444">4</span><span class="today-max">/10</span></div>
+     <div class="bar sm" style="margin-bottom:8px"><div class="bar-fill" style="width:40%;background:#EF4444"></div></div>
+     <div class="today-lbl">Fatigue</div>
+     <div style="display:flex;align-items:baseline;gap:4px"><span class="today-val" style="color:#6B5CA5">6</span><span class="today-max">/10</span></div>
+     <div class="bar sm" style="margin-bottom:8px"><div class="bar-fill" style="width:60%;background:#6B5CA5"></div></div>
+     <div class="today-lbl">Courbatures</div>
+     <div style="display:flex;align-items:baseline;gap:4px"><span class="today-val" style="color:#FB923C">4</span><span class="today-max">/10</span></div>
+     <div class="bar sm"><div class="bar-fill" style="width:40%;background:#FB923C"></div></div>
+    </div>
+   </div>
+   <div class="fm-conf">
+    <span class="fm-conf-title">Indice de confiance</span>
+    <span style="font-size:.72rem;color:#555">Physique : 5/10</span>
+    <span style="font-size:.72rem;color:#555">Mental : 4/10</span>
+    <div class="conf-bar"><div class="conf-bar-fill" style="width:45%;background:linear-gradient(90deg,#EF4444,#FB923C,#22C55E)"></div></div>
+    <div class="conf-score" style="background:#EF4444">9</div>
+    <span style="font-size:.85rem;font-weight:700;color:#EF4444">Fragile</span>
+    <span style="font-size:.65rem;color:#aaa">Score : 9/20</span>
+   </div>
+  </div>
+ </div>
+</div><div class="modal-overlay" id="fiche-darrenbique">
+ <a href="#_" style="position:absolute;top:0;left:0;right:0;bottom:0;z-index:0"></a>
+ <div class="fiche-modal-box" style="position:relative;z-index:1">
+  <div class="fm-header">
+   <div>
+    <div class="fm-title">DARREN BIQUE</div>
+    <div class="fm-sub">N2 · Lésion Grade 1 Quadriceps Droit</div>
+   </div>
+   <span class="badge" style="background:#FB923C;font-size:.7rem">—</span>
+   <span class="fm-tend" style="color:#2D2660;border-color:#2D2660">→ Stable</span>
+   <a href="#_" class="modal-close-btn" style="text-decoration:none;display:flex">✕</a>
+  </div>
+  <div class="fm-content">
+   <div class="fm-kpi-row">
+    <div class="fm-kpi" style="background:#DCFCE7;border-color:#22C55E"><div class="fm-kpi-val" style="color:#22C55E">0.0</div><div class="fm-kpi-lbl">Douleur moy.</div></div>
+    <div class="fm-kpi" style="border-color:#FB923C"><div class="fm-kpi-val" style="color:#FB923C">1.0</div><div class="fm-kpi-lbl">Courbatures moy.</div></div>
+    <div class="fm-kpi"><div class="fm-kpi-val" style="color:#6B5CA5">1.0</div><div class="fm-kpi-lbl">Fatigue moy.</div></div>
+    <div class="fm-kpi"><div class="fm-kpi-val" style="color:#2D2660">2</div><div class="fm-kpi-lbl">Soins</div></div>
+    <div class="fm-kpi"><div class="fm-kpi-val" style="color:#2D2660">3</div><div class="fm-kpi-lbl">Préventions</div></div>
+    <div class="fm-kpi" style="background:#F3F0FC"><div class="fm-kpi-val" style="color:#FB923C">79</div><div class="fm-kpi-lbl">RRI /100</div></div>
+   </div>
+   <div class="fm-frise" style="margin-bottom:14px">
+    <div class="fm-frise-title">■ Frise chronologique — Phases · Douleur · Courbatures · Matchs</div>
+    <div style="padding:20px;color:#aaa;font-style:italic;text-align:center">Frise non disponible — date du 1er match non renseignée</div>
+   </div>
+   <div style="background:#F8F7FF;border-radius:10px;padding:12px 16px;margin-bottom:14px;border:1px solid #E5E3F5">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px">
+     <span style="font-weight:700;color:#6B5CA5;font-size:.83rem">En attente du premier match — protocole non démarré</span>
+     
+    </div>
+    <div style="position:relative;height:20px;border-radius:10px;overflow:hidden;background:#EEE">
+     <div style="position:absolute;left:0;top:0;width:25%;height:100%;background:#EDE7F6"></div>
+     <div style="position:absolute;left:25%;top:0;width:25%;height:100%;background:#E3F2FD"></div>
+     <div style="position:absolute;left:50%;top:0;width:25%;height:100%;background:#E8F5E9"></div>
+     <div style="position:absolute;left:75%;top:0;width:25%;height:100%;background:#FFF3E0"></div>
+     <div style="position:absolute;left:0;top:0;width:0%;height:100%;background:#EF4444;opacity:.85;border-radius:10px;transition:width .5s"></div>
+     <div style="position:absolute;left:0%;top:50%;transform:translate(-50%,-50%);width:14px;height:14px;background:white;border:3px solid #EF4444;border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,.2)"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;margin-top:5px">
+     <span style="font-size:.6rem;color:#6B5CA5;font-weight:600">J+1</span>
+     <span style="font-size:.6rem;color:#6B5CA5;font-weight:600">Phase 1 · J+7</span>
+     <span style="font-size:.6rem;color:#6B5CA5;font-weight:600">Phase 2 · J+14</span>
+     <span style="font-size:.6rem;color:#6B5CA5;font-weight:600">Phase 3 · J+21</span>
+     <span style="font-size:.6rem;color:#6B5CA5;font-weight:600">J+25 ✓</span>
+    </div>
+   </div>
+   <div class="fm-body">
+    <div>
+     <div class="info-row"><span class="info-lbl">Catégorie :</span><span class="info-val">N2</span></div>
+     <div class="info-row"><span class="info-lbl">Focus prévent. :</span><span class="info-val">Isométrie Quadri / terciaire</span></div>
+     <div class="info-row"><span class="info-lbl">Vigilance :</span><span class="info-val">Sprint pas avant le 30/07</span></div>
+     <div style="margin-top:8px"><span class="info-lbl">Matchs joués :</span></div>
+     <div class="match-grid"><span style="color:#aaa;font-style:italic;font-size:.75rem">Aucun match enregistré</span></div>
+     
+    </div>
+    <div style="min-height:180px"><div style="height:100%;background:#6B5CA5;border-radius:10px;display:flex;align-items:center;justify-content:center;color:white;font-size:2.8rem;font-weight:800">DB</div></div>
+    <div>
+     <div class="obs-title">Observations</div>
+     <div class="obs-text">—</div>
+    </div>
+    <div>
+     <div style="font-weight:700;color:#2D2660;font-size:.75rem;margin-bottom:10px">Données du jour <span style="color:#aaa;font-weight:400;font-size:.65rem">26/07/2026</span></div>
+     <div class="today-lbl">Douleur</div>
+     <div style="display:flex;align-items:baseline;gap:4px"><span class="today-val" style="color:#22C55E">0</span><span class="today-max">/10</span></div>
+     <div class="bar sm" style="margin-bottom:8px"><div class="bar-fill" style="width:0%;background:#22C55E"></div></div>
+     <div class="today-lbl">Fatigue</div>
+     <div style="display:flex;align-items:baseline;gap:4px"><span class="today-val" style="color:#6B5CA5">1</span><span class="today-max">/10</span></div>
+     <div class="bar sm" style="margin-bottom:8px"><div class="bar-fill" style="width:10%;background:#6B5CA5"></div></div>
+     <div class="today-lbl">Courbatures</div>
+     <div style="display:flex;align-items:baseline;gap:4px"><span class="today-val" style="color:#FB923C">1</span><span class="today-max">/10</span></div>
+     <div class="bar sm"><div class="bar-fill" style="width:10%;background:#FB923C"></div></div>
+     <div style="font-size:.64rem;color:#888;margin-top:3px;font-weight:400">📍 Quadriceps · Bilatéral</div>
+    </div>
+   </div>
+   <div class="fm-conf">
+    <span class="fm-conf-title">Indice de confiance</span>
+    <span style="font-size:.72rem;color:#555">Physique : 9/10</span>
+    <span style="font-size:.72rem;color:#555">Mental : 10/10</span>
+    <div class="conf-bar"><div class="conf-bar-fill" style="width:95%;background:linear-gradient(90deg,#EF4444,#FB923C,#22C55E)"></div></div>
+    <div class="conf-score" style="background:#22C55E">19</div>
+    <span style="font-size:.85rem;font-weight:700;color:#22C55E">Prêt</span>
+    <span style="font-size:.65rem;color:#aaa">Score : 19/20</span>
+   </div>
+  </div>
+ </div>
+</div>
+
+<!-- MODALES RRI (cachées) -->
+<div class="modal-overlay" id="rri-frederiqueefuele">
+ <a href="#_" style="position:absolute;top:0;left:0;right:0;bottom:0;z-index:0"></a>
+ <div class="rri-modal-box" style="position:relative;z-index:1">
+  <div class="fm-header" style="border-radius:14px 14px 0 0">
+   <div><div class="fm-title">FREDERIQUE EFUELE</div><div class="fm-sub">Détail du score RRI</div></div>
+   <div style="display:flex;align-items:center;gap:8px;margin-left:auto">
+    <span style="font-size:2rem;font-weight:800;color:#EF4444">24</span>
+    <span style="color:#aaa">/100</span>
+    <span class="rri-badge" style="color:#EF4444;border-color:#EF4444">VIGILANCE</span>
+   </div>
+   <a href="#_" class="modal-close-btn" style="text-decoration:none;display:flex">✕</a>
+  </div>
+  <div class="rri-modal-body">
+   <div class="rri-left">
+    <div class="sec-title">Les 8 composantes</div>
+    <table class="comp-table"><thead><tr><th></th><th>Composante</th><th>Valeur</th><th>Score</th><th></th></tr></thead><tbody><tr><td><span class="dot" style="background:#6B5CA5"></span></td><td style="font-weight:500">Confiance Physique</td><td style="color:#666;font-style:italic">5/10</td><td style="font-weight:700;color:#6B5CA5">8/15</td><td><div class="comp-bar"><div class="comp-bar-fill" style="width:53%;background:#6B5CA5"></div></div></td></tr><tr><td><span class="dot" style="background:#8B5CF6"></span></td><td style="font-weight:500">Confiance Mentale</td><td style="color:#666;font-style:italic">4/10</td><td style="font-weight:700;color:#8B5CF6">6/15</td><td><div class="comp-bar"><div class="comp-bar-fill" style="width:40%;background:#8B5CF6"></div></div></td></tr><tr><td><span class="dot" style="background:#0EA5E9"></span></td><td style="font-weight:500">Soins + Prévention</td><td style="color:#666;font-style:italic">4 pts</td><td style="font-weight:700;color:#0EA5E9">0/15</td><td><div class="comp-bar"><div class="comp-bar-fill" style="width:0%;background:#0EA5E9"></div></div></td></tr><tr><td><span class="dot" style="background:#22C55E"></span></td><td style="font-weight:500">Douleur moyenne</td><td style="color:#666;font-style:italic">4.00/10</td><td style="font-weight:700;color:#22C55E">0/20</td><td><div class="comp-bar"><div class="comp-bar-fill" style="width:0%;background:#22C55E"></div></div></td></tr><tr><td><span class="dot" style="background:#FB923C"></span></td><td style="font-weight:500">Courbatures</td><td style="color:#666;font-style:italic">4.00/10</td><td style="font-weight:700;color:#FB923C">5/15</td><td><div class="comp-bar"><div class="comp-bar-fill" style="width:33%;background:#FB923C"></div></div></td></tr><tr><td><span class="dot" style="background:#14B8A6"></span></td><td style="font-weight:500">Fatigue</td><td style="color:#666;font-style:italic">6.00/10</td><td style="font-weight:700;color:#14B8A6">0/10</td><td><div class="comp-bar"><div class="comp-bar-fill" style="width:0%;background:#14B8A6"></div></div></td></tr><tr><td><span class="dot" style="background:#3B82F6"></span></td><td style="font-weight:500">Progression matchs</td><td style="color:#666;font-style:italic">Aucun</td><td style="font-weight:700;color:#3B82F6">0/5</td><td><div class="comp-bar"><div class="comp-bar-fill" style="width:0%;background:#3B82F6"></div></div></td></tr><tr><td><span class="dot" style="background:#EF4444"></span></td><td style="font-weight:500">Alertes rouges</td><td style="color:#666;font-style:italic">0 rouge(s)</td><td style="font-weight:700;color:#EF4444">5/5</td><td><div class="comp-bar"><div class="comp-bar-fill" style="width:100%;background:#EF4444"></div></div></td></tr></tbody></table>
+   </div>
+   <div class="rri-right">
+    <div class="sec-title">Chronologie du protocole</div>
+    <div class="info-box"><div class="lbl">Phase</div><div class="val">Avant 1er match</div></div>
+    <div class="info-box"><div class="lbl">J+ depuis 1er match</div><div class="val">—</div></div>
+    <div class="info-box"><div class="lbl">Douleur moy. 3 dern. séances</div><div class="val" style="color:#EF4444">4.00/10</div></div>
+    <div class="info-box"><div class="lbl">Soins · Préventions (protocole)</div><div class="val">Soins : 2 · Préventions : 2</div></div>
+   </div>
+  </div>
+ </div>
+</div><div class="modal-overlay" id="rri-darrenbique">
+ <a href="#_" style="position:absolute;top:0;left:0;right:0;bottom:0;z-index:0"></a>
+ <div class="rri-modal-box" style="position:relative;z-index:1">
+  <div class="fm-header" style="border-radius:14px 14px 0 0">
+   <div><div class="fm-title">DARREN BIQUE</div><div class="fm-sub">Détail du score RRI</div></div>
+   <div style="display:flex;align-items:center;gap:8px;margin-left:auto">
+    <span style="font-size:2rem;font-weight:800;color:#FB923C">79</span>
+    <span style="color:#aaa">/100</span>
+    <span class="rri-badge" style="color:#FB923C;border-color:#FB923C">SURV.</span>
+   </div>
+   <a href="#_" class="modal-close-btn" style="text-decoration:none;display:flex">✕</a>
+  </div>
+  <div class="rri-modal-body">
+   <div class="rri-left">
+    <div class="sec-title">Les 8 composantes</div>
+    <table class="comp-table"><thead><tr><th></th><th>Composante</th><th>Valeur</th><th>Score</th><th></th></tr></thead><tbody><tr><td><span class="dot" style="background:#6B5CA5"></span></td><td style="font-weight:500">Confiance Physique</td><td style="color:#666;font-style:italic">9/10</td><td style="font-weight:700;color:#6B5CA5">14/15</td><td><div class="comp-bar"><div class="comp-bar-fill" style="width:93%;background:#6B5CA5"></div></div></td></tr><tr><td><span class="dot" style="background:#8B5CF6"></span></td><td style="font-weight:500">Confiance Mentale</td><td style="color:#666;font-style:italic">10/10</td><td style="font-weight:700;color:#8B5CF6">15/15</td><td><div class="comp-bar"><div class="comp-bar-fill" style="width:100%;background:#8B5CF6"></div></div></td></tr><tr><td><span class="dot" style="background:#0EA5E9"></span></td><td style="font-weight:500">Soins + Prévention</td><td style="color:#666;font-style:italic">5 pts</td><td style="font-weight:700;color:#0EA5E9">0/15</td><td><div class="comp-bar"><div class="comp-bar-fill" style="width:0%;background:#0EA5E9"></div></div></td></tr><tr><td><span class="dot" style="background:#22C55E"></span></td><td style="font-weight:500">Douleur moyenne</td><td style="color:#666;font-style:italic">0.00/10</td><td style="font-weight:700;color:#22C55E">20/20</td><td><div class="comp-bar"><div class="comp-bar-fill" style="width:100%;background:#22C55E"></div></div></td></tr><tr><td><span class="dot" style="background:#FB923C"></span></td><td style="font-weight:500">Courbatures</td><td style="color:#666;font-style:italic">1.00/10</td><td style="font-weight:700;color:#FB923C">15/15</td><td><div class="comp-bar"><div class="comp-bar-fill" style="width:100%;background:#FB923C"></div></div></td></tr><tr><td><span class="dot" style="background:#14B8A6"></span></td><td style="font-weight:500">Fatigue</td><td style="color:#666;font-style:italic">1.00/10</td><td style="font-weight:700;color:#14B8A6">10/10</td><td><div class="comp-bar"><div class="comp-bar-fill" style="width:100%;background:#14B8A6"></div></div></td></tr><tr><td><span class="dot" style="background:#3B82F6"></span></td><td style="font-weight:500">Progression matchs</td><td style="color:#666;font-style:italic">Aucun</td><td style="font-weight:700;color:#3B82F6">0/5</td><td><div class="comp-bar"><div class="comp-bar-fill" style="width:0%;background:#3B82F6"></div></div></td></tr><tr><td><span class="dot" style="background:#EF4444"></span></td><td style="font-weight:500">Alertes rouges</td><td style="color:#666;font-style:italic">0 rouge(s)</td><td style="font-weight:700;color:#EF4444">5/5</td><td><div class="comp-bar"><div class="comp-bar-fill" style="width:100%;background:#EF4444"></div></div></td></tr></tbody></table>
+   </div>
+   <div class="rri-right">
+    <div class="sec-title">Chronologie du protocole</div>
+    <div class="info-box"><div class="lbl">Phase</div><div class="val">Avant 1er match</div></div>
+    <div class="info-box"><div class="lbl">J+ depuis 1er match</div><div class="val">—</div></div>
+    <div class="info-box"><div class="lbl">Douleur moy. 3 dern. séances</div><div class="val" style="color:#22C55E">0.00/10</div></div>
+    <div class="info-box"><div class="lbl">Soins · Préventions (protocole)</div><div class="val">Soins : 2 · Préventions : 3</div></div>
+   </div>
+  </div>
+ </div>
+</div>
+
+<script>
+/* Navigation via :target CSS — aucun JS requis pour les modales */
+</script>
+</body>
+</html>
