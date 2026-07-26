@@ -964,6 +964,7 @@ function askDeleteBilan(name,sha,joueur){
   <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
     <button id="ssub-quotidien" onclick="showSaisieSub('quotidien')" style="padding:9px 18px;border:1.5px solid #2D2660;border-radius:20px;background:#2D2660;color:white;font-weight:700;font-size:.78rem;cursor:pointer">📝 Quotidien</button>
     <button id="ssub-joueurs" onclick="showSaisieSub('joueurs')" style="padding:9px 18px;border:1.5px solid #2D2660;border-radius:20px;background:white;color:#2D2660;font-weight:700;font-size:.78rem;cursor:pointer">👤 Joueurs</button>
+    <button id="ssub-iprrs" onclick="showSaisieSub('iprrs')" style="padding:9px 18px;border:1.5px solid #2D2660;border-radius:20px;background:white;color:#2D2660;font-weight:700;font-size:.78rem;cursor:pointer">🎯 IPRRS</button>
     <button id="ssub-alertes" onclick="showSaisieSub('alertes')" style="padding:9px 18px;border:1.5px solid #2D2660;border-radius:20px;background:white;color:#2D2660;font-weight:700;font-size:.78rem;cursor:pointer">🚨 Alertes</button>
     <button id="ssub-matchs" onclick="showSaisieSub('matchs')" style="padding:9px 18px;border:1.5px solid #2D2660;border-radius:20px;background:white;color:#2D2660;font-weight:700;font-size:.78rem;cursor:pointer">⚽ Matchs</button>
     <button id="ssub-donnees" onclick="showSaisieSub('donnees')" style="padding:9px 18px;border:1.5px solid #2D2660;border-radius:20px;background:white;color:#2D2660;font-weight:700;font-size:.78rem;cursor:pointer">🗄️ Données</button>
@@ -1010,22 +1011,27 @@ function askDeleteBilan(name,sha,joueur){
         <div><label style="font-size:.72rem;font-weight:700;color:#555">Date 1er match</label>
           <input type="date" id="jf-match" style="width:100%;padding:9px 12px;border:1.5px solid #DDD;border-radius:8px;font-size:.82rem;margin-top:3px"></div>
       </div>
-      <div style="margin-top:14px">
-        <div style="font-size:.75rem;font-weight:800;color:#6B5CA5;margin-bottom:8px">IPRRS — Questionnaire de confiance (6 × /10)</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px" id="jf-iprrs-grid">
-          <div style="display:flex;align-items:center;gap:8px"><span style="flex:1;font-size:.72rem;color:#555">Pratiquer football</span><input type="number" id="jf-iprrs-0" min="0" max="10" style="width:64px;padding:7px;border:1.5px solid #DDD;border-radius:8px;text-align:center"></div>
-          <div style="display:flex;align-items:center;gap:8px"><span style="flex:1;font-size:.72rem;color:#555">Pratiquer sans douleurs</span><input type="number" id="jf-iprrs-1" min="0" max="10" style="width:64px;padding:7px;border:1.5px solid #DDD;border-radius:8px;text-align:center"></div>
-          <div style="display:flex;align-items:center;gap:8px"><span style="flex:1;font-size:.72rem;color:#555">Me donner à 100 %</span><input type="number" id="jf-iprrs-2" min="0" max="10" style="width:64px;padding:7px;border:1.5px solid #DDD;border-radius:8px;text-align:center"></div>
-          <div style="display:flex;align-items:center;gap:8px"><span style="flex:1;font-size:.72rem;color:#555">Ne pas penser à la blessure</span><input type="number" id="jf-iprrs-3" min="0" max="10" style="width:64px;padding:7px;border:1.5px solid #DDD;border-radius:8px;text-align:center"></div>
-          <div style="display:flex;align-items:center;gap:8px"><span style="flex:1;font-size:.72rem;color:#555">Confiance partie blessée</span><input type="number" id="jf-iprrs-4" min="0" max="10" style="width:64px;padding:7px;border:1.5px solid #DDD;border-radius:8px;text-align:center"></div>
-          <div style="display:flex;align-items:center;gap:8px"><span style="flex:1;font-size:.72rem;color:#555">Capacités tech/physiques</span><input type="number" id="jf-iprrs-5" min="0" max="10" style="width:64px;padding:7px;border:1.5px solid #DDD;border-radius:8px;text-align:center"></div>
-        </div>
-      </div>
       <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap">
         <button onclick="saveJoueur()" style="padding:11px 24px;border:none;border-radius:10px;background:#22C55E;color:white;font-weight:800;font-size:.82rem;cursor:pointer">💾 Enregistrer le joueur</button>
         <button onclick="resetJoueurForm()" style="padding:11px 18px;border:1.5px solid #DDD;border-radius:10px;background:white;color:#666;font-weight:600;font-size:.78rem;cursor:pointer">Annuler</button>
         <button id="jf-delete" onclick="deleteJoueur()" style="display:none;padding:11px 18px;border:1.5px solid #EF4444;border-radius:10px;background:white;color:#EF4444;font-weight:700;font-size:.78rem;cursor:pointer;margin-left:auto">🗑️ Supprimer ce joueur</button>
       </div>
+    </div>
+  </div>
+
+  <!-- IPRRS — TEST DE FIN DE PROTOCOLE -->
+  <div id="saisie-iprrs" style="display:none">
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-title">🎯 Test IPRRS — dernier entretien du protocole</div>
+      <div style="font-size:.78rem;color:#7C2D12;background:#FFF7ED;border:1.5px solid #FB923C;border-radius:10px;padding:10px 14px;margin-bottom:14px">
+        ⚠️ Ce test se réalise lors du <b>DERNIER entretien</b> du protocole, juste avant de publier le bilan de fin — il n'a rien à voir avec la création du profil joueur.
+      </div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:12px">
+        <select id="ir-joueur" onchange="buildIprrsForm()" style="flex:1;min-width:220px;padding:10px 12px;border:1.5px solid #DDD;border-radius:10px;font-size:.85rem;font-weight:600"></select>
+        <input type="date" id="ir-date" style="padding:10px 12px;border:1.5px solid #DDD;border-radius:10px;font-size:.82rem">
+      </div>
+      <div id="ir-existing" style="font-size:.78rem;margin-bottom:12px"></div>
+      <div id="ir-form" style="display:none"></div>
     </div>
   </div>
 
@@ -1152,7 +1158,7 @@ function askDeleteBilan(name,sha,joueur){
 
 </div>
 <script>
-/* ══ MOTEUR TFC EMBARQUÉ (schéma v3 · rapport v7 gelé · bilan paysage v9 PDF) ══ */
+/* ══ MOTEUR TFC EMBARQUÉ — VERSION FINALE (schéma v4 : fatigue/10, etatSuivi, zones, IPRRS daté) ══ */
 /* ═══════════════════════════════════════════════════════════════════
    TFC — Moteur ODS unifié (port JavaScript des scripts Python)
    Décisions validées :
@@ -2636,7 +2642,7 @@ function deriveEtatSuivi(statut){
 
 // ── ODS (déjà parsé par loadWorkbook) → JSON de stockage ─────────────
 function odsToJson(data){
-  var out = {version: 3, profils: [], suivi: [], alertes: [], matchs: []};  // v2 : fatigue /10 ; v3 : etatSuivi + zones
+  var out = {version: 4, profils: [], suivi: [], alertes: [], matchs: []};  // v2 : fatigue /10 ; v3 : etatSuivi + zones ; v4 : iprrsDate
 
   // Profils : un par joueur, la DERNIÈRE ligne gagne (comportement identique au moteur/pidx)
   var byPlayer = {};
@@ -2670,6 +2676,7 @@ function odsToJson(data){
       dateReprise: isoOf(dr),
       datePremierMatch: isoOf(dm),
       iprrs: iprrs.slice(0,6),
+      iprrsDate: null,
       etatSuivi: deriveEtatSuivi(etat)
     });
   });
@@ -2805,6 +2812,12 @@ function upgradeStore(json){
       if(x.courbaturesLateralite === undefined) x.courbaturesLateralite = '';
     });
     json.version = 3; upgraded = true;
+  }
+  if(json.version < 4){
+    (json.profils || []).forEach(function(p){
+      if(p.iprrsDate === undefined) p.iprrsDate = null;
+    });
+    json.version = 4; upgraded = true;
   }
   return upgraded;
 }
@@ -3163,7 +3176,7 @@ function frOfIso(iso){ if(!iso) return '—'; var m=iso.match(/(\d{4})-(\d{2})-(
 // ── Navigation interne ──────────────────────────────────────────────
 function showSaisieSub(sub){
   saisieSub = sub;
-  ['quotidien','joueurs','alertes','matchs','donnees'].forEach(function(s){
+  ['quotidien','joueurs','iprrs','alertes','matchs','donnees'].forEach(function(s){
     var sec = document.getElementById('saisie-'+s);
     if(sec) sec.style.display = s===sub ? '' : 'none';
     var btn = document.getElementById('ssub-'+s);
@@ -3179,8 +3192,15 @@ function renderSaisie(){
   if(!storeLoaded) return;
   if(saisieSub==='quotidien') renderQuotidien();
   else if(saisieSub==='joueurs') renderJoueurs();
+  else if(saisieSub==='iprrs') renderIprrs();
   else if(saisieSub==='alertes') renderAlertes();
   else if(saisieSub==='matchs') renderMatchs();
+}
+
+function findProfil(nom){
+  var p = null;
+  storeData.profils.forEach(function(x){ if(x.joueur===nom) p=x; });
+  return p;
 }
 
 // ═══ 1. QUESTIONNAIRE QUOTIDIEN ═════════════════════════════════════
@@ -3405,6 +3425,12 @@ function renderJoueurs(){
     list.innerHTML = profils.map(function(p){
       var nSuivi = storeData.suivi.filter(function(s){ return s.joueur===p.joueur; }).length;
       var enCours = p.etatSuivi !== 'termine';
+      var hasVal = p.iprrs && p.iprrs.some(function(v){ return v>0; });
+      var iprrsBadge = p.iprrsDate
+        ? '<span style="font-size:.64rem;color:#15803D;font-weight:700">IPRRS \u2713 '+frOfIso(p.iprrsDate)+'</span>'
+        : hasVal
+          ? '<span style="font-size:.64rem;color:#B45309;font-weight:700">IPRRS import\u00E9 (date inconnue)</span>'
+          : '<span style="font-size:.64rem;color:#999;font-weight:600">IPRRS non fait</span>';
       var toggle = '<button onclick="toggleEtatSuivi(\''+p.joueur.replace(/'/g,"\\'")+'\')" title="Cliquer pour basculer" '
         + 'style="padding:6px 14px;border-radius:16px;border:2px solid '+(enCours?'#22C55E':'#999')+';background:'+(enCours?'#DCFCE7':'#F3F4F6')+';color:'+(enCours?'#15803D':'#666')+';cursor:pointer;font-size:.72rem;font-weight:800;flex-shrink:0">'
         + (enCours?'\uD83D\uDFE2 En cours':'\u2713 Terminé')+'</button>';
@@ -3412,7 +3438,8 @@ function renderJoueurs(){
         + toggle
         + '<div style="flex:1;min-width:0"><div style="font-weight:700;color:#2D2660">'+p.joueur+'</div>'
         + '<div style="font-size:.72rem;color:#666">'+[p.categorie, p.blessure, p.statutProtocole].filter(Boolean).join(' · ')+'</div>'
-        + '<div style="font-size:.68rem;color:#999">Reprise '+frOfIso(p.dateReprise)+' · 1er match '+frOfIso(p.datePremierMatch)+' · '+nSuivi+' saisie(s)</div></div>'
+        + '<div style="font-size:.68rem;color:#999">Reprise '+frOfIso(p.dateReprise)+' · 1er match '+frOfIso(p.datePremierMatch)+' · '+nSuivi+' saisie(s)</div>'
+        + '<div style="margin-top:2px">'+iprrsBadge+'</div></div>'
         + '<button onclick="editJoueur(\''+p.joueur.replace(/'/g,"\\'")+'\')" style="padding:6px 14px;border:1.5px solid #2D2660;border-radius:8px;background:white;color:#2D2660;cursor:pointer;font-size:.72rem;font-weight:700">Modifier</button>'
         + '</div>';
     }).join('');
@@ -3433,7 +3460,6 @@ function resetJoueurForm(){
   editJoueurNom = null;
   document.getElementById('jf-title').textContent = '➕ Nouveau joueur';
   ['jf-nom','jf-cat','jf-blessure','jf-etat','jf-focus','jf-vigilance','jf-reprise','jf-match'].forEach(function(id){ document.getElementById(id).value=''; });
-  for(var i=0;i<6;i++) document.getElementById('jf-iprrs-'+i).value='';
   document.getElementById('jf-delete').style.display='none';
 }
 
@@ -3451,7 +3477,6 @@ function editJoueur(nom){
   document.getElementById('jf-vigilance').value = p.pointsVigilance||'';
   document.getElementById('jf-reprise').value = p.dateReprise||'';
   document.getElementById('jf-match').value = p.datePremierMatch||'';
-  for(var i=0;i<6;i++) document.getElementById('jf-iprrs-'+i).value = (p.iprrs && p.iprrs[i]!==undefined) ? p.iprrs[i] : '';
   document.getElementById('jf-delete').style.display='';
   document.getElementById('jf-nom').scrollIntoView({behavior:'smooth', block:'center'});
 }
@@ -3459,11 +3484,6 @@ function editJoueur(nom){
 async function saveJoueur(){
   var nom = document.getElementById('jf-nom').value.trim();
   if(!nom){ alert('Le nom du joueur est obligatoire.'); return; }
-  var iprrs = [];
-  for(var i=0;i<6;i++){
-    var v = Number(document.getElementById('jf-iprrs-'+i).value);
-    iprrs.push(isNaN(v) ? 0 : Math.max(0, Math.min(10, v)));
-  }
   var obj = {
     joueur: nom,
     categorie: document.getElementById('jf-cat').value.trim(),
@@ -3473,13 +3493,18 @@ async function saveJoueur(){
     pointsVigilance: document.getElementById('jf-vigilance').value.trim(),
     dateReprise: document.getElementById('jf-reprise').value || null,
     datePremierMatch: document.getElementById('jf-match').value || null,
-    iprrs: iprrs,
+    iprrs: [0,0,0,0,0,0],
+    iprrsDate: null,
     etatSuivi: 'en_cours'
   };
-  // conserver l'état existant en cas de modification
+  // IPRRS et état ne se saisissent pas ici : on préserve toujours ce qui existe déjà
   var prev = null;
   storeData.profils.forEach(function(x){ if(x.joueur===(editJoueurNom||nom)) prev=x; });
-  if(prev && prev.etatSuivi) obj.etatSuivi = prev.etatSuivi;
+  if(prev){
+    if(prev.etatSuivi) obj.etatSuivi = prev.etatSuivi;
+    if(prev.iprrs) obj.iprrs = prev.iprrs;
+    if(prev.iprrsDate !== undefined) obj.iprrsDate = prev.iprrsDate;
+  }
   var replaced = false;
   var target = editJoueurNom || nom;
   for(var k=0;k<storeData.profils.length;k++){
@@ -3513,6 +3538,75 @@ async function deleteJoueur(){
   storeData.matchs = storeData.matchs.filter(function(m){ return m.joueur!==editJoueurNom; });
   var ok = await storeSave('Suppression '+editJoueurNom);
   if(ok){ resetJoueurForm(); renderJoueurs(); }
+}
+
+// ═══ 2b. IPRRS — TEST DE FIN DE PROTOCOLE ═══════════════════════════
+function renderIprrs(){
+  var sel = document.getElementById('ir-joueur');
+  var current = sel.value;
+  var profils = profilsActifs();
+  sel.innerHTML = '<option value="">— Choisir un joueur —</option>'
+    + profils.map(function(p){ return '<option value="'+p.joueur+'">'+p.joueur+'</option>'; }).join('');
+  if(current) sel.value = current;
+  if(!document.getElementById('ir-date').value) document.getElementById('ir-date').value = todayIso();
+  buildIprrsForm();
+}
+
+function buildIprrsForm(){
+  var wrap = document.getElementById('ir-form');
+  var joueur = document.getElementById('ir-joueur').value;
+  var ex = document.getElementById('ir-existing');
+  if(!joueur){ wrap.style.display='none'; ex.innerHTML=''; return; }
+  wrap.style.display='';
+  var p = findProfil(joueur);
+  var hasVal = p && p.iprrs && p.iprrs.some(function(v){ return v>0; });
+  if(p && p.iprrsDate){
+    ex.innerHTML = '<span style="color:#B45309;font-weight:700">\u270F\uFE0F Test d\u00E9j\u00E0 r\u00E9alis\u00E9 le '+frOfIso(p.iprrsDate)+' pour '+joueur+' \u2014 vous le corrigez.</span>';
+  } else if(hasVal){
+    ex.innerHTML = '<span style="color:#B45309;font-weight:700">\u26A0\uFE0F Valeurs import\u00E9es de l\'ODS pour '+joueur+' (date du test inconnue) \u2014 confirmez une date pour valider.</span>';
+  } else {
+    ex.innerHTML = '<span style="color:#22C55E;font-weight:600">Aucun test enregistr\u00E9 pour '+joueur+' \u2014 nouveau test.</span>';
+  }
+  var vals = (p && p.iprrs && p.iprrs.length===6) ? p.iprrs.slice() : [0,0,0,0,0,0];
+
+  var html = '';
+  TFCStore.IPRRS_CANON.forEach(function(label, i){
+    var val = vals[i];
+    html += '<div style="margin-bottom:12px">'
+      + '<div style="font-size:.8rem;font-weight:700;color:#2D2660;margin-bottom:5px">'+label+' <span style="font-weight:400;color:#999;font-size:.66rem">/10</span></div>'
+      + '<div style="display:flex;flex-wrap:wrap;gap:4px" id="irbtns-'+i+'">';
+    for(var x=0;x<=10;x++){
+      var active = Number(val)===x;
+      html += '<button type="button" onclick="irSet('+i+','+x+')" data-v="'+x+'" style="min-width:32px;padding:8px 0;border-radius:8px;border:1.5px solid '+(active?'#6B5CA5':'#DDD')+';background:'+(active?'#6B5CA5':'white')+';color:'+(active?'white':'#444')+';cursor:pointer;font-size:.78rem;font-weight:700">'+x+'</button>';
+    }
+    html += '</div></div>';
+  });
+  html += '<button onclick="saveIprrs()" style="padding:12px 28px;border:none;border-radius:10px;background:#22C55E;color:white;font-weight:800;font-size:.88rem;cursor:pointer;width:100%">\uD83D\uDCBE '+((p && p.iprrsDate)?'Mettre \u00E0 jour le test IPRRS':'Enregistrer le test IPRRS')+'</button>';
+
+  wrap.innerHTML = html;
+  window._irVals = vals.slice();
+}
+
+function irSet(i, val){
+  window._irVals[i] = val;
+  var box = document.getElementById('irbtns-'+i);
+  Array.prototype.forEach.call(box.querySelectorAll('button'), function(b){
+    var active = Number(b.dataset.v) === val;
+    b.style.background = active ? '#6B5CA5' : 'white';
+    b.style.color = active ? 'white' : '#444';
+    b.style.borderColor = active ? '#6B5CA5' : '#DDD';
+  });
+}
+
+async function saveIprrs(){
+  var joueur = document.getElementById('ir-joueur').value;
+  if(!joueur) return;
+  var p = findProfil(joueur);
+  if(!p) return;
+  p.iprrs = window._irVals.slice();
+  p.iprrsDate = document.getElementById('ir-date').value || todayIso();
+  var ok = await storeSave('Test IPRRS '+joueur+' \u2014 '+frOfIso(p.iprrsDate));
+  if(ok){ buildIprrsForm(); renderJoueurs(); }
 }
 
 // ═══ 3. ALERTES ═════════════════════════════════════════════════════
