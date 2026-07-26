@@ -1,5 +1,5 @@
 {
- "version": 3,
+ "version": 4,
  "profils": [
   {
    "joueur": "Frederique Efuele",
@@ -18,7 +18,8 @@
     0,
     0
    ],
-   "etatSuivi": "en_cours"
+   "etatSuivi": "en_cours",
+   "iprrsDate": null
   },
   {
    "joueur": "Darren Bique",
@@ -37,7 +38,8 @@
     0,
     0
    ],
-   "etatSuivi": "en_cours"
+   "etatSuivi": "en_cours",
+   "iprrsDate": null
   }
  ],
  "suivi": [
