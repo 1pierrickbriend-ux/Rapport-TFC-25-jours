@@ -40,6 +40,26 @@
    ],
    "etatSuivi": "en_cours",
    "iprrsDate": "2026-07-26"
+  },
+  {
+   "joueur": "Aymen Amaaouch",
+   "categorie": "N2",
+   "blessure": "Lésion grande 1 psoas Droit (fausse donnée)",
+   "statutProtocole": "En attente",
+   "focusPrevention": "Renforcement concentrique + rééquilibrage force",
+   "pointsVigilance": "Asymétrie psoas D/G",
+   "dateReprise": "2026-08-17",
+   "datePremierMatch": null,
+   "iprrs": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "iprrsDate": null,
+   "etatSuivi": "en_cours"
   }
  ],
  "suivi": [
