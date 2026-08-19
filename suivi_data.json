@@ -110,6 +110,22 @@
    "courbaturesZone": "Quadriceps",
    "courbaturesLateralite": "Unilatéral gauche",
    "commentaire": ""
+  },
+  {
+   "id": "s_mt03woyq_2go",
+   "date": "2026-08-19",
+   "joueur": "Aymen Amaaouch",
+   "douleur": 0,
+   "courbatures": 1,
+   "fatigue": 1,
+   "soins": 2,
+   "prevention": 2,
+   "confiancePhysique": 8,
+   "confianceMentale": 7,
+   "douleurZone": "",
+   "courbaturesZone": "Psoas / fléchisseurs de hanche",
+   "courbaturesLateralite": "Bilatéral",
+   "commentaire": ""
   }
  ],
  "alertes": [],
